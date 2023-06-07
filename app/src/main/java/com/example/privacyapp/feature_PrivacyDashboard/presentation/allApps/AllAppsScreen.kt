@@ -1,5 +1,6 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.map
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
-
 @Composable
-fun MapScreen() {
+fun AllAppsScreen() {
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "MapScreen", color = Color.Black)
+        Text(text = "All Apps", color = Color.Black)
     }
 }
