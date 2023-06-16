@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -43,13 +45,34 @@ class AppsViewModel @Inject constructor(
                     appUseCases.addApp(app)
                 }
             }
-        getAppsFromDB()
+        getAppsFromDB(AppOrder.Title(OrderType.Ascending))
+    }
+
+    fun onEvent(event: AppsEvent){
+        when(event) {
+            is AppsEvent.Order -> {
+                if (state.value.appOrder::class == event.appOrder::class &&
+                    state.value.appOrder.orderType == event.appOrder.orderType
+                ) {
+                    return
+                }
+                getAppsFromDB(event.appOrder)
+                _state.value = state.value.copy(
+                    appOrder = event.appOrder
+                )
+            }
+            is AppsEvent.ToggleOrderSection -> {
+                _state.value = state.value.copy(
+                    isOrderSectionVisible = !state.value.isOrderSectionVisible
+                )
+            }
+        }
     }
 
 
-    private fun getAppsFromDB() {
+    private fun getAppsFromDB(appOrder: AppOrder) {
         getAppsJob?.cancel()
-        getAppsJob = appUseCases.getApps().onEach { app ->
+        getAppsJob = appUseCases.getApps(appOrder).onEach { app ->
             _state.value = state.value.copy(
                 apps = app
             )

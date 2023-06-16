@@ -48,7 +48,10 @@ fun AppItem(
             .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = rememberDrawablePainter(getAppIcon(app.packageName)), contentDescription = null)
+
+                Image(painter = rememberDrawablePainter(getAppIcon(app.packageName)), contentDescription = null)
+
+
             Spacer(modifier = Modifier.width(10.dp))
             Column() {
                 Text(text = app.appName)

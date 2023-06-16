@@ -2,7 +2,6 @@ package com.example.privacyapp.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDao
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.LocationRepositoryImpl
@@ -12,7 +11,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AddApp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AddLocation
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.DeleteAllApps
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.GetAppIcons
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.GetApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.GetLocations
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.InitApps
