@@ -16,12 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AllAppsScreen
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AppsViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.appDetails.AppDetailsScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.DashboardScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.FavoritesScreen
@@ -33,7 +36,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.Navigat
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(appsViewModel: AppsViewModel) {
+
     val navController = rememberNavController()
     val items = listOf(
         NavigationItem.Dashboard,
@@ -86,7 +90,7 @@ fun BottomNavigationBar() {
         }
     }) {
         it
-        NavigationController(navController = navController)
+        NavigationController(navController = navController, appsViewModel = appsViewModel)
     }
 
 }
@@ -96,7 +100,7 @@ fun BottomNavigationBar() {
  * Function with the Route/Navigation logic
  */
 @Composable
-fun NavigationController(navController: NavHostController) {
+fun NavigationController(navController: NavHostController, appsViewModel: AppsViewModel) {
     NavHost(navController = navController, startDestination = NavigationItem.Dashboard.route) {
 
         composable(NavigationItem.Dashboard.route) {
@@ -104,7 +108,7 @@ fun NavigationController(navController: NavHostController) {
         }
 
         composable(NavigationItem.AllApps.route) {
-            AllAppsScreen()
+            AllAppsScreen(navController,appsViewModel)
         }
 
         composable(NavigationItem.Favorites.route) {

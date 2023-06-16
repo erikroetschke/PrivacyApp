@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -55,7 +57,8 @@ dependencies {
     implementation platform('androidx.compose:compose-bom:2022.10.00')
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
+    //implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.ui:ui-tooling:1.4.3'
     implementation 'androidx.compose.material3:material3'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -64,6 +67,7 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
 
     //navigation
     implementation 'androidx.navigation:navigation-compose:2.5.3'
@@ -77,4 +81,30 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
+
+    // roomDB
+    implementation("androidx.room:room-runtime:2.5.1")
+    kapt "androidx.room:room-compiler:2.5.1"
+        // To use Kotlin annotation processing tool (kapt)
+    kapt("androidx.room:room-compiler:2.5.1")
+    implementation 'androidx.room:room-ktx:2.5.1'
+
+    //DaggerHilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt "com.google.dagger:hilt-android-compiler:2.44"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+
+
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+
+    //accompanist
+    implementation "com.google.accompanist:accompanist-drawablepainter:0.28.0"
+}
+
+kapt {
+    correctErrorTypes = true
 }
