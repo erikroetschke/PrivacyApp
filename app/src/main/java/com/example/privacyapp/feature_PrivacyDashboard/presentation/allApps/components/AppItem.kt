@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,28 +42,37 @@ fun AppItem(
     modifier: Modifier = Modifier
     ){
 
-    Box(modifier = modifier
+    Card(modifier = modifier
         .clip(RoundedCornerShape(10.dp))
-        .background(color = Color.Gray)
+        .background(color = Color.White)
     ) {
         Row(modifier = Modifier
             .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            Box(Modifier.height(45.dp).width(45.dp)) {
                 Image(painter = rememberDrawablePainter(getAppIcon(app.packageName)), contentDescription = null)
-
+            }
 
             Spacer(modifier = Modifier.width(10.dp))
             Column() {
-                Text(text = app.appName)
+                Text(text = app.appName, style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(10.dp))
-                Box(modifier = Modifier
-                    .clip(RoundedCornerShape(2.dp))
-                    .height(10.dp)
-                    .width(app.estimatedLocationRequestFrequency.dp)
-                    .background(color = Color.Green)
-                )
+                Box() {
+                    Box(modifier = Modifier
+                        .clip(RoundedCornerShape(2.dp))
+                        .height(10.dp)
+                        .fillMaxWidth()
+                        .background(color = Color.DarkGray)
+                    )
+                    Box(modifier = Modifier
+                        .clip(RoundedCornerShape(2.dp))
+                        .height(10.dp)
+                        .width(app.estimatedLocationRequestFrequency.dp)
+                        .background(color = Color.Green)
+                    )
+                }
             }
         }
     }

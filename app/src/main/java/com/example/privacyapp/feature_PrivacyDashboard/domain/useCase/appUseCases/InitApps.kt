@@ -1,7 +1,9 @@
-package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase
+package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases
 
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 
@@ -19,7 +21,12 @@ class InitApps(
 
         val appsList = mutableListOf<App>()
         // get list of all the apps installed
-        val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        var packages: List<ApplicationInfo> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+            )
+        } else {
+            packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        }
         for (applicationInfo in packages) {
             var packageName = ""
             var appName = ""
@@ -31,15 +38,18 @@ class InitApps(
                 // System application
             } else {
                 // Installed by user
-                if (applicationInfo.name == null) {
+/*                if (applicationInfo.name == null) {
                     continue
+                }*/
+
+                var packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
+                } else {
+                    packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS)
                 }
-                val packageInfo = packageManager.getPackageInfo(
-                    applicationInfo.packageName,
-                    PackageManager.GET_PERMISSIONS
-                )
+
                 packageName = packageInfo.packageName
-                appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)) as String
+                appName = packageManager.getApplicationLabel(applicationInfo) as String
                 //Get Permissions
                 val requestedPermissions = packageInfo.requestedPermissions
                 if (requestedPermissions != null) {
@@ -63,8 +73,11 @@ class InitApps(
                 15,
                 false
             )
-            appsList.add(app)
+            if (app.packageName != ""){
+                appsList.add(app)
+            }
+
         }
-        return appsList
+        return appsList.sortedBy { it.appName.lowercase() }
     }
 }

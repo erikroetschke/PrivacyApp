@@ -8,6 +8,6 @@ data class Location(
     val longitude: Double,
     val latitude: Double,
     @PrimaryKey val timestamp: Long,
-    val processed: Boolean
-    //val Apps: List<App>
+    val processed: Boolean,
+    var locationUsed: Boolean?
 )

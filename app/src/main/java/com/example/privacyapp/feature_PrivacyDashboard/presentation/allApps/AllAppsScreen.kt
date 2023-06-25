@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ import androidx.navigation.NavController
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.components.AppItem
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.components.OrderSection
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 import javax.inject.Inject
 
 
@@ -46,21 +48,21 @@ fun AllAppsScreen(
 ) {
     val state = viewModel.state.value
 
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "All Apps",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
+                    Text(
+                        text = "All Apps",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
                 IconButton(
                     onClick = {
                         viewModel.onEvent(AppsEvent.ToggleOrderSection)
@@ -88,10 +90,6 @@ fun AllAppsScreen(
                 )
             }
 
-            /*Spacer(modifier = Modifier.height(5.dp))
-        Text(text = "All Apps", color = Color.Black, style = MaterialTheme.typography.headlineLarge,)
-        Spacer(modifier = Modifier.height(10.dp))*/
-
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.apps) { app ->
                     AppItem(
@@ -100,11 +98,10 @@ fun AllAppsScreen(
                             .fillMaxWidth()
                             .padding(10.dp, 10.dp, 10.dp, 0.dp)
                             .clickable {
-
+                                navController.navigate(NavigationItem.AppDetails.route + "/${app.packageName}")
                             }
                     )
                 }
             }
         }
-
 }

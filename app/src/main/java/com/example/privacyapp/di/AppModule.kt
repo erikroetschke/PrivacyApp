@@ -4,17 +4,25 @@ import android.app.Application
 import androidx.room.Room
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppRepositoryImpl
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppUsageRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.LocationRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AddApp
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AddLocation
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.AddApp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.AddLocation
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.DeleteAllApps
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.GetApps
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.GetLocations
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.InitApps
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.DeleteAllApps
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.DeleteApp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetApp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetApps
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetFavoriteApps
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocations
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.InitApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,7 +40,7 @@ object AppModule {
             app,
             Database::class.java,
             Database.DATABASE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -46,7 +54,8 @@ object AppModule {
     fun provideLocationUseCases(repository: LocationRepository): LocationUseCases {
         return LocationUseCases(
             getLocations = GetLocations(repository),
-            addLocation = AddLocation(repository)
+            addLocation = AddLocation(repository),
+            getLocationsWithLocationUsedIsNull = GetLocationsWithLocationUsedIsNull(repository)
         )
     }
 
@@ -58,12 +67,29 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideAppUsageRepository(db: Database): AppUsageRepository {
+        return AppUsageRepositoryImpl(db.appUsageDao)
+    }
+
+    @Provides
+    @Singleton
     fun provideAppUseCases(repository: AppRepository): AppUseCases {
         return AppUseCases(
             getApps = GetApps(repository),
             addApp = AddApp(repository),
             deleteAllApps = DeleteAllApps(repository),
-            initApps = InitApps()
+            initApps = InitApps(),
+            getApp = GetApp(repository),
+            getFavoriteApps = GetFavoriteApps(repository),
+            deleteApp = DeleteApp(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppUsageUseCases(repository: AppUsageRepository, locationRepository: LocationRepository, appRepository: AppRepository): AppUsageUseCases {
+        return AppUsageUseCases(
+            computeUsage = ComputeUsage(repository, locationRepository, appRepository)
         )
     }
 }

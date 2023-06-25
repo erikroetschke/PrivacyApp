@@ -24,6 +24,10 @@ class LocationRepositoryImpl(
         return dao.getLocationsbyIntervall(timestampStart, timestampEnd)
     }
 
+    override suspend fun getLocationsWithLocationUsedIsNull(): List<Location> {
+        return dao.getLocationsWithLocationUsedIsNull()
+    }
+
     override suspend fun insertLocation(location: Location) {
         return dao.insertLocation(location)
     }

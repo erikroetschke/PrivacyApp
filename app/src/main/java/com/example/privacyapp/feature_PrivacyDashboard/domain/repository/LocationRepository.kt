@@ -15,6 +15,8 @@ interface LocationRepository {
 
     fun getLocationsbyIntervall(timestampStart: Long, timestampEnd: Long): Flow<List<Location>>
 
+    suspend fun getLocationsWithLocationUsedIsNull () : List<Location>
+
     suspend fun insertLocation(location: Location)
 
     suspend fun deletelocation(location: Location)

@@ -17,5 +17,5 @@ data class AppUsage(
     val packageName: String,
     val timestamp: Long,
     val foreground: Boolean,
-    val background: Boolean
+    var background: Boolean
 )

@@ -1,14 +1,14 @@
-package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase
+package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases
 
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetLocations(
+class GetLocationsWithLocationUsedIsNull(
     private val repository: LocationRepository
 ) {
 
-    operator fun invoke(): Flow<List<Location>> {
-        return repository.getLocations()
+    suspend operator fun invoke(): List<Location> {
+        return repository.getLocationsWithLocationUsedIsNull()
     }
 }

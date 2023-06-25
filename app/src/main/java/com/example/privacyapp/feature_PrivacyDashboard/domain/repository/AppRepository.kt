@@ -1,11 +1,12 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.repository
 
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppAndAppUsage
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
 
-    fun getApps(): Flow<List<App>>
+    suspend fun getApps(): List<App>
 
     suspend fun getAppByName(packageName: String): App?
 
@@ -16,4 +17,6 @@ interface AppRepository {
     suspend fun deleteApp(app: App)
 
     suspend fun deleteAllApps()
+
+    suspend fun getAppWithUsage(packageName: String): List<AppAndAppUsage>
 }

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.room.PrimaryKey
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDao
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppAndAppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import kotlinx.coroutines.flow.Flow
@@ -13,8 +14,12 @@ import kotlinx.coroutines.flow.Flow
 class AppRepositoryImpl(
     private val dao: AppDao
 ) : AppRepository {
-    override fun getApps(): Flow<List<App>> {
+    override suspend fun getApps(): List<App> {
         return dao.getApps()
+    }
+
+    override suspend fun getAppWithUsage(packageName: String): List<AppAndAppUsage> {
+        return dao.getAppWithUsage(packageName)
     }
 
     override suspend fun getAppByName(packageName: String): App? {

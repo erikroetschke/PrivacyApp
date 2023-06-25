@@ -22,5 +22,6 @@ sealed class NavigationItem(val route:String, val label:String, val icon:ImageVe
     object Favorites : NavigationItem("Favorites", "Favorites", Icons.Default.Favorite)
     //object Map : NavigationItem(Resources.getSystem().getString(R.string.map), Resources.getSystem().getString(R.string.map), Icons.Default.LocationOn)
     object Map : NavigationItem("Map", "Map", Icons.Default.LocationOn)
+    object AppDetails : NavigationItem("AppDetails", "AppDetails", Icons.Default.LocationOn)
 
 }
