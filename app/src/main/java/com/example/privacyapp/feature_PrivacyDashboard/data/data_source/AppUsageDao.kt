@@ -23,4 +23,7 @@ interface AppUsageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAppUsage(appUsage: AppUsage)
+
+    @Query("SELECT * FROM appusage WHERE packageName =:packageName AND timestamp >= :startInterval")
+    suspend fun getAppUsageStatsSinceTimestamp(packageName: String, startInterval: Long): List<AppUsage>
 }

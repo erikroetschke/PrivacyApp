@@ -15,4 +15,6 @@ interface AppUsageRepository {
 
     suspend fun insertAppUsage(appUsage: AppUsage)
 
+    suspend fun getAppUsageStatsSinceTimestamp(packageName: String, startInterval: Long): List<AppUsage>
+
 }

@@ -18,5 +18,5 @@ interface AppRepository {
 
     suspend fun deleteAllApps()
 
-    suspend fun getAppWithUsage(packageName: String): List<AppAndAppUsage>
+    suspend fun getAppWithUsage(packageName: String): AppAndAppUsage
 }

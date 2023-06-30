@@ -18,7 +18,7 @@ class GetApps(
                 when (appOrder) {
                     is AppOrder.Title -> repository.getApps().sortedBy { it.appName.lowercase() }
                     is AppOrder.LocationUsage -> repository.getApps()
-                        .sortedBy { it.estimatedLocationRequestFrequency }
+                        .sortedBy { it.numberOfEstimatedRequests }
                 }
             }
 
@@ -28,7 +28,7 @@ class GetApps(
                         .sortedByDescending { it.appName.lowercase() }
 
                     is AppOrder.LocationUsage -> repository.getApps()
-                        .sortedByDescending { it.estimatedLocationRequestFrequency }
+                        .sortedByDescending { it.numberOfEstimatedRequests }
                 }
             }
         }

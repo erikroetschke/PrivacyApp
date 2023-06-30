@@ -34,7 +34,11 @@ class ComputeUsage(
         val appUsages =
             HashMap<String, AppUsage>() //final appUsage objects in a Hashmap to access them easily
         var newOuterForLoop = false
-        val listAppsWithForegroundPermission = appRepository.getApps().filter { it.ACCESS_COARSE_LOCATION }
+        //Get apps of which usage is relevant, ACCESS_CORSE_LOCATION is not considered as relevant, as it has am accuracy of 2km
+        val listAppsWithForegroundPermission =
+            appRepository.getApps().filter { it.ACCESS_FINE_LOCATION }
+        val listAppsWithBackgroundPermission =
+            appRepository.getApps().filter { it.ACCESS_BACKGROUND_LOCATION }
 
         //get usage Stats
         val usageStatsManager =
@@ -43,7 +47,6 @@ class ComputeUsage(
             locationsCopy.first().timestamp,
             locationsCopy.last().timestamp
         )
-
 
 
         for ((counter, location) in locationsCopy.withIndex()) {
@@ -61,33 +64,40 @@ class ComputeUsage(
                     }
                     newOuterForLoop = false
 
+                    //get packageName of Event and break if package has no relevant permissions
                     val packageName = currentEvent.packageName
+                    var foreground = false
+                    var background = false
+                    if (listAppsWithForegroundPermission.any { it.packageName == packageName }) {
+                        foreground = true
+                    }
+                    if (listAppsWithBackgroundPermission.any { it.packageName == packageName }) {
+                        background =
+                            true // Background permission cant be granted without normal foreground permission
+                    }
+
                     //update appStatusMap
-                    if (nonSystemsAppsList.containsKey(packageName)) {
-                        when (currentEvent.eventType) {
-                            UsageEvents.Event.ACTIVITY_RESUMED -> {
-                                locationUsed = true
-                                appStatusMap[packageName] = AppStatus.FOREGROUND
-                                //create new AppUsage, if ACTIVITY_RESUMED occurs multiple times between two locations within the same package, it will be overwritten
-                                appUsages[packageName] = AppUsage(
-                                    packageName, location.timestamp,
-                                    foreground = true,
-                                    background = false
-                                )
-                            }
+                    if (foreground && nonSystemsAppsList.containsKey(packageName)) {
+                        if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_RESUMED) {
+                            locationUsed = true
+                            appStatusMap[packageName] = AppStatus.FOREGROUND
+                            //create new AppUsage, if ACTIVITY_RESUMED occurs multiple times between two locations within the same package, it will be overwritten
+                            appUsages[packageName] = AppUsage(
+                                packageName, location.timestamp,
+                                foreground = true,
+                                background = false
+                            )
+                        }
 
-                            UsageEvents.Event.ACTIVITY_PAUSED -> {
-                                locationUsed = true
-                                appStatusMap[packageName] = AppStatus.BACKGROUND
-                                //As it must have been in Foreground before, add also background
-                                appUsages[packageName]?.background = true
-                            }
+                        if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_PAUSED && background) {
+                            locationUsed = true
+                            appStatusMap[packageName] = AppStatus.BACKGROUND
+                            //As it must have been in Foreground before, add also background
+                            appUsages[packageName]?.background = true
+                        }
 
-                            UsageEvents.Event.ACTIVITY_STOPPED -> {
-                                appStatusMap[packageName] = AppStatus.NOT_RUNNING
-                            }
-
-                            //TODO implement foregroundservice start and end 
+                        if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_STOPPED) {
+                            appStatusMap[packageName] = AppStatus.NOT_RUNNING
                         }
                     }
                 }

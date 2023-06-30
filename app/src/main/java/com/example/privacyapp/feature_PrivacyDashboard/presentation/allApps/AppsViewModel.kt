@@ -25,14 +25,12 @@ class AppsViewModel @Inject constructor(
     private val _state = mutableStateOf(AppsState())
     val state: MutableState<AppsState> = _state
 
-    private var getAppsJob: Job? = null
-
+    var maxLocationUsage = 0
 
     init {
-        //clear table
-
-
+        //get apps
         getAppsFromDB(AppOrder.Title(OrderType.Ascending))
+
     }
 
     fun onEvent(event: AppsEvent){
@@ -42,11 +40,12 @@ class AppsViewModel @Inject constructor(
                     state.value.appOrder.orderType == event.appOrder.orderType
                 ) {
                     return
+                }else {
+                    _state.value = state.value.copy(
+                        appOrder = event.appOrder
+                    )
+                    getAppsFromDB(event.appOrder)
                 }
-                getAppsFromDB(event.appOrder)
-                _state.value = state.value.copy(
-                    appOrder = event.appOrder
-                )
             }
             is AppsEvent.ToggleOrderSection -> {
                 _state.value = state.value.copy(
@@ -57,9 +56,12 @@ class AppsViewModel @Inject constructor(
     }
 
 
+
     private fun getAppsFromDB(appOrder: AppOrder) {
     viewModelScope.launch {
         _state.value = state.value.copy(apps = appUseCases.getApps(appOrder))
+        //get the Maximum location usage to scale accordingly
+        maxLocationUsage = _state.value.apps.maxOf { it.numberOfEstimatedRequests }
     }
 
     /*getAppsJob?.cancel()

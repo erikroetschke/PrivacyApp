@@ -10,6 +10,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppAndAppUsa
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import kotlinx.coroutines.flow.Flow
+import java.sql.Timestamp
 
 class AppRepositoryImpl(
     private val dao: AppDao
@@ -18,7 +19,7 @@ class AppRepositoryImpl(
         return dao.getApps()
     }
 
-    override suspend fun getAppWithUsage(packageName: String): List<AppAndAppUsage> {
+    override suspend fun getAppWithUsage(packageName: String): AppAndAppUsage {
         return dao.getAppWithUsage(packageName)
     }
 

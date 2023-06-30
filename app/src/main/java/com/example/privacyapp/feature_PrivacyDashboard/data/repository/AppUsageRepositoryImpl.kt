@@ -34,4 +34,11 @@ class AppUsageRepositoryImpl(
     override suspend fun insertAppUsage(appUsage: AppUsage) {
         return appUsageDao.insertAppUsage(appUsage)
     }
+
+    override suspend fun getAppUsageStatsSinceTimestamp(
+        packageName: String,
+        startInterval: Long
+    ): List<AppUsage> {
+        return appUsageDao.getAppUsageStatsSinceTimestamp(packageName, startInterval)
+    }
 }

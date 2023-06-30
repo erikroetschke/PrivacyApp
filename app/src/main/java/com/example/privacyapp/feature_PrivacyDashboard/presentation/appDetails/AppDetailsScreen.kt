@@ -1,6 +1,8 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.appDetails
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.lineDiagram
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.core.entry.entriesOf
 
 @Composable
 fun AppDetailsScreen(
@@ -29,7 +34,10 @@ fun AppDetailsScreen(
     viewModel: AppDetailsViewModel
 ) {
 
-    val state = viewModel.state.value
+    val state = viewModel.stateApp.value
+    if(state.appName == "Instagram"){
+        Log.v("test", "test")
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -57,12 +65,12 @@ fun AppDetailsScreen(
                 }
             }
         }
-        Card(modifier = Modifier
+        Box(modifier = Modifier
             .padding(10.dp, 15.dp, 10.dp, 15.dp)
             .fillMaxWidth()
             .height(300.dp)
         ) {
-            Text(text = "Diagram")
+            lineDiagram(yPoints = entriesOf(*viewModel.appUsagePerHour.toTypedArray()), modifier = Modifier.fillMaxWidth().padding(5.dp))
         }
         Column(modifier = Modifier.padding(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(),
@@ -79,6 +87,11 @@ fun AppDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = "Background Location Permission:")
                 Text(text = state.ACCESS_BACKGROUND_LOCATION.toString())
+            }
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Estimated Location Requests in the last 24 hours:")
+                Text(text = state.numberOfEstimatedRequests.toString())
             }
         }
     }

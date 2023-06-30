@@ -7,7 +7,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepo
 class GetAppWithUsage(
     private val repository: AppRepository
 ) {
-    suspend operator fun invoke(packageName: String): List<AppAndAppUsage> {
+    suspend operator fun invoke(packageName: String): AppAndAppUsage {
         return repository.getAppWithUsage(packageName)
     }
 }

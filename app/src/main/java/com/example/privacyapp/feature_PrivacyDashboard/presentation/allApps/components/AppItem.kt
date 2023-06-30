@@ -2,6 +2,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.com
 
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,12 +36,15 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.samples.Samp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
-@Preview(showSystemUi = true, showBackground = true)
+//@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun AppItem(
     @PreviewParameter(SampleAppProvider::class) app: App,
+    maxLocationUsage: Int,
     modifier: Modifier = Modifier
     ){
+
+     val locationUsedBoxWidthInPercentage = (100/maxLocationUsage.toFloat()) * app.numberOfEstimatedRequests
 
     Card(modifier = modifier
         .clip(RoundedCornerShape(10.dp))
@@ -69,7 +73,7 @@ fun AppItem(
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(2.dp))
                         .height(10.dp)
-                        .width(app.estimatedLocationRequestFrequency.dp)
+                        .fillMaxWidth(locationUsedBoxWidthInPercentage/100)
                         .background(color = Color.Green)
                     )
                 }

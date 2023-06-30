@@ -9,7 +9,7 @@ import androidx.room.ForeignKey
         entity = App::class,
         parentColumns = arrayOf("packageName"),
         childColumns = arrayOf("packageName"),
-        onDelete = ForeignKey.CASCADE,
+        onDelete = ForeignKey.NO_ACTION,
         onUpdate = ForeignKey.CASCADE
     )]
 )

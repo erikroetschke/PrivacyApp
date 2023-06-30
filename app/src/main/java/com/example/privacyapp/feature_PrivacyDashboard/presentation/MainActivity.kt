@@ -70,7 +70,7 @@ class MainActivity() : ComponentActivity() {
                                 appsFromPhone[indexFromPhone].ACCESS_COARSE_LOCATION,
                                 appsFromPhone[indexFromPhone].ACCESS_FINE_LOCATION,
                                 appsFromPhone[indexFromPhone].ACCESS_BACKGROUND_LOCATION,
-                                app.estimatedLocationRequestFrequency,
+                                app.numberOfEstimatedRequests,
                                 app.favorite
                             )
                         )
@@ -86,11 +86,14 @@ class MainActivity() : ComponentActivity() {
                 appUseCases.addApp(app)
             }
 
-            //load UsageStats and update location
+            //create UsageStats and update location
             val locationsWithLocationUsedIsNull = locationUseCases.getLocationsWithLocationUsedIsNull()
             if (locationsWithLocationUsedIsNull.isNotEmpty()) {
                 appUsageUseCases.computeUsage(locationsWithLocationUsedIsNull)
             }
+
+            //update Apps with number of location Requests
+            appUsageUseCases.updateAppUsageLast24Hours()
         }
 
         //actual content/ui

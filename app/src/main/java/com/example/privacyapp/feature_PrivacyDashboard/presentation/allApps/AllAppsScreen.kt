@@ -48,6 +48,7 @@ fun AllAppsScreen(
 ) {
     val state = viewModel.state.value
 
+    //TODO if  lower than Android 10 (API level 29), background location access is always allowed, therefore the permission not needed
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,6 +95,7 @@ fun AllAppsScreen(
                 items(state.apps) { app ->
                     AppItem(
                         app = app,
+                        maxLocationUsage = viewModel.maxLocationUsage,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp, 10.dp, 10.dp, 0.dp)

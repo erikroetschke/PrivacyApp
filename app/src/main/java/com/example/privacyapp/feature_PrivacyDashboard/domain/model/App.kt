@@ -11,7 +11,7 @@ data class App(
     val ACCESS_COARSE_LOCATION: Boolean,
     val ACCESS_FINE_LOCATION: Boolean,
     val ACCESS_BACKGROUND_LOCATION: Boolean,
-    val estimatedLocationRequestFrequency: Int,
+    val numberOfEstimatedRequests: Int,
     val favorite: Boolean
 )
 

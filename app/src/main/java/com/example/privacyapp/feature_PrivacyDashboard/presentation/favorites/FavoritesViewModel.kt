@@ -26,31 +26,20 @@ class FavoritesViewModel @Inject constructor(
 
     private var getAppsJob: Job? = null
 
+    var maxLocationUsage = 0
+
     init {
-        //clear table
-
-        /*viewModelScope.launch {
-            appUseCases.deleteAllApps()
-        }*/
-
-        //get the apps
-        //val apps = appUseCases.initApps()
-        //insert apps in db
-        /*for (app in apps){
-            viewModelScope.launch {
-                appUseCases.addApp(app)
-            }
-        }*/
         getAppsFromDB()
     }
 
 
     private fun getAppsFromDB() {
         getAppsJob?.cancel()
-        getAppsJob = appUseCases.getFavoriteApps().onEach { app ->
+        getAppsJob = appUseCases.getFavoriteApps().onEach { apps ->
             _state.value = state.value.copy(
-                apps = app
+                apps = apps
             )
+            maxLocationUsage = apps.maxOf { it.numberOfEstimatedRequests }
         }
             .launchIn(viewModelScope)
     }

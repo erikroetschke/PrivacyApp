@@ -33,5 +33,5 @@ interface AppDao {
 
     @Transaction
     @Query("SELECT * from app WHERE packageName = :packageName")
-    suspend fun getAppWithUsage(packageName: String): List<AppAndAppUsage>
+    suspend fun getAppWithUsage(packageName: String): AppAndAppUsage
 }

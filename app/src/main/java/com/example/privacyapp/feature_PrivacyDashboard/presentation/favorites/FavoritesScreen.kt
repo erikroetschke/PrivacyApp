@@ -52,6 +52,7 @@ fun FavoritesScreen(
             items(state.apps) { app ->
                 AppItem(
                     app = app,
+                    maxLocationUsage = viewModel.maxLocationUsage,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp, 10.dp, 10.dp, 0.dp)

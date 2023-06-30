@@ -11,7 +11,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 
 @Database(
     entities = [Location::class, App::class, AppUsage::class],
-    version = 6
+    version = 8
 )
 abstract class Database: RoomDatabase() {
 
