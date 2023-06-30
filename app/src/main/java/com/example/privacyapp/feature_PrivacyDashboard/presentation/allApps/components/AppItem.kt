@@ -43,8 +43,11 @@ fun AppItem(
     maxLocationUsage: Int,
     modifier: Modifier = Modifier
     ){
+    var locationUsedBoxWidthInPercentage = 0f
+    if (maxLocationUsage != 0) {
+        locationUsedBoxWidthInPercentage = (100/maxLocationUsage.toFloat()) * app.numberOfEstimatedRequests
+    }
 
-     val locationUsedBoxWidthInPercentage = (100/maxLocationUsage.toFloat()) * app.numberOfEstimatedRequests
 
     Card(modifier = modifier
         .clip(RoundedCornerShape(10.dp))
