@@ -7,8 +7,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetNumberOfPOI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AppsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-
+    private val locationUseCases: LocationUseCases,
+    private val privacyAssessmentUseCases: PrivacyAssessmentUseCases
 ) : ViewModel() {
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
     private val _trackingActive = mutableStateOf(false)
@@ -24,6 +30,11 @@ class DashboardViewModel @Inject constructor(
 
     init {
         _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        val locations = listOf(Location(52.5200066, 13.404954, 123123, false, false), Location(52.5200066, 13.404954, 123123, false, false))
+        //privacyAssessmentUseCases.getNumberOfPOI(locations)
+        val py = Python.getInstance()
+        val modulePoint = py.getModule("script")
+        modulePoint.get("num")?.toInt()
     }
 
     @Suppress("DEPRECATION") // Deprecated for third party Services.

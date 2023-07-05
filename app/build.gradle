@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.chaquo.python'
 }
 
 android {
@@ -19,6 +20,23 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        ndk {
+            abiFilters "armeabi-v7a", "x86_64"
+        }
+        python {
+            version "3.10"
+        }
+        python {
+            buildPython "C:/Users/Erik/AppData/Local/Programs/Python/Python310/python.exe"
+        }
+        python {
+            pip{
+                install "numpy"
+                install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-stop-detection.git"
+                install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git"
+                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git#egg=de4l_geodata[torch]"
+            }
         }
     }
 
@@ -45,6 +63,11 @@ android {
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    sourceSets {
+        main {
+            python.srcDir "src/main/java/com/example/privacyapp/feature_PrivacyDashboard/domain/python"
         }
     }
 }
@@ -117,6 +140,9 @@ dependencies {
     implementation "com.patrykandpatrick.vico:core:1.6.5"
     implementation "com.patrykandpatrick.vico:compose:1.6.5"
     implementation "com.patrykandpatrick.vico:compose-m3:1.6.5"
+
+    //python integration
+
 }
 
 kapt {

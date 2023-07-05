@@ -21,7 +21,9 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocations
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.InitApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetNumberOfPOI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
@@ -94,6 +96,13 @@ object AppModule {
             computeUsage = ComputeUsage(repository, locationRepository, appRepository),
             updateAppUsageLast24Hours = UpdateAppUsageLast24Hours(repository, appRepository),
             getAppUsageSinceTimestamp = GetAppUsageSinceTimestamp(repository)
+        )
+    }
+    @Provides
+    @Singleton
+    fun providePrivacyAssessmentUseCases(): PrivacyAssessmentUseCases {
+        return PrivacyAssessmentUseCases(
+            getNumberOfPOI = GetNumberOfPOI()
         )
     }
 }

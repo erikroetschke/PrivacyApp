@@ -24,9 +24,12 @@ class AppDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val appUsagePerHour: MutableList<Pair<Int, Int>> = mutableListOf()
-    private val minutesFromCompleteHour = Calendar.getInstance().get(Calendar.MINUTE)
-    private val timestamp24HoursAgoRoundedToCompleteHour = System.currentTimeMillis() - (minutesFromCompleteHour * 60 * 1000) - (1000 * 60 * 60 * 24)
+    private val _stateDiagramData = mutableStateOf(emptyList<Pair<Int, Int>>())
+    val stateDiagramData = _stateDiagramData
+    private val appUsagePerHour = mutableListOf<Pair<Int, Int>>()
+    private val minutesToCompleteHour = 60 - Calendar.getInstance().get(Calendar.MINUTE)
+    private val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    private val timestamp24HoursAgoRoundedToCompleteHour = System.currentTimeMillis() + (minutesToCompleteHour * 60 * 1000) - (1000 * 60 * 60 * 24)
     private val hourInMillis = 1000 * 60 * 60
     private var listAppUsages = mutableListOf<AppUsage>()
 
@@ -67,15 +70,12 @@ class AppDetailsViewModel @Inject constructor(
             }
 
             var endTimestamp = timestamp24HoursAgoRoundedToCompleteHour + hourInMillis
-            var hour = 0
+            var hour = (currentHour + 1 % 24)
             var counter = 0
-            while (listAppUsages.isNotEmpty() || hour < 24){
-                if(listAppUsages.isEmpty()){
-                    appUsagePerHour.add(Pair(hour, 0))
-                    hour++
-                }else if(listAppUsages[0].timestamp > endTimestamp){
+            while (listAppUsages.isNotEmpty()){
+                if(listAppUsages[0].timestamp > endTimestamp){
                     appUsagePerHour.add(Pair(hour, counter))
-                    hour ++
+                    hour = (hour + 1) % 24
                     counter = 0
                     endTimestamp += hourInMillis
                 } else {
@@ -83,6 +83,17 @@ class AppDetailsViewModel @Inject constructor(
                     listAppUsages.removeAt(0)
                 }
             }
+            //add the one from the last iteration
+            appUsagePerHour.add(Pair(hour, counter))
+            hour = (hour + 1) % 24
+            if (appUsagePerHour.size < 24) {
+                //fill the rest with 0
+                for (i in appUsagePerHour.size..23) {
+                    appUsagePerHour.add(Pair(hour,0))
+                    hour = (hour + 1) % 24
+                }
+            }
+            _stateDiagramData.value = appUsagePerHour
         }
     }
     private fun getApp() {
@@ -123,7 +134,7 @@ class AppDetailsViewModel @Inject constructor(
                         )
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        System.out.println("couldn´t update app")
+                        println("couldn´t update app")
                     }
                 }
                 _stateApp.value = stateApp.value.copy(

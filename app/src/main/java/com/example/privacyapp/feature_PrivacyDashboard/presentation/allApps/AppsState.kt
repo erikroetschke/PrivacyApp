@@ -6,6 +6,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 
 data class AppsState(
     val apps: List<App> = emptyList(),
-    val appOrder: AppOrder =AppOrder.Title(OrderType.Ascending),
+    val appOrder: AppOrder = AppOrder.LocationUsage(OrderType.Descending),
     val isOrderSectionVisible: Boolean = false
 )

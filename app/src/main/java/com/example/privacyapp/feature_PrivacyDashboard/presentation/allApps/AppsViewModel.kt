@@ -29,8 +29,7 @@ class AppsViewModel @Inject constructor(
 
     init {
         //get apps
-        getAppsFromDB(AppOrder.Title(OrderType.Ascending))
-
+        getAppsFromDB(AppOrder.LocationUsage(OrderType.Descending))
     }
 
     fun onEvent(event: AppsEvent) {

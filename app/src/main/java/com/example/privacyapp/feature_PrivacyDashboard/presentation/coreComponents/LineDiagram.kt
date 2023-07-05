@@ -42,8 +42,8 @@ fun lineDiagram(
     yPoints: List<FloatEntry>
 ) {
     val chartEntryModel = entryModelOf(yPoints)
-    val lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) - 1
-    val bottomAxisValueFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { x, _ -> ((x+lastHour) % 24).toInt().toString() }
+    val lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    val bottomAxisValueFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { x, _ -> ((x+lastHour+1) % 24).toInt().toString() }
     val lineColor = Color.Green
     val chartColor = listOf(lineColor)
 
