@@ -32,9 +32,9 @@ class DashboardViewModel @Inject constructor(
         _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
         val locations = listOf(Location(52.5200066, 13.404954, 123123, false, false), Location(52.5200066, 13.404954, 123123, false, false))
         //privacyAssessmentUseCases.getNumberOfPOI(locations)
-        val py = Python.getInstance()
+        /*val py = Python.getInstance()
         val modulePoint = py.getModule("script")
-        modulePoint.get("num")?.toInt()
+        modulePoint.get("num")?.toInt()*/
     }
 
     @Suppress("DEPRECATION") // Deprecated for third party Services.

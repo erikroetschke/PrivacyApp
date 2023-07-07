@@ -1,18 +1,14 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.util
 
-import android.content.res.Resources
-import android.provider.Settings.Global.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.privacyapp.R
 
 
-sealed class NavigationItem(val route:String, val label:String, val icon:ImageVector){
+sealed class NavigationItem(val route:String, val label:String, val icon: ImageVector){
 
     //object Dashboard : NavigationItem(Resources.getSystem().getString(R.string.dashboard), Resources.getSystem().getString(R.string.dashboard), Icons.Default.Home)
     object Dashboard : NavigationItem("Dashboard", "Dashboard", Icons.Default.Home)
@@ -23,5 +19,4 @@ sealed class NavigationItem(val route:String, val label:String, val icon:ImageVe
     //object Map : NavigationItem(Resources.getSystem().getString(R.string.map), Resources.getSystem().getString(R.string.map), Icons.Default.LocationOn)
     object Map : NavigationItem("Map", "Map", Icons.Default.LocationOn)
     object AppDetails : NavigationItem("AppDetails", "AppDetails", Icons.Default.LocationOn)
-
 }

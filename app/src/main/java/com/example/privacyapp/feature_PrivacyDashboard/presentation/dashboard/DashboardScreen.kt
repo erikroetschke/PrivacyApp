@@ -41,7 +41,14 @@ fun DashboardScreen(
 
     val dialogQueue = viewModel.visiblePermissionDialogQueue
     //Request Permissions
-    val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
+        arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+    }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
         arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -88,8 +95,6 @@ fun DashboardScreen(
                     ApplicationProvider.application.startService(this)
                 }
             } else {
-                //TODO handle ACTION_USAGE_ACCESS_SETTINGS better
-                mainActivity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
                 multiplePermissionResultLauncher.launch(permissionsToRequest)
             }
 

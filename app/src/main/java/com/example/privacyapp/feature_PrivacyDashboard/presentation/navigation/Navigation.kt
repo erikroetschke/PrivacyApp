@@ -33,6 +33,9 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.Fa
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.FavoritesViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
+
 //import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
@@ -118,7 +121,9 @@ fun NavigationController(navController: NavHostController, mainActivity: MainAct
             }
 
             composable(NavigationItem.Map.route) {
-                MapScreen()
+                val welcomeViewModel = hiltViewModel<WelcomeScreenViewModel>()
+                welcomeScreen(viewModel = welcomeViewModel, mainActivity = mainActivity)
+                //MapScreen()
             }
 
             composable(NavigationItem.AppDetails.route +

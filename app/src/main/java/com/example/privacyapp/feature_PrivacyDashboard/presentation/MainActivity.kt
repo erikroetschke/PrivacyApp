@@ -1,21 +1,24 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
-
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
@@ -23,6 +26,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationPr
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation.BottomNavigationBar
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation.NavigationController
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,8 +52,6 @@ class MainActivity() : ComponentActivity() {
         if (! Python.isStarted()) {
             Python.start(AndroidPlatform(this));
         }
-
-
 
         //get Application to provide it in other classes
         ApplicationProvider.initialize(this.application)

@@ -79,3 +79,26 @@ class LocationPermissionTextProvider: PermissionTextProvider {
     }
 }
 
+class BackgroundLocationPermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if(isPermanentlyDeclined) {
+            "It seems you permanently declined background location permission. " +
+                    "You can go to the app settings to grant it."
+        } else {
+            "This app needs access to your location in the background to work as intended."
+        }
+    }
+}
+
+
+class NotificationPermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if(isPermanentlyDeclined) {
+            "It seems you permanently declined Notification permission. " +
+                    "You can go to the app settings to grant it."
+        } else {
+            "This app needs access to be able to send you Notifications to work as intended."
+        }
+    }
+}
+

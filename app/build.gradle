@@ -28,13 +28,13 @@ android {
             version "3.10"
         }
         python {
-            buildPython "C:/Users/Erik/AppData/Local/Programs/Python/Python310/python.exe"
+            buildPython "/home/erikr/ml/bin/python3.10"
         }
         python {
             pip{
-                install "numpy"
-                install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-stop-detection.git"
-                install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git"
+                //install "numpy"
+                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-stop-detection.git"
+                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git"
                 //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git#egg=de4l_geodata[torch]"
             }
         }
