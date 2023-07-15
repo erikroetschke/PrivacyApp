@@ -3,6 +3,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,12 +30,18 @@ class DashboardViewModel @Inject constructor(
     val trackingActive: MutableState<Boolean> = _trackingActive
 
     init {
-        _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
-        val locations = listOf(Location(52.5200066, 13.404954, 123123, false, false), Location(52.5200066, 13.404954, 123123, false, false))
-        //privacyAssessmentUseCases.getNumberOfPOI(locations)
-        /*val py = Python.getInstance()
-        val modulePoint = py.getModule("script")
-        modulePoint.get("num")?.toInt()*/
+        _trackingActive.value =
+            ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        val locations = listOf(
+            Location(54.5200066, 13.404954, System.currentTimeMillis(), false, false),
+            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 1, false, false),
+            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 2, false, false),
+            Location(52.5200065, 13.404954, System.currentTimeMillis() - 1000 * 60 * 4, false, false),
+            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 8, false, false),
+            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 9, false, false),
+            Location(54.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 15, false, false)
+        )
+        privacyAssessmentUseCases.getNumberOfPOI(locations)
     }
 
     @Suppress("DEPRECATION") // Deprecated for third party Services.

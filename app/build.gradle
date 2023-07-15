@@ -25,17 +25,18 @@ android {
             abiFilters "armeabi-v7a", "x86_64"
         }
         python {
-            version "3.10"
+            version "3.8"
         }
         python {
-            buildPython "/home/erikr/ml/bin/python3.10"
+            buildPython "C:/Users/Erik/AppData/Local/Programs/Python/Python38-32/python.exe"
         }
         python {
             pip{
-                //install "numpy"
-                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-stop-detection.git"
-                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git"
-                //install "git+https://git@git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata.git#egg=de4l_geodata[torch]"
+                install "git+https://github.com/erikroetschke/geoDetection.git"
+                install "numpy"
+                install "haversine"
+                install "pandas"
+                install "torch"
             }
         }
     }
