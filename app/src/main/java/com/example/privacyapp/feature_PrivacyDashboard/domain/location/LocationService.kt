@@ -70,7 +70,6 @@ class LocationService : Service() {
                         location.longitude,
                         location.latitude,
                         System.currentTimeMillis(),
-                        false,
                         null
                     )
                 )

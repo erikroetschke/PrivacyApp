@@ -59,12 +59,11 @@ class MainActivity() : ComponentActivity() {
         //init apps from the phone
         lifecycleScope.launch {
 
-
             //get the apps
             val appsFromPhone = appUseCases.initApps().toMutableList()   //is sorted ascending by appName
             val appsFromDb = appUseCases.getApps(AppOrder.Title(OrderType.Ascending))
 
-            //check if db is up to date
+            //check if app-db is up to date
             for ((index, app) in appsFromDb.withIndex()) {
                 val indexFromPhone = appsFromPhone.indexOfFirst { it.packageName == app.packageName }
                 if (indexFromPhone != -1) {
@@ -98,12 +97,14 @@ class MainActivity() : ComponentActivity() {
             }
 
             //create UsageStats and update location
+            //get locationData which isnt processed into UsageStats yet
             val locationsWithLocationUsedIsNull = locationUseCases.getLocationsWithLocationUsedIsNull()
             if (locationsWithLocationUsedIsNull.isNotEmpty()) {
+                //get usageStats into db
                 appUsageUseCases.computeUsage(locationsWithLocationUsedIsNull)
             }
 
-            //update Apps with number of location Requests
+            //update Apps in db with number of location Requests in th last 24 hours
             appUsageUseCases.updateAppUsageLast24Hours()
         }
 

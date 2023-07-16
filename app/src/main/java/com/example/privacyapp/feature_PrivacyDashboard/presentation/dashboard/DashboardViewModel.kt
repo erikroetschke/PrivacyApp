@@ -3,20 +3,15 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetNumberOfPOI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AppsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -33,15 +28,15 @@ class DashboardViewModel @Inject constructor(
         _trackingActive.value =
             ApplicationProvider.application.isServiceRunning(LocationService::class.java)
         val locations = listOf(
-            Location(54.5200066, 13.404954, System.currentTimeMillis(), false, false),
-            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 1, false, false),
-            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 2, false, false),
-            Location(52.5200065, 13.404954, System.currentTimeMillis() - 1000 * 60 * 4, false, false),
-            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 8, false, false),
-            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 9, false, false),
-            Location(54.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 15, false, false)
+            Location(54.5200066, 13.404954, System.currentTimeMillis(), false),
+            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 1, false),
+            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 2, false),
+            Location(52.5200065, 13.404954, System.currentTimeMillis() - 1000 * 60 * 4, false),
+            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 8, false),
+            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 9, false),
+            Location(54.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 15, false)
         )
-        privacyAssessmentUseCases.getNumberOfPOI(locations)
+        privacyAssessmentUseCases.stopDetection(locations)
     }
 
     @Suppress("DEPRECATION") // Deprecated for third party Services.

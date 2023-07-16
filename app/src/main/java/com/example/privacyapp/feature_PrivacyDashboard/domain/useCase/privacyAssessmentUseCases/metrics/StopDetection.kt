@@ -1,11 +1,10 @@
-package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases
+package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics
 
-import android.util.Log
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 
-class GetNumberOfPOI {
+class StopDetection {
 
     operator fun invoke(points: List<Location>): List<Location>{
 
@@ -36,7 +35,7 @@ class GetNumberOfPOI {
             val poi = pois.get(i).toString()
             val temp = regex.findAll(poi).map { it.value }.toList()
             //timestamp is not the actual timestamp of the POI, timestamps are sequential numbers to order the locations. The lower the number, the earlier the POI was found
-            finalPois.add(Location(Math.toDegrees(temp[0].toDouble()),Math.toDegrees(temp[1].toDouble()), i.toLong(), true, true))
+            finalPois.add(Location(Math.toDegrees(temp[0].toDouble()),Math.toDegrees(temp[1].toDouble()), i.toLong(), true))
         }
 
         return finalPois

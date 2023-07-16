@@ -6,9 +6,11 @@ import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppUsageRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.LocationRepositoryImpl
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PrivacyAssessmentRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.AddApp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.AddLocation
@@ -23,7 +25,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetNumberOfPOI
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.AddPrivacyAssessment
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DeletePrivacyAssessment
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1hByMetricSinceTimestamp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1wByMetricSinceTimestamp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.StopDetection
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
@@ -74,6 +81,11 @@ object AppModule {
     fun provideAppUsageRepository(db: Database): AppUsageRepository {
         return AppUsageRepositoryImpl(db.appUsageDao)
     }
+    @Provides
+    @Singleton
+    fun providePrivacyAssessmentRepository(db: Database): PrivacyAssessmentRepository {
+        return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1hDao, db.privacyAssessment1dDao, db.privacyAssessment1wDao)
+    }
 
     @Provides
     @Singleton
@@ -100,9 +112,14 @@ object AppModule {
     }
     @Provides
     @Singleton
-    fun providePrivacyAssessmentUseCases(): PrivacyAssessmentUseCases {
+    fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository): PrivacyAssessmentUseCases {
         return PrivacyAssessmentUseCases(
-            getNumberOfPOI = GetNumberOfPOI()
+            stopDetection = StopDetection(),
+            addPrivacyAssessment = AddPrivacyAssessment(repository),
+            deletePrivacyAssessment = DeletePrivacyAssessment(repository),
+            getAssessment1hByMetricSinceTimestamp = GetAssessment1hByMetricSinceTimestamp(repository),
+            getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
+            getAssessment1wByMetricSinceTimestamp = GetAssessment1wByMetricSinceTimestamp(repository)
         )
     }
 }
