@@ -82,8 +82,7 @@ class LocationPermissionTextProvider: PermissionTextProvider {
 class BackgroundLocationPermissionTextProvider: PermissionTextProvider {
     override fun getDescription(isPermanentlyDeclined: Boolean): String {
         return if(isPermanentlyDeclined) {
-            "It seems you permanently declined background location permission. " +
-                    "You can go to the app settings to grant it."
+            "To be able to track your location in the background, you need to grant background location usage for this app in the settings"
         } else {
             "This app needs access to your location in the background to work as intended."
         }

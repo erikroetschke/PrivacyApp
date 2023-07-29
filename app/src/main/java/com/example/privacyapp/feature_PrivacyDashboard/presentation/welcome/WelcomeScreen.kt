@@ -37,7 +37,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.co
 
 @Composable
 fun welcomeScreen(viewModel: WelcomeScreenViewModel, mainActivity: MainActivity) {
-
+/*
     val dialogQueue = viewModel.visiblePermissionDialogQueue
 
     val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
@@ -185,5 +185,5 @@ fun welcomeScreen(viewModel: WelcomeScreenViewModel, mainActivity: MainActivity)
                 },
                 onGoToAppSettingsClick = ::openAppSettings
             )
-        }
+        }*/
 }

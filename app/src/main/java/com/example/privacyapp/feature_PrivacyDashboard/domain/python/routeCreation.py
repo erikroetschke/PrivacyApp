@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 def create_Point(lat, lon, timestamp):
-    point = geoDetection.point_t.PointT([np.deg2rad(lat), np.deg2rad(lon)], pd.to_datetime(timestamp, unit = "ms"))
+    point = geoDetection.point_t.PointT([np.deg2rad(lon), np.deg2rad(lat)], pd.to_datetime(timestamp, unit = "ms"))
     return point
 
 def create_Route(list, timestamps):

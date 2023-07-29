@@ -21,7 +21,7 @@ class AddPrivacyAssessment(
         metricInterval: MetricInterval
     ) {
         return when (metricInterval) {
-            MetricInterval.HOUR -> {
+            MetricInterval.DAY -> {
                 privacyAssessmentRepository.insertAssessment1h(
                     PrivacyAssessment1h(
                         timestampStart,
@@ -33,7 +33,7 @@ class AddPrivacyAssessment(
                 )
             }
 
-            MetricInterval.DAY -> {
+            MetricInterval.WEEK -> {
                 privacyAssessmentRepository.insertAssessment1d(
                     PrivacyAssessment1d(
                         timestampStart,
@@ -45,7 +45,7 @@ class AddPrivacyAssessment(
                 )
             }
 
-            MetricInterval.WEEK -> {
+            MetricInterval.MONTH -> {
                 privacyAssessmentRepository.insertAssessment1w(
                     PrivacyAssessment1w(
                         timestampStart,

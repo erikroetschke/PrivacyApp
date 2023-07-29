@@ -12,11 +12,21 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.DashboardEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +51,7 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
     private var _onFirstPage = mutableStateOf(true)
     var onFirstPage = _onFirstPage
 
-    fun onNextButtonClick(mainActivity: MainActivity): Boolean {
+    fun onNextButtonClick(welcomeActivity: WelcomeScreenActivity): Boolean {
         if (_onFirstPage.value) {
             if (checkIfUsagePermissionIsGranted()) {
                 _onFirstPage.value = false
@@ -52,22 +62,22 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
                             "so that you can see when the tracking is active"
                 nextButton.value = "Finish"
                 actionButton.value = "Grant Permissions"
+                welcomeActivity.getSharedPreferences("PREFS_NAME", ComponentActivity.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("USAGE_PERMISSION_GRANTED", true)
+                    .apply()
                 return true
             } else {
                 return false
             }
         } else {
             if (ContextCompat.checkSelfPermission(
-                mainActivity,
+                welcomeActivity,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(
-                        mainActivity,
-                        Manifest.permission.ACCESS_COARSE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                mainActivity.getSharedPreferences("PREFERENCE", ComponentActivity.MODE_PRIVATE)
+                    == PackageManager.PERMISSION_GRANTED ) {
+                welcomeActivity.getSharedPreferences("PREFS_NAME", ComponentActivity.MODE_PRIVATE)
                     .edit()
-                    .putBoolean("firstrun", false)
+                    .putBoolean("FIRST_RUN", false)
                     .apply()
                 return true
             }else {
@@ -76,14 +86,21 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
     }
 
     fun onPermissionResult(
         permission: String,
-        isGranted: Boolean
+        welcomeActivity: WelcomeScreenActivity
     ) {
+        var isGranted = false
+        if(ContextCompat.checkSelfPermission(welcomeActivity, permission)
+            == PackageManager.PERMISSION_GRANTED) {
+            isGranted = true
+        }
+
         if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
             visiblePermissionDialogQueue.add(permission)
         }

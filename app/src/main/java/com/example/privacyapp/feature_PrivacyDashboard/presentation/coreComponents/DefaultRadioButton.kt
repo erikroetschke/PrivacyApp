@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.components
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

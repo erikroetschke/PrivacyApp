@@ -121,8 +121,6 @@ fun NavigationController(navController: NavHostController, mainActivity: MainAct
             }
 
             composable(NavigationItem.Map.route) {
-                val welcomeViewModel = hiltViewModel<WelcomeScreenViewModel>()
-                welcomeScreen(viewModel = welcomeViewModel, mainActivity = mainActivity)
                 //MapScreen()
             }
 

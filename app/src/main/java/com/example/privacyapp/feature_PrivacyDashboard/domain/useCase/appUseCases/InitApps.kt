@@ -33,49 +33,56 @@ class InitApps(
             var ACCESS_COARSE_LOCATION = false
             var ACCESS_FINE_LOCATION = false
             var ACCESS_BACKGROUND_LOCATION = false
+            var nonSystemAppOrSystemAppWithLocationPermission = false
 
-            if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
-                // System application
+            var packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
             } else {
-                // Installed by user
-/*                if (applicationInfo.name == null) {
-                    continue
-                }*/
+                packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS)
+            }
 
-                var packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
-                } else {
-                    packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS)
-                }
+            packageName = packageInfo.packageName
+            appName = packageManager.getApplicationLabel(applicationInfo) as String
 
-                packageName = packageInfo.packageName
-                appName = packageManager.getApplicationLabel(applicationInfo) as String
-                //Get Permissions
-                val requestedPermissions = packageInfo.requestedPermissions
-                if (requestedPermissions != null) {
-                    for (i in requestedPermissions.indices) {
-                        if (requestedPermissions[i].contains("android.permission.ACCESS_COARSE_LOCATION")) {
-                            ACCESS_COARSE_LOCATION = true
-                        } else if (requestedPermissions[i].contains("android.permission.ACCESS_FINE_LOCATION")) {
-                            ACCESS_FINE_LOCATION = true
-                        } else if (requestedPermissions[i].contains("android.permission.ACCESS_BACKGROUND_LOCATION")) {
-                            ACCESS_BACKGROUND_LOCATION = true
-                        }
+            //Get Permissions
+            val requestedPermissions = packageInfo.requestedPermissions
+            if (requestedPermissions != null) {
+                for (i in requestedPermissions.indices) {
+                    if (requestedPermissions[i].contains("android.permission.ACCESS_COARSE_LOCATION")) {
+                        ACCESS_COARSE_LOCATION = true
+                    } else if (requestedPermissions[i].contains("android.permission.ACCESS_FINE_LOCATION")) {
+                        ACCESS_FINE_LOCATION = true
+                    } else if (requestedPermissions[i].contains("android.permission.ACCESS_BACKGROUND_LOCATION")) {
+                        ACCESS_BACKGROUND_LOCATION = true
                     }
                 }
             }
-            val app = App(
-                packageName,
-                appName,
-                ACCESS_COARSE_LOCATION,
-                ACCESS_FINE_LOCATION,
-                ACCESS_BACKGROUND_LOCATION,
-                0,
-                false
-            )
-            if (app.packageName != ""){
-                appsList.add(app)
+
+            if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
+                if(ACCESS_COARSE_LOCATION && ACCESS_FINE_LOCATION) {
+                    //preinstalled
+                    nonSystemAppOrSystemAppWithLocationPermission = true
+                }
+            }else {
+                // Installed by user
+                nonSystemAppOrSystemAppWithLocationPermission = true
             }
+            if(nonSystemAppOrSystemAppWithLocationPermission) {
+
+                val app = App(
+                    packageName,
+                    appName,
+                    ACCESS_COARSE_LOCATION,
+                    ACCESS_FINE_LOCATION,
+                    ACCESS_BACKGROUND_LOCATION,
+                    0,
+                    false
+                )
+                if (app.packageName != ""){
+                    appsList.add(app)
+                }
+            }
+
 
         }
         return appsList.sortedBy { it.appName.lowercase() }

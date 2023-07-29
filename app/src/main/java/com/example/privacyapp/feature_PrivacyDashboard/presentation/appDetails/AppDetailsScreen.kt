@@ -29,9 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChart
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.lineDiagram
-import com.patrykandpatrick.vico.core.entry.FloatEntry
-import com.patrykandpatrick.vico.core.entry.entriesOf
+
 
 @Composable
 fun AppDetailsScreen(

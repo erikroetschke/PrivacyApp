@@ -1,10 +1,6 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases
 
-import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAssessment1d
-import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAssessment1h
-import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAssessment1w
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
-import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterval
 
 class DeletePrivacyAssessment(
@@ -16,15 +12,15 @@ class DeletePrivacyAssessment(
         metricInterval: MetricInterval
     ) {
         return when (metricInterval) {
-            MetricInterval.HOUR -> {
+            MetricInterval.DAY -> {
                 privacyAssessmentRepository.deleteAssessment1hOlderThanTimestamp(timestamp)
             }
 
-            MetricInterval.DAY -> {
+            MetricInterval.WEEK -> {
                 privacyAssessmentRepository.deleteAssessment1dOlderThanTimestamp(timestamp)
             }
 
-            MetricInterval.WEEK -> {
+            MetricInterval.MONTH -> {
                 privacyAssessmentRepository.deleteAssessment1wOlderThanTimestamp(timestamp)
             }
         }

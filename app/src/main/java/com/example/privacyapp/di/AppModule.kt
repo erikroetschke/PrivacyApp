@@ -25,11 +25,14 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetUsedLocationsLastSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.AddPrivacyAssessment
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DeletePrivacyAssessment
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DoAssessment
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1hByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1wByMetricSinceTimestamp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.CallMetric
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.StopDetection
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
@@ -66,7 +69,8 @@ object AppModule {
         return LocationUseCases(
             getLocations = GetLocations(repository),
             addLocation = AddLocation(repository),
-            getLocationsWithLocationUsedIsNull = GetLocationsWithLocationUsedIsNull(repository)
+            getLocationsWithLocationUsedIsNull = GetLocationsWithLocationUsedIsNull(repository),
+            getUsedLocationsLastSinceTimestamp = GetUsedLocationsLastSinceTimestamp(repository)
         )
     }
 
@@ -112,14 +116,15 @@ object AppModule {
     }
     @Provides
     @Singleton
-    fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository): PrivacyAssessmentUseCases {
+    fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository, locationRepository: LocationRepository): PrivacyAssessmentUseCases {
         return PrivacyAssessmentUseCases(
-            stopDetection = StopDetection(),
+            callMetric = CallMetric(),
             addPrivacyAssessment = AddPrivacyAssessment(repository),
             deletePrivacyAssessment = DeletePrivacyAssessment(repository),
             getAssessment1hByMetricSinceTimestamp = GetAssessment1hByMetricSinceTimestamp(repository),
             getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
-            getAssessment1wByMetricSinceTimestamp = GetAssessment1wByMetricSinceTimestamp(repository)
+            getAssessment1wByMetricSinceTimestamp = GetAssessment1wByMetricSinceTimestamp(repository),
+            doAssessment = DoAssessment(locationRepository, repository)
         )
     }
 }

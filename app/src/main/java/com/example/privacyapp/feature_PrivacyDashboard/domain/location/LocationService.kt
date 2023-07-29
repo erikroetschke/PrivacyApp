@@ -56,8 +56,7 @@ class LocationService : Service() {
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
 
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
             .getLocationUpdates(LOCATION_INTERVAL)
@@ -73,8 +72,6 @@ class LocationService : Service() {
                         null
                     )
                 )
-
-                //locationUseCases.addLocation(Location(location.longitude, location.latitude, System.currentTimeMillis(), false))
                 val lat = location.latitude.toString()
                 val long = location.longitude.toString()
                 val updatedNotification = notification.setContentText(

@@ -39,7 +39,12 @@ class FavoritesViewModel @Inject constructor(
             _state.value = state.value.copy(
                 apps = apps
             )
-            maxLocationUsage = apps.maxOf { it.numberOfEstimatedRequests }
+            maxLocationUsage = if (apps.isEmpty()){
+                0
+            }else {
+                apps.maxOf { it.numberOfEstimatedRequests }
+            }
+
         }
             .launchIn(viewModelScope)
     }

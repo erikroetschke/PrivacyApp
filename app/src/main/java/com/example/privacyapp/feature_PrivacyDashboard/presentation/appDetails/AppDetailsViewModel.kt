@@ -9,9 +9,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AppsState
-import com.patrykandpatrick.vico.core.entry.ChartEntry
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Calendar

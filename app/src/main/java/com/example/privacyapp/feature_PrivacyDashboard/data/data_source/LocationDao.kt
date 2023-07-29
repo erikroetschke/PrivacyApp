@@ -25,7 +25,7 @@ interface LocationDao {
     suspend fun getLocationsWithLocationUsedIsNull (): List<Location>
 
     @Query("SELECT * FROM location WHERE locationUsed = 1 AND timestamp >= :timestamp")
-    suspend fun getUsedAndUnprocessedLocations (timestamp: Long): List<Location>
+    suspend fun getUsedLocations (timestamp: Long): List<Location>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLocation(location: Location)

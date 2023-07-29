@@ -28,7 +28,7 @@ class ComputeUsage(
         val locationsCopy: List<Location> =
             locations.sortedBy { it.timestamp }     //sort by timestamp
         val currentEvent = UsageEvents.Event()  //event for iteration
-        val nonSystemsAppsList = getNonSystemAppsList()
+        val nonSystemsAppsList = getAppsList()
         val appStatusMap =
             HashMap<String, AppStatus>() //to track weather an app is currently running
         val appUsages =
@@ -40,12 +40,12 @@ class ComputeUsage(
         val listAppsWithBackgroundPermission =
             appRepository.getApps().filter { it.ACCESS_BACKGROUND_LOCATION }
 
-        //get usage Stats
+        //get usage Stats NOTE: Events are only kept by the system for a few days.
         val usageStatsManager =
             ApplicationProvider.application.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val usageEvents: UsageEvents? = usageStatsManager.queryEvents(
             locationsCopy.first().timestamp,
-            locationsCopy.last().timestamp
+            locationsCopy.last().timestamp + 60000
         )
 
 
@@ -53,11 +53,21 @@ class ComputeUsage(
             if (usageEvents != null) {
                 var locationUsed = false
                 while (usageEvents.hasNextEvent()) {
-                    //checks if current event is applicable to the next location
-                    if (currentEvent.timeStamp >= locationsCopy[counter + 1].timestamp) {
-                        newOuterForLoop = true
-                        break
+                    //checks if current event is applicable to this location, or if its timestamp is beyond the next (location)-timestamp
+                    if(counter + 1 != locationsCopy.size){
+                        if (currentEvent.timeStamp >= locationsCopy[counter + 1].timestamp) {
+                            newOuterForLoop = true
+                            break
+                        }
                     }
+                    //check if event is too for away from location(more than 3 minutes),
+                    //this could happen when the location could not be tracked for while and there is a bigger gap between to locations
+                    //TODO evaulate how ofthen the location can be tracked in the background per hour
+                    if(currentEvent.timeStamp >= locationsCopy[counter].timestamp + 180000) {
+                        usageEvents.getNextEvent(currentEvent)
+                        continue
+                    }
+
                     //so that the last element before the break is considered in the next for loop
                     if (!newOuterForLoop) {
                         usageEvents.getNextEvent(currentEvent)
@@ -78,9 +88,18 @@ class ComputeUsage(
 
                     //update appStatusMap
                     if (foreground && nonSystemsAppsList.containsKey(packageName)) {
+
                         if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_RESUMED) {
                             locationUsed = true
-                            appStatusMap[packageName] = AppStatus.FOREGROUND
+                            when (appStatusMap[packageName]) {
+                                AppStatus.BACKGROUND -> appStatusMap[packageName] = AppStatus.FOREGROUND
+                                AppStatus.NOT_RUNNING -> appStatusMap[packageName] = AppStatus.FOREGROUND
+                                AppStatus.BACKGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.FOREGROUND_AND_SERVICE
+                                AppStatus.SERVICE -> appStatusMap[packageName] = AppStatus.FOREGROUND_AND_SERVICE
+                                null -> appStatusMap[packageName] = AppStatus.FOREGROUND
+                                else -> {}
+                            }
+
                             //create new AppUsage, if ACTIVITY_RESUMED occurs multiple times between two locations within the same package, it will be overwritten
                             appUsages[packageName] = AppUsage(
                                 packageName, location.timestamp,
@@ -91,13 +110,68 @@ class ComputeUsage(
 
                         if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_PAUSED && background) {
                             locationUsed = true
-                            appStatusMap[packageName] = AppStatus.BACKGROUND
-                            //As it must have been in Foreground before, add also background
-                            appUsages[packageName]?.background = true
+                            when (appStatusMap[packageName]){
+                                AppStatus.FOREGROUND -> appStatusMap[packageName] = AppStatus.BACKGROUND
+                                AppStatus.NOT_RUNNING -> appStatusMap[packageName] = AppStatus.BACKGROUND
+                                AppStatus.FOREGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.BACKGROUND_AND_SERVICE
+                                AppStatus.SERVICE -> appStatusMap[packageName] = AppStatus.BACKGROUND_AND_SERVICE
+                                null -> appStatusMap[packageName] = AppStatus.BACKGROUND
+                                else -> {}
+                            }
+
+                            if(appUsages[packageName] == null) {
+                                //As it must have been in Foreground before this not trigger in most cases,
+                                //but there could be the case that the start of the application was missed,
+                                //as it happened before the first (location)-timestamp.
+                                //Furthermore, this will happen everytime with this app itself,
+                                // when tracking was not turned on when the app got opened
+                                appUsages[packageName] = AppUsage(
+                                    packageName, location.timestamp,
+                                    foreground = false,
+                                    background = true
+                                )
+                            }else {
+                                appUsages[packageName]?.background = true
+                            }
+
                         }
 
                         if (currentEvent.eventType == UsageEvents.Event.ACTIVITY_STOPPED) {
-                            appStatusMap[packageName] = AppStatus.NOT_RUNNING
+                            when(appStatusMap[packageName]) {
+                                AppStatus.FOREGROUND -> appStatusMap[packageName] = AppStatus.NOT_RUNNING
+                                AppStatus.BACKGROUND -> appStatusMap[packageName] = AppStatus.NOT_RUNNING
+                                AppStatus.FOREGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.SERVICE
+                                AppStatus.BACKGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.SERVICE
+                                else -> {}
+                            }
+                        }
+
+                        if (currentEvent.eventType == UsageEvents.Event.FOREGROUND_SERVICE_START && background){
+                            locationUsed = true
+                            when (appStatusMap[packageName]){
+                                AppStatus.FOREGROUND -> appStatusMap[packageName] = AppStatus.FOREGROUND_AND_SERVICE
+                                AppStatus.BACKGROUND -> appStatusMap[packageName] = AppStatus.BACKGROUND_AND_SERVICE
+                                null -> {appStatusMap[packageName] = AppStatus.SERVICE
+                                    //create new appUsage
+                                    appUsages[packageName] = AppUsage(
+                                        packageName, location.timestamp,
+                                        foreground = false,
+                                        background = true
+                                    )
+                                }
+                                else -> {}
+                            }
+                            appUsages[packageName]?.background = true
+
+                        }
+
+                        if (currentEvent.eventType == UsageEvents.Event.FOREGROUND_SERVICE_STOP && background){
+                            when (appStatusMap[packageName]){
+                                AppStatus.FOREGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.FOREGROUND
+                                AppStatus.BACKGROUND_AND_SERVICE -> appStatusMap[packageName] = AppStatus.BACKGROUND
+                                AppStatus.SERVICE -> appStatusMap[packageName] = AppStatus.NOT_RUNNING
+                                else -> {}
+                            }
                         }
                     }
                 }
@@ -131,7 +205,7 @@ class ComputeUsage(
         return
     }
 
-    private fun getNonSystemAppsList(): Map<String, String> {
+    private fun getAppsList(): Map<String, String> {
         val packageManager: PackageManager =
             ApplicationProvider.application.applicationContext.packageManager
         val appInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -143,13 +217,16 @@ class ComputeUsage(
         }
         val appInfoMap = HashMap<String, String>()
         for (appInfo in appInfos) {
-            if (appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
+            appInfoMap[appInfo.packageName] =
+                packageManager.getApplicationLabel(appInfo).toString()
+            /*if (appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
                 //system application
+
             } else {
                 //user app
                 appInfoMap[appInfo.packageName] =
                     packageManager.getApplicationLabel(appInfo).toString()
-            }
+            }*/
         }
         return appInfoMap
     }
