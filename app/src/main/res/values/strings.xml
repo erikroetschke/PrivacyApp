@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PrivacyApp</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="favorites">Favorites</string>
+    <string name="map">Map</string>
+    <string name="app_deatails">App Details</string>
+</resources>
