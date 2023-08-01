@@ -1,12 +1,18 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.appDetails
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,8 +32,11 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChart
 
@@ -37,13 +47,17 @@ fun AppDetailsScreen(
     viewModel: AppDetailsViewModel
 ) {
 
+    val mContext = LocalContext.current
+
     val state = viewModel.stateApp.value
     if(state.appName == "Instagram"){
         Log.v("test", "test")
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,6 +82,7 @@ fun AppDetailsScreen(
                 }
             }
         }
+        Text(text = "Possible location tracking last 24h:", style = MaterialTheme.typography.headlineSmall)
         Box(modifier = Modifier
             .padding(10.dp, 15.dp, 10.dp, 15.dp)
             .fillMaxWidth()
@@ -83,6 +98,7 @@ fun AppDetailsScreen(
             )
             //lineDiagram(yPoints = entriesOf(*viewModel.appUsagePerHour.toTypedArray()), modifier = Modifier.fillMaxWidth().padding(5.dp))
         }
+        Text(text = "Permissions:", style = MaterialTheme.typography.headlineSmall)
         Column(modifier = Modifier.padding(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
@@ -100,5 +116,23 @@ fun AppDetailsScreen(
                 Text(text = state.ACCESS_BACKGROUND_LOCATION.toString())
             }
         }
+        Button(onClick = {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.fromParts("package", viewModel.stateApp.value.packageName, null)
+            )
+            try {
+            mContext.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(mContext, "Operation is not possible with this app.",Toast.LENGTH_SHORT).show()
+        } }, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Change permissions")
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Other:", style = MaterialTheme.typography.headlineSmall)
+        Button(onClick = { /*TODO*/}, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Don´t consider app in assessment")
+        }
     }
 }
+

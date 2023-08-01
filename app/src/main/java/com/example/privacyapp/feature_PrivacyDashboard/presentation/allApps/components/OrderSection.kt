@@ -28,7 +28,7 @@ fun OrderSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
-                text = "LocationUsage",
+                text = "Possible location usage",
                 selected = noteOrder is AppOrder.LocationUsage,
                 onSelect = { onOrderChange(AppOrder.LocationUsage(noteOrder.orderType)) }
             )

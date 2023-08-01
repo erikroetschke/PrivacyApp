@@ -100,10 +100,7 @@ fun DashboardScreen(
     val scrollState = rememberScrollState()
 
     Column() {
-
-
         Column() {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

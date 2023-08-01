@@ -23,9 +23,12 @@ fun LineChart(
     val spacing = 100f
     val graphColor = Color.Green
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
-    val upperValueWithoutSpacing = (data.maxOfOrNull { it.second }) ?: 0
+    var upperValueWithoutSpacing = (data.maxOfOrNull { it.second }) ?: 1
+    if(upperValueWithoutSpacing == 0) {
+        upperValueWithoutSpacing = 1
+    }
     val upperValue = upperValueWithoutSpacing + upperValueWithoutSpacing/5.toFloat()
-    val lowerValue = (data.minOfOrNull { it.second } ?: 0)
+    val lowerValue = 0
     val density = LocalDensity.current
 
     val textPaint = remember(density) {
