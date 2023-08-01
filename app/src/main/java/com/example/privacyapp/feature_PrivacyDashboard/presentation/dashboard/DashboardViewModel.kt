@@ -27,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +56,7 @@ class DashboardViewModel @Inject constructor(
     private val _privacyLeakData = mutableStateOf(emptyList<Pair<Int, Double>>())
     val privacyLeakData = _privacyLeakData
 
-    private val _top5Apps = mutableStateOf(mutableListOf<App>()) //TODO convert to mutbaleStateList
+    private val _top5Apps = mutableStateListOf<App>()
     val top5Apps = _top5Apps
 
     private val _isLoading = mutableStateOf(false)
@@ -69,15 +70,20 @@ class DashboardViewModel @Inject constructor(
     private var privacyAssessmentJob: Job? = null
 
     init {
-        _trackingActive.value =
-            ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        loadPrivacyLeakData()
+        updateTop5()
+    }
+
+    private fun updateTop5() {
         viewModelScope.launch {
-            loadPrivacyLeakData()
-            _top5Apps.value =
-                appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5)
-                    .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
-            maxLocationUsage = if (_top5Apps.value.isNotEmpty()) {
-                _top5Apps.value.maxOf { it.numberOfEstimatedRequests }
+            _top5Apps.clear()
+            _top5Apps.addAll(appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending))
+                .take(5)
+                .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
+            )
+            maxLocationUsage = if (_top5Apps.isNotEmpty()) {
+                _top5Apps.maxOf { it.numberOfEstimatedRequests }
             } else {
                 0
             }
@@ -88,7 +94,9 @@ class DashboardViewModel @Inject constructor(
         privacyAssessmentJob?.cancel()
 
         privacyAssessmentJob = viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.value = true
+            withContext(Dispatchers.Main) {
+                _isLoading.value = true
+            }
 
             var result = mutableListOf<Pair<Int, Double>>()
             for ((index, metric) in _selectedMetrics.toList().withIndex()) {
@@ -126,7 +134,9 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
 
-            _isLoading.value = false
+            withContext(Dispatchers.Main) {
+                _isLoading.value = false
+            }
         }
 
     }
@@ -190,7 +200,7 @@ class DashboardViewModel @Inject constructor(
                 } else {
                     _selectedMetrics.add(event.metric)
                 }
-                    loadPrivacyLeakData()
+                loadPrivacyLeakData()
             }
 
             is DashboardEvent.RefreshData -> {
@@ -198,26 +208,19 @@ class DashboardViewModel @Inject constructor(
                     _isLoading.value = true
                     updateUsageStats()
                     loadPrivacyLeakData()
-                    _top5Apps.value =
-                        appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5)
-                            .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
-                    maxLocationUsage = if (_top5Apps.value.isNotEmpty()) {
-                        _top5Apps.value.maxOf { it.numberOfEstimatedRequests }
-                    } else {
-                        0
-                    }
+                    updateTop5()
                     _isLoading.value = false
                 }
             }
 
             is DashboardEvent.ChangeMetricType -> {
                 _metricType.value = event.metricType
-                    loadPrivacyLeakData()
+                loadPrivacyLeakData()
             }
 
             is DashboardEvent.ChangeMetricInterval -> {
                 _metricInterval.value = event.metricInterval
-                    loadPrivacyLeakData()
+                loadPrivacyLeakData()
             }
         }
     }

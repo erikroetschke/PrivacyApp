@@ -272,7 +272,7 @@ fun DashboardScreen(
                 Text(text = "Top 5 last 24 hours:", style = MaterialTheme.typography.headlineSmall)
             }
             Column(modifier = Modifier.fillMaxSize()) {
-                (viewModel.top5Apps.value).forEach { app ->
+                (viewModel.top5Apps).forEach { app ->
                     AppItem(
                         app = app,
                         maxLocationUsage = viewModel.maxLocationUsage,
