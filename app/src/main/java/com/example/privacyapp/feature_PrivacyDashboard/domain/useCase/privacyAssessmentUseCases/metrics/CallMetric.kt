@@ -37,6 +37,10 @@ class CallMetric() {
             Metric.StopDetection -> {
                 return ExtractPOIs().invoke(pyRoute).map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
             }
+
+            Metric.StopFrequency -> {
+                return ExtractPOIs().invoke(pyRoute).map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
+            }
         }
     }
 }

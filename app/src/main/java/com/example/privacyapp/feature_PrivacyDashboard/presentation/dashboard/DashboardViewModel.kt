@@ -20,10 +20,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterval
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,43 +46,89 @@ class DashboardViewModel @Inject constructor(
     private val _metricSectionExpanded = mutableStateOf(false)
     val metricSectionExpanded = _metricSectionExpanded
 
-    private val _metricDropdownSelected = mutableStateOf(Metric.StopDetection)
-    val metricDropdownSelected = _metricDropdownSelected
+    private val _selectedMetrics = mutableStateListOf(Metric.StopDetection)
+    val selectedMetrics = _selectedMetrics
 
-    private val _metricIntervalDropdownSelected = mutableStateOf(MetricInterval.DAY)
-    val metricIntervalDropdownSelected = _metricIntervalDropdownSelected
+    private val _metricInterval = mutableStateOf(MetricInterval.DAY)
+    val metricInterval = _metricInterval
 
     private val _privacyLeakData = mutableStateOf(emptyList<Pair<Int, Double>>())
     val privacyLeakData = _privacyLeakData
 
-    private val _top5Apps = mutableStateOf(mutableListOf<App>())
+    private val _top5Apps = mutableStateOf(mutableListOf<App>()) //TODO convert to mutbaleStateList
     val top5Apps = _top5Apps
 
     private val _isLoading = mutableStateOf(false)
     val isLoading = _isLoading
 
+    private val _metricType = mutableStateOf(MetricType.CUMULATIVE)
+    val metricType = _metricType
+
     var maxLocationUsage = 0
 
+    private var privacyAssessmentJob: Job? = null
+
     init {
-        _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        _trackingActive.value =
+            ApplicationProvider.application.isServiceRunning(LocationService::class.java)
         viewModelScope.launch {
             loadPrivacyLeakData()
-            _top5Apps.value = appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5).filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
-            maxLocationUsage = if(_top5Apps.value.isNotEmpty()){
+            _top5Apps.value =
+                appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5)
+                    .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
+            maxLocationUsage = if (_top5Apps.value.isNotEmpty()) {
                 _top5Apps.value.maxOf { it.numberOfEstimatedRequests }
-            }else {
+            } else {
                 0
             }
         }
     }
 
-    private suspend fun loadPrivacyLeakData() {
+    private fun loadPrivacyLeakData() {
+        privacyAssessmentJob?.cancel()
 
+        privacyAssessmentJob = viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
 
-                _privacyLeakData.value = privacyAssessmentUseCases.doAssessment(
-                    _metricDropdownSelected.value,
-                    _metricIntervalDropdownSelected.value
-                )
+            var result = mutableListOf<Pair<Int, Double>>()
+            for ((index, metric) in _selectedMetrics.toList().withIndex()) {
+
+                if (index == 0) {
+                    result = privacyAssessmentUseCases.doAssessment(
+                        metric,
+                        _metricInterval.value,
+                        _metricType.value
+                    ).toMutableList()
+                } else {
+                    val otherMetric = privacyAssessmentUseCases.doAssessment(
+                        metric,
+                        _metricInterval.value,
+                        _metricType.value
+                    ).toMutableList()
+                    //add other metrics to the first
+                    for ((index, point) in otherMetric.withIndex()) {
+                        result[index] =
+                            Pair(result[index].first, result[index].second + point.second)
+                    }
+                }
+            }
+
+            _privacyLeakData.value =
+                if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.CUMULATIVE) {
+                    result
+                } else {
+                    //type is Score and there were mutiple metrics selected so avaerage the metrics, to maintain value range [0,1]
+                    result.map { pair ->
+                        Pair(
+                            pair.first,
+                            pair.second / _selectedMetrics.toList().size
+                        )
+                    }
+                }
+
+            _isLoading.value = false
+        }
+
     }
 
     private suspend fun updateUsageStats() {
@@ -113,8 +161,9 @@ class DashboardViewModel @Inject constructor(
         mainActivity: MainActivity
     ) {
         var isGranted = false
-        if(ContextCompat.checkSelfPermission(mainActivity, permission)
-            == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mainActivity, permission)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             isGranted = true
         }
 
@@ -133,30 +182,42 @@ class DashboardViewModel @Inject constructor(
                 _metricSectionExpanded.value = !_metricSectionExpanded.value
             }
 
-            is DashboardEvent.ChangeMetricDropdown -> {
-                _metricDropdownSelected.value = event.metric
-                _metricIntervalDropdownSelected.value = event.metricInterval
-
-                viewModelScope.launch(Dispatchers.IO) {
-                    _isLoading.value = true
-                    loadPrivacyLeakData()
-                    _isLoading.value = false
+            is DashboardEvent.ChangeMetric -> {
+                if (_selectedMetrics.contains(event.metric)) {
+                    if (_selectedMetrics.size > 1) {
+                        _selectedMetrics.remove(event.metric)
+                    }
+                } else {
+                    _selectedMetrics.add(event.metric)
                 }
+                    loadPrivacyLeakData()
             }
 
-            DashboardEvent.RefreshData -> {
-                viewModelScope.launch {
+            is DashboardEvent.RefreshData -> {
+                viewModelScope.launch(Dispatchers.IO) {
                     _isLoading.value = true
                     updateUsageStats()
                     loadPrivacyLeakData()
-                    _top5Apps.value = appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5).filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
-                    maxLocationUsage = if(_top5Apps.value.isNotEmpty()){
+                    _top5Apps.value =
+                        appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).take(5)
+                            .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
+                    maxLocationUsage = if (_top5Apps.value.isNotEmpty()) {
                         _top5Apps.value.maxOf { it.numberOfEstimatedRequests }
-                    }else {
+                    } else {
                         0
                     }
                     _isLoading.value = false
                 }
+            }
+
+            is DashboardEvent.ChangeMetricType -> {
+                _metricType.value = event.metricType
+                    loadPrivacyLeakData()
+            }
+
+            is DashboardEvent.ChangeMetricInterval -> {
+                _metricInterval.value = event.metricInterval
+                    loadPrivacyLeakData()
             }
         }
     }

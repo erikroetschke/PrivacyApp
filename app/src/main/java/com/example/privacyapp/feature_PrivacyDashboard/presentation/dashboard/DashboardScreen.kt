@@ -24,44 +24,31 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
-import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.AppsEvent
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.components.OrderSection
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.AppItem
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChart
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChartV2
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.BackgroundLocationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.LocationPermissionTextProvider
@@ -158,16 +145,18 @@ fun DashboardScreen(
                 exit = fadeOut() + slideOutVertically()
             ) {
                 MetricSection(
-                    metric = viewModel.metricDropdownSelected.value,
-                    metricInterval = viewModel.metricIntervalDropdownSelected.value,
-                    onMetricChange = { metric, metricInterval ->
+                    metrics = viewModel.selectedMetrics.toList(),
+                    metricInterval = viewModel.metricInterval.value,
+                    onMetricChange = { metric ->
                         viewModel.onEvent(
-                            DashboardEvent.ChangeMetricDropdown(
-                                metric,
-                                metricInterval
-                            )
+                            DashboardEvent.ChangeMetric(metric)
                         )
-                    })
+                    },
+                    metricType = viewModel.metricType.value,
+                    onMetricTypeChange = {metricType -> viewModel.onEvent(DashboardEvent.ChangeMetricType(metricType))},
+                    modifier = Modifier.padding(10.dp),
+                    onMetricIntervalChange = {metricInterval -> viewModel.onEvent(DashboardEvent.ChangeMetricInterval(metricInterval))}
+                )
             }
         }
         Column(

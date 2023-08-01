@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.DashboardEvent
 import java.lang.Math.round
 import kotlin.math.roundToInt
 
@@ -29,9 +31,13 @@ fun LineChartV2(
     val spacing = 100f
     val graphColor = Color.Green
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
-    val upperValueWithoutSpacing = (data.maxOfOrNull { it.second })?.toInt() ?: 0
+
+    var upperValueWithoutSpacing = (data.maxOfOrNull { it.second })?.toInt() ?: 1
+    if (upperValueWithoutSpacing < 1) {
+        upperValueWithoutSpacing = 1
+    }
     val upperValue = upperValueWithoutSpacing + upperValueWithoutSpacing/5.toFloat()
-    val lowerValue = (data.minOfOrNull { it.second }?.toInt() ?: 0)
+    val lowerValue = 0
     val density = LocalDensity.current
 
     val textPaint = remember(density) {
