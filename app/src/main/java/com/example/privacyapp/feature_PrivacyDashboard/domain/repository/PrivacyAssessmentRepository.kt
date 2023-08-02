@@ -10,6 +10,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
 
 interface PrivacyAssessmentRepository {
 
+    suspend fun deleteAssessment1d(privacyAssessment1d: PrivacyAssessment1d)
     suspend fun getAssessment1hByMetricSinceTimestamp(metric: Metric, timestamp: Long): List<PrivacyAssessment1h>
 
     suspend fun insertAssessment1h(privacyAssessment1h: PrivacyAssessment1h)

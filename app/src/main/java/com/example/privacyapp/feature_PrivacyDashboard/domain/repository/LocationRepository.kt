@@ -13,7 +13,7 @@ interface LocationRepository {
 
     suspend fun getLocationByTimestamp(timestamp: Long): Location?
 
-    fun getLocationsbyIntervall(timestampStart: Long, timestampEnd: Long): Flow<List<Location>>
+    suspend fun getUsedLocationsByInterval(timestampStart: Long, timestampEnd: Long): List<Location>
 
     suspend fun getLocationsWithLocationUsedIsNull () : List<Location>
 

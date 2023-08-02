@@ -17,11 +17,11 @@ class LocationRepositoryImpl(
         return dao.getLocationByTimestamp(timestamp)
     }
 
-    override fun getLocationsbyIntervall(
+    override suspend fun getUsedLocationsByInterval(
         timestampStart: Long,
         timestampEnd: Long
-    ): Flow<List<Location>> {
-        return dao.getLocationsbyIntervall(timestampStart, timestampEnd)
+    ): List<Location> {
+        return dao.getUsedLocationsByInterval(timestampStart, timestampEnd)
     }
 
     override suspend fun getLocationsWithLocationUsedIsNull(): List<Location> {

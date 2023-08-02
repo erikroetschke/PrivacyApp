@@ -18,8 +18,8 @@ interface LocationDao {
     @Query("SELECT * FROM location WHERE timestamp = :timestamp")
     suspend fun getLocationByTimestamp(timestamp: Long): Location?
 
-    @Query("SELECT * FROM location WHERE timestamp >= :timestampStart AND timestamp <= :timestampEnd")
-    fun getLocationsbyIntervall(timestampStart: Long, timestampEnd: Long): Flow<List<Location>>
+    @Query("SELECT * FROM location WHERE locationUsed = 1 AND timestamp >= :timestampStart AND timestamp <= :timestampEnd")
+    fun getUsedLocationsByInterval(timestampStart: Long, timestampEnd: Long): List<Location>
 
     @Query("SELECT * FROM location WHERE locationUsed IS NULL")
     suspend fun getLocationsWithLocationUsedIsNull (): List<Location>

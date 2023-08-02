@@ -21,6 +21,10 @@ class PrivacyAssessmentRepositoryImpl(
         return privacyAssessment1hDao.getAssessmentByMetricSinceTimestamp(metric.metricName, timestamp)
     }
 
+    override suspend fun deleteAssessment1d(privacyAssessment1d: PrivacyAssessment1d) {
+        return privacyAssessment1dDao.deleteAssessment(privacyAssessment1d)
+    }
+
     override suspend fun getAssessment1dByMetricSinceTimestamp(
         metric: Metric,
         timestamp: Long

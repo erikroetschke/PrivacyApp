@@ -136,9 +136,8 @@ dependencies {
     //location services
     implementation "com.google.android.gms:play-services-location:21.0.1"
 
-    /*//maps
-    implementation 'com.google.maps.android:maps-compose:2.11.0'
-    implementation 'com.google.android.gms:play-services-maps:18.1.0'*/
+    //maps
+    //implementation 'ovh.plrapps:mapcompose:2.0.0-rc01'
 
     //splash screen
     implementation "androidx.core:core-splashscreen:1.0.1"

@@ -18,4 +18,7 @@ interface PrivacyAssessment1dDao {
 
     @Query("DELETE FROM privacyassessment1d WHERE timestampStart < :timestamp")
     suspend fun deleteAssessmentOlderThanTimestamp(timestamp: Long)
+
+    @Delete
+    suspend fun deleteAssessment(privacyAssessment1d: PrivacyAssessment1d)
 }

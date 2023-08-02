@@ -33,6 +33,7 @@ class CallMetric() {
         //create route from points
         val pyRoute = routeCreation.callAttr("create_Route", pyPoints.toTypedArray(), timestamps.toTypedArray())
 
+
         when (metric) {
             Metric.StopDetection -> {
                 return ExtractPOIs().invoke(pyRoute).map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
