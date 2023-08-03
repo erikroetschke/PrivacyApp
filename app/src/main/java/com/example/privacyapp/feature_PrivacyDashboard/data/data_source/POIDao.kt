@@ -20,4 +20,7 @@ interface POIDao {
 
     @Delete
     suspend fun deletePOI(poi: POI)
+
+    @Query("DELETE FROM poi WHERE timestamp < :timestamp")
+    suspend fun deletePOIOlderThanTimestamp(timestamp: Long)
 }

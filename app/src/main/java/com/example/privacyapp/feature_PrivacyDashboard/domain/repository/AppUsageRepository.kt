@@ -17,4 +17,6 @@ interface AppUsageRepository {
 
     suspend fun getAppUsageStatsSinceTimestamp(packageName: String, startInterval: Long): List<AppUsage>
 
+    suspend fun deleteAppUsageOlderThanTimestamp(timestamp: Long)
+
 }

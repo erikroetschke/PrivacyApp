@@ -16,4 +16,8 @@ class POIRepositoryImpl(private val poiDao: POIDao): POIRepository {
     override suspend fun deletePOI(poi: POI) {
         return poiDao.deletePOI(poi)
     }
+
+    override suspend fun deletePOIOlderThanTimestamp(timestamp: Long) {
+        return poiDao.deletePOIOlderThanTimestamp(timestamp)
+    }
 }

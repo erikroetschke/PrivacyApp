@@ -22,4 +22,6 @@ interface LocationRepository {
     suspend fun insertLocation(location: Location)
 
     suspend fun deletelocation(location: Location)
+
+    suspend fun deleteLocationOlderThanTimestamp(timestamp: Long)
 }

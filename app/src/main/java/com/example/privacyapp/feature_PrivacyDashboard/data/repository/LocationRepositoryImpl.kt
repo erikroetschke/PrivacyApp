@@ -39,4 +39,8 @@ class LocationRepositoryImpl(
     override suspend fun deletelocation(location: Location) {
         return dao.deletelocation(location)
     }
+
+    override suspend fun deleteLocationOlderThanTimestamp(timestamp: Long) {
+        return dao.deleteLocationOlderThanTimestamp(timestamp)
+    }
 }

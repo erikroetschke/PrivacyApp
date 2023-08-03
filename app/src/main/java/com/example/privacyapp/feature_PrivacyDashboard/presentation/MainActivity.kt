@@ -22,9 +22,11 @@ import androidx.navigation.compose.rememberNavController
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
@@ -36,6 +38,9 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welc
 import com.example.privacyapp.ui.theme.PrivacyAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,6 +56,12 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
 
     @Inject
     lateinit var appUsageUseCases: AppUsageUseCases
+
+    @Inject
+    lateinit var privacyAssessmentUseCases: PrivacyAssessmentUseCases
+
+    @Inject
+    lateinit var poiRepository: POIRepository
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +87,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         } else {
             initData()
+            cleanDb()
         }
 
 
@@ -97,6 +109,25 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * function to remove data from the db which wont be needed anymore.
+     * SO everything older than a month will be removed
+     * Locations, AppUSages, PrivacyAssessments, POIs
+     */
+    private fun cleanDb() {
+        //get timestamp one month ago
+        val timestamp = ChronoUnit.MILLIS.between(
+            Instant.EPOCH,
+            Instant.now().atZone(ZoneId.systemDefault()).minusMonths(1)
+        )
+        lifecycleScope.launch {
+            privacyAssessmentUseCases.deletePrivacyAssessment(timestamp)
+            locationUseCases.deleteLocationsOlderThanTimestamp(timestamp)
+            appUsageUseCases.deleteAppUsageOlderThanTimestamp(timestamp)
+            poiRepository.deletePOIOlderThanTimestamp(timestamp)
         }
     }
 

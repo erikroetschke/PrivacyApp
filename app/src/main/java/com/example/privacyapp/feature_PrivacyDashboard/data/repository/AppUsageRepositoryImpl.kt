@@ -41,4 +41,8 @@ class AppUsageRepositoryImpl(
     ): List<AppUsage> {
         return appUsageDao.getAppUsageStatsSinceTimestamp(packageName, startInterval)
     }
+
+    override suspend fun deleteAppUsageOlderThanTimestamp(timestamp: Long) {
+        return appUsageDao.deleteAppUsageOlderThanTimestamp(timestamp)
+    }
 }

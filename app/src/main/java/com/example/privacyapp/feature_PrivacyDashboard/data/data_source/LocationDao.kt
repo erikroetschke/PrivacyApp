@@ -32,4 +32,7 @@ interface LocationDao {
 
     @Delete
     suspend fun deletelocation(location: Location)
+
+    @Query("DELETE FROM location WHERE timestamp < :timestamp")
+    suspend fun deleteLocationOlderThanTimestamp(timestamp: Long)
 }

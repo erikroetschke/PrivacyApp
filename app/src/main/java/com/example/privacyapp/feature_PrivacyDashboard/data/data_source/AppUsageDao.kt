@@ -21,6 +21,9 @@ interface AppUsageDao {
     @Query("DELETE FROM appusage WHERE packageName =:packageName AND timestamp BETWEEN :startInterval AND :endInterval")
     suspend fun deleteAppUsageStatsByInterval(packageName: String, startInterval: Long, endInterval: Long)
 
+    @Query("DELETE FROM appusage WHERE timestamp < :timestamp")
+    suspend fun deleteAppUsageOlderThanTimestamp(timestamp: Long)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAppUsage(appUsage: AppUsage)
 
