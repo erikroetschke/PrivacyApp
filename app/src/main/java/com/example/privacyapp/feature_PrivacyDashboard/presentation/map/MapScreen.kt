@@ -33,11 +33,10 @@ fun MapScreen(viewModel: MapViewModel) {
 
     val builder = LatLngBounds.builder()
 
-    if (viewModel.pois.isNotEmpty()) {
-        for (poi in viewModel.pois) {
-            builder.include(LatLng(poi.latitude, poi.longitude))
-        }
+    for (poi in viewModel.pois) {
+        builder.include(LatLng(poi.latitude, poi.longitude))
     }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -57,16 +56,24 @@ fun MapScreen(viewModel: MapViewModel) {
             if (viewModel.isLoading.value) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
-                val bounds = builder.build()
+                if (viewModel.pois.isNotEmpty()) {
+                    val bounds = builder.build()
+
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = rememberCameraPositionState {
                         position = CameraPosition.fromLatLngZoom(bounds.center, 10f)
                     }
                 ) {
-
                     viewModel.pois.forEach {
                         Marker(position = LatLng(it.latitude, it.longitude))
+                    }
+                }
+                }else {
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = rememberCameraPositionState()
+                    ) {
                     }
                 }
             }

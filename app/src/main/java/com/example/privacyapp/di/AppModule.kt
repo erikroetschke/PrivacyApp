@@ -31,11 +31,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DoAssessment
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1hByMetricSinceTimestamp
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1wByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.CallMetric
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.ExtractPOIs
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.StopDetection
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
@@ -90,7 +86,7 @@ object AppModule {
     @Provides
     @Singleton
     fun providePrivacyAssessmentRepository(db: Database): PrivacyAssessmentRepository {
-        return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1hDao, db.privacyAssessment1dDao, db.privacyAssessment1wDao)
+        return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1dDao)
     }
 
     @Provides
@@ -123,9 +119,7 @@ object AppModule {
             callMetric = CallMetric(),
             addPrivacyAssessment = AddPrivacyAssessment(repository),
             deletePrivacyAssessment = DeletePrivacyAssessment(repository),
-            getAssessment1hByMetricSinceTimestamp = GetAssessment1hByMetricSinceTimestamp(repository),
             getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
-            getAssessment1wByMetricSinceTimestamp = GetAssessment1wByMetricSinceTimestamp(repository),
             doAssessment = DoAssessment(locationRepository, repository),
             extractPOIsLast24h = ExtractPOIsLast24h(locationRepository)
         )

@@ -8,21 +8,8 @@ class DeletePrivacyAssessment(
 ) {
 
     suspend operator fun invoke(
-        timestamp: Long,
-        metricInterval: MetricInterval
+        timestamp: Long
     ) {
-        return when (metricInterval) {
-            MetricInterval.DAY -> {
-                privacyAssessmentRepository.deleteAssessment1hOlderThanTimestamp(timestamp)
-            }
-
-            MetricInterval.WEEK -> {
-                privacyAssessmentRepository.deleteAssessment1dOlderThanTimestamp(timestamp)
-            }
-
-            MetricInterval.MONTH -> {
-                privacyAssessmentRepository.deleteAssessment1wOlderThanTimestamp(timestamp)
-            }
-        }
+        return privacyAssessmentRepository.deleteAssessment1dOlderThanTimestamp(timestamp)
     }
 }
