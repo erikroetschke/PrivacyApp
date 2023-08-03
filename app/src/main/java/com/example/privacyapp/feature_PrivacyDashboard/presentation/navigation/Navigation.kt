@@ -32,6 +32,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.Da
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.FavoritesScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.FavoritesViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapScreen
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
@@ -121,7 +122,8 @@ fun NavigationController(navController: NavHostController, mainActivity: MainAct
             }
 
             composable(NavigationItem.Map.route) {
-                //MapScreen()
+                val mapViewModel = hiltViewModel<MapViewModel>()
+                MapScreen(mapViewModel)
             }
 
             composable(NavigationItem.AppDetails.route +
