@@ -50,9 +50,6 @@ fun AppDetailsScreen(
     val mContext = LocalContext.current
 
     val state = viewModel.stateApp.value
-    if(state.appName == "Instagram"){
-        Log.v("test", "test")
-    }
 
     Column(
         modifier = Modifier
@@ -67,7 +64,7 @@ fun AppDetailsScreen(
             }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
             }
-            Text(text = state.appName, color = Color.Black, style = MaterialTheme.typography.headlineMedium)
+            Text(text = state.appName, style = MaterialTheme.typography.headlineMedium)
             if (state.favorite){
                 IconButton(onClick = {
                     viewModel.onEvent(AppDetailsEvent.Favor)

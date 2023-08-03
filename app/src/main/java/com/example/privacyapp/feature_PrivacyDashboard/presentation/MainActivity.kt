@@ -33,14 +33,16 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation.N
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
+import com.example.privacyapp.ui.theme.PrivacyAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener  {
+class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val isLoading = mutableStateOf(true)
+
     @Inject
     lateinit var appUseCases: AppUseCases
 
@@ -49,7 +51,6 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
 
     @Inject
     lateinit var appUsageUseCases: AppUsageUseCases
-
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +74,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             val intent = Intent(this, WelcomeScreenActivity::class.java)
             startActivity(intent)
             sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        }else {
+        } else {
             initData()
         }
 
@@ -85,14 +86,15 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
         }
         //actual content/ui
         setContent {
+            PrivacyAppTheme {
+                val navController = rememberNavController()
 
-            val navController = rememberNavController()
-
-            Scaffold(bottomBar = {
-                BottomNavigationBar(navController)
-            }) {
-                Box(modifier = Modifier.padding(it)) {
-                    NavigationController(navController = navController, this@MainActivity)
+                Scaffold(bottomBar = {
+                    BottomNavigationBar(navController)
+                }) {
+                    Box(modifier = Modifier.padding(it)) {
+                        NavigationController(navController = navController, this@MainActivity)
+                    }
                 }
             }
         }
@@ -156,7 +158,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
     }
 
     override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
-        if (key.equals("USAGE_PERMISSION_GRANTED")){
+        if (key.equals("USAGE_PERMISSION_GRANTED")) {
             initData()
         }
     }

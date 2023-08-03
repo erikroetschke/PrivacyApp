@@ -2,6 +2,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.coreCompone
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ fun LineChartV2(
     modifier: Modifier = Modifier
 ) {
     val spacing = 100f
-    val graphColor = Color.Green
+    val graphColor = MaterialTheme.colorScheme.primary
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
 
     var upperValueWithoutSpacing = (data.maxOfOrNull { it.second })?.toInt() ?: 1
@@ -39,10 +40,11 @@ fun LineChartV2(
     val upperValue = upperValueWithoutSpacing + upperValueWithoutSpacing/5.toFloat()
     val lowerValue = 0
     val density = LocalDensity.current
+    val textColor = MaterialTheme.colorScheme.onBackground
 
     val textPaint = remember(density) {
         Paint().apply {
-            color = android.graphics.Color.BLACK
+            color = textColor.hashCode()
             textAlign = Paint.Align.CENTER
             textSize = density.run { 12.sp.toPx() }
         }
@@ -75,14 +77,14 @@ fun LineChartV2(
 
         //x-axis
         drawLine(
-            color = Color.DarkGray,
+            color = textColor,
             start = Offset(0f, size.height - spacing),
             end = Offset(size.width -10 , size.height - spacing),
             strokeWidth = 5f
         )
         (data.indices step stepSize).forEach {i ->
             drawLine(
-                color = Color.DarkGray,
+                color = textColor,
                 start = Offset(spacing + i * spacePerHour, size.height - spacing +30),
                 end = Offset(spacing + i * spacePerHour , size.height - spacing - 10),
                 strokeWidth = 5f
@@ -98,7 +100,7 @@ fun LineChartV2(
         }
         drawPath(
             path = trianglePath,
-            color = Color.DarkGray
+            color = textColor
         )
         //arrow at the beginning of the x-Axis
         /*val trianglePath2 = Path().apply {

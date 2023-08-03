@@ -3,6 +3,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -53,7 +54,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         NavigationItem.Map
     )
 
-    NavigationBar(modifier = Modifier, containerColor = Color.DarkGray, tonalElevation = 5.dp) {
+    NavigationBar(modifier = Modifier, containerColor = MaterialTheme.colorScheme.secondary, tonalElevation = 5.dp) {
         items.forEach { item ->
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -72,9 +73,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.Green,
-                    unselectedIconColor = Color.Gray,
-                    indicatorColor = Color.Gray
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                    indicatorColor = MaterialTheme.colorScheme.onSecondary
                 ),
                 icon = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

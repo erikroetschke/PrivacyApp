@@ -213,7 +213,7 @@ fun DashboardScreen(
                             }
                         },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.Green,
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
                             checkedTrackColor = Color.Gray
                         )
                     )

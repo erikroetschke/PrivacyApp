@@ -43,7 +43,7 @@ fun AppItem(
 
     Card(modifier = modifier
         .clip(RoundedCornerShape(10.dp))
-        .background(color = Color.White)
+        //.background(color = Color.White)
     ) {
         Row(modifier = Modifier
             .padding(10.dp),
@@ -63,13 +63,13 @@ fun AppItem(
                         .clip(RoundedCornerShape(2.dp))
                         .height(10.dp)
                         .fillMaxWidth()
-                        .background(color = Color.DarkGray)
+                        .background(color = MaterialTheme.colorScheme.tertiary)
                     )
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(2.dp))
                         .height(10.dp)
                         .fillMaxWidth(locationUsedBoxWidthInPercentage/100)
-                        .background(color = Color.Green)
+                        .background(color = MaterialTheme.colorScheme.primary)
                     )
                 }
             }

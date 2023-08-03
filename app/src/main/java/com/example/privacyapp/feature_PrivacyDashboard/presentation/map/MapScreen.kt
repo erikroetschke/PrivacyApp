@@ -12,20 +12,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.CameraUpdate
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -46,7 +42,6 @@ fun MapScreen(viewModel: MapViewModel) {
         Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp).fillMaxWidth()) {
             Text(
                 text = "POIs in the last 24h:",
-                color = Color.Black,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.align(Alignment.TopStart)
             )
