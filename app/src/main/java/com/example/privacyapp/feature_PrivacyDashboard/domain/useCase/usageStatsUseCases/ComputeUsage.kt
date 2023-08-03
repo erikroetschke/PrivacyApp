@@ -48,7 +48,6 @@ class ComputeUsage(
             locationsCopy.last().timestamp + 60000
         )
 
-
         for ((counter, location) in locationsCopy.withIndex()) {
             if (usageEvents != null) {
                 var locationUsed = false
@@ -62,7 +61,6 @@ class ComputeUsage(
                     }
                     //check if event is too for away from location(more than 3 minutes),
                     //this could happen when the location could not be tracked for while and there is a bigger gap between to locations
-                    //TODO evaulate how ofthen the location can be tracked in the background per hour
                     if(currentEvent.timeStamp >= locationsCopy[counter].timestamp + 180000) {
                         usageEvents.getNextEvent(currentEvent)
                         continue

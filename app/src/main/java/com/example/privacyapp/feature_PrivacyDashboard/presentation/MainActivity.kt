@@ -38,6 +38,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welc
 import com.example.privacyapp.ui.theme.PrivacyAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -132,7 +133,8 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
     }
 
     private fun initData() {
-        lifecycleScope.launch {
+        //run blocking to make sure init completes before dashboard will be initialized
+        runBlocking {
             //init apps from the phone
             //get the apps
             val appsFromPhone =
