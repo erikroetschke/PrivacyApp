@@ -25,6 +25,14 @@ class MapViewModel @Inject constructor(
     val isLoading = _isLoading
 
     init {
+        getPOi()
+    }
+
+    fun refresh() {
+        getPOi()
+    }
+
+    private fun getPOi() {
         viewModelScope.launch {
             _isLoading.value = true
             _pois.addAll(privacyAssessmentUseCases.extractPOIsLast24h())
