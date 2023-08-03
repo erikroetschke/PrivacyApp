@@ -139,7 +139,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             //get the apps
             val appsFromPhone =
                 appUseCases.initApps().toMutableList()   //is sorted ascending by appName
-            val appsFromDb = appUseCases.getApps(AppOrder.Title(OrderType.Ascending))
+            val appsFromDb = appUseCases.getAppsSuspend(AppOrder.Title(OrderType.Ascending))
 
             //check if app-db is up to date
             for ((index, app) in appsFromDb.withIndex()) {

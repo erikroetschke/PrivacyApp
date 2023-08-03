@@ -10,7 +10,7 @@ class UpdateAppUsageLast24Hours(
 ) {
 
     suspend operator fun invoke() {
-        val appList = appRepository.getApps()
+        val appList = appRepository.getAppsSuspend()
         //getLast24Hours
         val timestamp24HoursAgo = System.currentTimeMillis() - 1000 * 60 * 60 * 24
         for (app in appList) {

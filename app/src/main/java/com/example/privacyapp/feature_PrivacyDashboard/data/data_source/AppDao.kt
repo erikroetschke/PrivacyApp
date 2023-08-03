@@ -14,7 +14,10 @@ import kotlinx.coroutines.flow.Flow
 interface AppDao {
 
     @Query("SELECT * FROM app")
-    suspend fun getApps(): List<App>
+    fun getApps(): Flow<List<App>>
+
+    @Query("SELECT * FROM app")
+    suspend fun getAppsSuspend(): List<App>
 
     @Query("SELECT * FROM app WHERE packageName = :packageName")
     suspend fun getAppByName(packageName: String): App?

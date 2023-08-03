@@ -5,6 +5,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.DeleteApp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetApp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetApps
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetAppsSuspend
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetFavoriteApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.InitApps
 
@@ -15,5 +16,6 @@ data class AppUseCases(
     val initApps: InitApps,
     val getApp: GetApp,
     val getFavoriteApps: GetFavoriteApps,
-    val deleteApp: DeleteApp
+    val deleteApp: DeleteApp,
+    val getAppsSuspend: GetAppsSuspend
 )

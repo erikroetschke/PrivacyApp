@@ -15,8 +15,12 @@ import java.sql.Timestamp
 class AppRepositoryImpl(
     private val dao: AppDao
 ) : AppRepository {
-    override suspend fun getApps(): List<App> {
+    override fun getApps(): Flow<List<App>> {
         return dao.getApps()
+    }
+
+    override suspend fun getAppsSuspend(): List<App> {
+        return dao.getAppsSuspend()
     }
 
     override suspend fun getAppWithUsage(packageName: String): AppAndAppUsage {

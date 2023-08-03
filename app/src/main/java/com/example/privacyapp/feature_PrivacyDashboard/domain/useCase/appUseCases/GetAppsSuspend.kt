@@ -7,27 +7,32 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetApps(
+class GetAppsSuspend(
     private val repository: AppRepository
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         appOrder: AppOrder = AppOrder.Title(OrderType.Ascending)
-    ): Flow<List<App>> {
+    ): List<App> {
         return when (appOrder.orderType) {
             is OrderType.Ascending -> {
                 when (appOrder) {
-                    is AppOrder.Title -> repository.getApps().map { apps -> apps.sortedBy { it.appName.lowercase() } }
-                    is AppOrder.LocationUsage -> repository.getApps().map { apps ->  apps.sortedBy { it.numberOfEstimatedRequests }}
+                    is AppOrder.Title -> repository.getAppsSuspend()
+                        .sortedBy { it.appName.lowercase() }
+
+                    is AppOrder.LocationUsage -> repository.getAppsSuspend()
+                        .sortedBy { it.numberOfEstimatedRequests }
                 }
             }
 
             is OrderType.Descending -> {
                 when (appOrder) {
-                    is AppOrder.Title -> repository.getApps().map { apps -> apps.sortedByDescending { it.appName.lowercase() }}
-                    is AppOrder.LocationUsage -> repository.getApps().map { apps -> apps.sortedByDescending { it.numberOfEstimatedRequests } }
+                    is AppOrder.Title -> repository.getAppsSuspend()
+                        .sortedByDescending { it.appName.lowercase() }
+
+                    is AppOrder.LocationUsage -> repository.getAppsSuspend()
+                        .sortedByDescending { it.numberOfEstimatedRequests }
                 }
             }
         }
-
     }
 }

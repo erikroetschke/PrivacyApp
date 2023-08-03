@@ -26,6 +26,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -68,26 +70,29 @@ class DashboardViewModel @Inject constructor(
     var maxLocationUsage = 0
 
     private var privacyAssessmentJob: Job? = null
+    private var getTop5AppsJob: Job? = null
 
     init {
-        _trackingActive.value = ApplicationProvider.application.isServiceRunning(LocationService::class.java)
+        _trackingActive.value =
+            ApplicationProvider.application.isServiceRunning(LocationService::class.java)
         loadPrivacyLeakData()
-        updateTop5()
+        getTop5()
     }
 
-    private fun updateTop5() {
-        viewModelScope.launch {
-            _top5Apps.clear()
-            _top5Apps.addAll(appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending))
-                .take(5)
-                .filter { it.numberOfEstimatedRequests > 0 }.toMutableList()
-            )
-            maxLocationUsage = if (_top5Apps.isNotEmpty()) {
-                _top5Apps.maxOf { it.numberOfEstimatedRequests }
-            } else {
-                0
-            }
-        }
+    private fun getTop5() {
+        getTop5AppsJob?.cancel()
+        getTop5AppsJob =
+            appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).onEach { apps ->
+                _top5Apps.clear()
+                val appTop5 = apps.take(5)
+                    .filter { it.numberOfEstimatedRequests > 0 }
+                _top5Apps.addAll(appTop5)
+                maxLocationUsage = if (_top5Apps.isNotEmpty()) {
+                    _top5Apps.maxOf { it.numberOfEstimatedRequests }
+                } else {
+                    0
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun loadPrivacyLeakData() {
@@ -208,7 +213,7 @@ class DashboardViewModel @Inject constructor(
                     _isLoading.value = true
                     updateUsageStats()
                     loadPrivacyLeakData()
-                    updateTop5()
+                    //getTop5()
                     _isLoading.value = false
                 }
             }

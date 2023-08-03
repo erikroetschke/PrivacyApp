@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
 
-    suspend fun getApps(): List<App>
+    fun getApps(): Flow<List<App>>
+    suspend fun getAppsSuspend(): List<App>
 
     suspend fun getAppByName(packageName: String): App?
 

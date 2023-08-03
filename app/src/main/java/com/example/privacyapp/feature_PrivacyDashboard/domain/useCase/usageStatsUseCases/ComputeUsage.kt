@@ -36,9 +36,9 @@ class ComputeUsage(
         var newOuterForLoop = false
         //Get apps of which usage is relevant, ACCESS_CORSE_LOCATION is not considered as relevant, as it has am accuracy of 2km
         val listAppsWithForegroundPermission =
-            appRepository.getApps().filter { it.ACCESS_FINE_LOCATION }
+            appRepository.getAppsSuspend().filter { it.ACCESS_FINE_LOCATION }
         val listAppsWithBackgroundPermission =
-            appRepository.getApps().filter { it.ACCESS_BACKGROUND_LOCATION }
+            appRepository.getAppsSuspend().filter { it.ACCESS_BACKGROUND_LOCATION }
 
         //get usage Stats NOTE: Events are only kept by the system for a few days.
         val usageStatsManager =

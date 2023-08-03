@@ -27,6 +27,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.InitApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetAppsSuspend
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.DeleteLocationsOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetUsedLocationsLastSinceTimestamp
@@ -111,7 +112,8 @@ object AppModule {
             initApps = InitApps(),
             getApp = GetApp(repository),
             getFavoriteApps = GetFavoriteApps(repository),
-            deleteApp = DeleteApp(repository)
+            deleteApp = DeleteApp(repository),
+            getAppsSuspend = GetAppsSuspend(repository)
         )
     }
 
