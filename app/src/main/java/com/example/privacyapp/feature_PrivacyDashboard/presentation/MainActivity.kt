@@ -127,7 +127,8 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
                                 appsFromPhone[indexFromPhone].ACCESS_FINE_LOCATION,
                                 appsFromPhone[indexFromPhone].ACCESS_BACKGROUND_LOCATION,
                                 app.numberOfEstimatedRequests,
-                                app.favorite
+                                app.favorite,
+                                app.active
                             )
                         )
                     }

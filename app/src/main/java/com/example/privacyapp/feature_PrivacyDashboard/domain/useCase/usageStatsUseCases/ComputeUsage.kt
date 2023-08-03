@@ -68,14 +68,21 @@ class ComputeUsage(
                         continue
                     }
 
-                    //so that the last element before the break is considered in the next for loop
+                    //if a new location has begun, skip one iteration so the last event is reconsidered in this locaion
                     if (!newOuterForLoop) {
                         usageEvents.getNextEvent(currentEvent)
                     }
                     newOuterForLoop = false
 
-                    //get packageName of Event and break if package has no relevant permissions
+
+                    //get packageName of Event and check if package has no relevant permissions
                     val packageName = currentEvent.packageName
+
+                    //continue if app is deactivated by the user, so this app has no influence
+                    if(appRepository.getAppByName(packageName)?.active == false){
+                        continue
+                    }
+
                     var foreground = false
                     var background = false
                     if (listAppsWithForegroundPermission.any { it.packageName == packageName }) {

@@ -27,7 +27,8 @@ class AppDetailsViewModel @Inject constructor(
     private val appUsagePerHour = mutableListOf<Pair<Int, Int>>()
     private val minutesToCompleteHour = 60 - Calendar.getInstance().get(Calendar.MINUTE)
     private val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    private val timestamp24HoursAgoRoundedToCompleteHour = System.currentTimeMillis() + (minutesToCompleteHour * 60 * 1000) - (1000 * 60 * 60 * 24)
+    private val timestamp24HoursAgoRoundedToCompleteHour =
+        System.currentTimeMillis() + (minutesToCompleteHour * 60 * 1000) - (1000 * 60 * 60 * 24)
     private val hourInMillis = 1000 * 60 * 60
     private var listAppUsages = mutableListOf<AppUsage>()
 
@@ -40,21 +41,12 @@ class AppDetailsViewModel @Inject constructor(
                 false,
                 false,
                 0,
-                false
+                false,
+                true
             )
         )
     val stateApp: MutableState<App> = _stateApp
 
-    private var currentApp: App =
-        App(
-            "App not found",
-            "App not found",
-            false,
-            false,
-            false,
-            0,
-            false
-        )
 
     init {
         getApp()
@@ -63,21 +55,24 @@ class AppDetailsViewModel @Inject constructor(
 
     private fun getAppUsage() {
         viewModelScope.launch {
-            savedStateHandle.get<String>("packageName")?.let {packageName ->
-                listAppUsages = appUsageUseCases.getAppUsageSinceTimestamp(packageName, timestamp24HoursAgoRoundedToCompleteHour).sortedBy { it.timestamp }.toMutableList()
+            savedStateHandle.get<String>("packageName")?.let { packageName ->
+                listAppUsages = appUsageUseCases.getAppUsageSinceTimestamp(
+                    packageName,
+                    timestamp24HoursAgoRoundedToCompleteHour
+                ).sortedBy { it.timestamp }.toMutableList()
             }
 
             var endTimestamp = timestamp24HoursAgoRoundedToCompleteHour + hourInMillis
             var hour = (currentHour + 1 % 24)
             var counter = 0
-            while (listAppUsages.isNotEmpty()){
-                if(listAppUsages[0].timestamp > endTimestamp){
+            while (listAppUsages.isNotEmpty()) {
+                if (listAppUsages[0].timestamp > endTimestamp) {
                     appUsagePerHour.add(Pair(hour, counter))
                     hour = (hour + 1) % 24
                     counter = 0
                     endTimestamp += hourInMillis
                 } else {
-                    counter ++
+                    counter++
                     listAppUsages.removeAt(0)
                 }
             }
@@ -87,27 +82,19 @@ class AppDetailsViewModel @Inject constructor(
             if (appUsagePerHour.size < 24) {
                 //fill the rest with 0
                 for (i in appUsagePerHour.size..23) {
-                    appUsagePerHour.add(Pair(hour,0))
+                    appUsagePerHour.add(Pair(hour, 0))
                     hour = (hour + 1) % 24
                 }
             }
             _stateDiagramData.value = appUsagePerHour
         }
     }
+
     private fun getApp() {
         savedStateHandle.get<String>("packageName")?.let { packageName ->
             viewModelScope.launch {
                 appUseCases.getApp(packageName)?.also { app ->
-                    currentApp = app
-                    _stateApp.value = stateApp.value.copy(
-                        packageName = app.packageName,
-                        appName = app.appName,
-                        ACCESS_COARSE_LOCATION = app.ACCESS_COARSE_LOCATION,
-                        ACCESS_FINE_LOCATION = app.ACCESS_FINE_LOCATION,
-                        ACCESS_BACKGROUND_LOCATION = app.ACCESS_BACKGROUND_LOCATION,
-                        numberOfEstimatedRequests = app.numberOfEstimatedRequests,
-                        favorite = app.favorite
-                    )
+                    _stateApp.value = app
                 }
             }
         }
@@ -119,13 +106,14 @@ class AppDetailsViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         val currentAppCopy = App(
-                            packageName = currentApp.packageName,
-                            appName = currentApp.appName,
-                            ACCESS_COARSE_LOCATION = currentApp.ACCESS_COARSE_LOCATION,
-                            ACCESS_FINE_LOCATION = currentApp.ACCESS_FINE_LOCATION,
-                            ACCESS_BACKGROUND_LOCATION = currentApp.ACCESS_BACKGROUND_LOCATION,
-                            numberOfEstimatedRequests = currentApp.numberOfEstimatedRequests,
-                            favorite = !currentApp.favorite
+                            packageName = _stateApp.value.packageName,
+                            appName = _stateApp.value.appName,
+                            ACCESS_COARSE_LOCATION = _stateApp.value.ACCESS_COARSE_LOCATION,
+                            ACCESS_FINE_LOCATION = _stateApp.value.ACCESS_FINE_LOCATION,
+                            ACCESS_BACKGROUND_LOCATION = _stateApp.value.ACCESS_BACKGROUND_LOCATION,
+                            numberOfEstimatedRequests = _stateApp.value.numberOfEstimatedRequests,
+                            favorite = !_stateApp.value.favorite,
+                            active = _stateApp.value.active
                         )
                         appUseCases.addApp(
                             currentAppCopy
@@ -137,6 +125,32 @@ class AppDetailsViewModel @Inject constructor(
                 }
                 _stateApp.value = stateApp.value.copy(
                     favorite = !_stateApp.value.favorite
+                )
+            }
+
+            AppDetailsEvent.ToggleActive -> {
+                viewModelScope.launch {
+                    try {
+                        val currentAppCopy = App(
+                            packageName = _stateApp.value.packageName,
+                            appName = _stateApp.value.appName,
+                            ACCESS_COARSE_LOCATION = _stateApp.value.ACCESS_COARSE_LOCATION,
+                            ACCESS_FINE_LOCATION = _stateApp.value.ACCESS_FINE_LOCATION,
+                            ACCESS_BACKGROUND_LOCATION = _stateApp.value.ACCESS_BACKGROUND_LOCATION,
+                            numberOfEstimatedRequests = _stateApp.value.numberOfEstimatedRequests,
+                            favorite = _stateApp.value.favorite,
+                            active = !_stateApp.value.active
+                        )
+                        appUseCases.addApp(
+                            currentAppCopy
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        println("couldn´t update app")
+                    }
+                }
+                _stateApp.value = stateApp.value.copy(
+                    active = !_stateApp.value.active
                 )
             }
         }

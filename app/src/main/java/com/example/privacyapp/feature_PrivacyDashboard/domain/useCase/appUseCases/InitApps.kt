@@ -76,7 +76,8 @@ class InitApps(
                     ACCESS_FINE_LOCATION,
                     ACCESS_BACKGROUND_LOCATION,
                     0,
-                    false
+                    false,
+                    true
                 )
                 if (app.packageName != ""){
                     appsList.add(app)

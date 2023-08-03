@@ -12,7 +12,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAsses
 
 @Database(
     entities = [Location::class, App::class, AppUsage::class, PrivacyAssessment1d::class, POI::class],
-    version = 12
+    version = 13
 )
 abstract class Database: RoomDatabase() {
 

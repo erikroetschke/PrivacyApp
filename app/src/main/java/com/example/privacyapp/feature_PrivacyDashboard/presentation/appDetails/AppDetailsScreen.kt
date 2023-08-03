@@ -56,20 +56,26 @@ fun AppDetailsScreen(
             .fillMaxSize()
             .padding(10.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(onClick = {
                 navController.navigateUp()
             }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(text = state.appName, style = MaterialTheme.typography.headlineMedium)
-            if (state.favorite){
+            if (state.favorite) {
                 IconButton(onClick = {
                     viewModel.onEvent(AppDetailsEvent.Favor)
                 }) {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favor", tint = Color.Green)
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Favor",
+                        tint = Color.Green
+                    )
                 }
             } else {
                 IconButton(onClick = {
@@ -79,11 +85,15 @@ fun AppDetailsScreen(
                 }
             }
         }
-        Text(text = "Possible location tracking last 24h:", style = MaterialTheme.typography.headlineSmall)
-        Box(modifier = Modifier
-            .padding(10.dp, 15.dp, 10.dp, 15.dp)
-            .fillMaxWidth()
-            .height(300.dp)
+        Text(
+            text = "Possible location tracking last 24h:",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Box(
+            modifier = Modifier
+                .padding(10.dp, 15.dp, 10.dp, 15.dp)
+                .fillMaxWidth()
+                .height(300.dp)
             //.background(Color.Black)
         ) {
             LineChart(
@@ -97,18 +107,24 @@ fun AppDetailsScreen(
         }
         Text(text = "Permissions:", style = MaterialTheme.typography.headlineSmall)
         Column(modifier = Modifier.padding(10.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(text = "Location Permission:")
                 Text(text = state.ACCESS_COARSE_LOCATION.toString())
             }
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(text = "Accurate Location Permission:")
                 Text(text = state.ACCESS_FINE_LOCATION.toString())
             }
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(text = "Background Location Permission:")
                 Text(text = state.ACCESS_BACKGROUND_LOCATION.toString())
             }
@@ -119,16 +135,43 @@ fun AppDetailsScreen(
                 Uri.fromParts("package", viewModel.stateApp.value.packageName, null)
             )
             try {
-            mContext.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(mContext, "Operation is not possible with this app.",Toast.LENGTH_SHORT).show()
-        } }, modifier = Modifier.fillMaxWidth()) {
+                mContext.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(
+                    mContext,
+                    "Operation is not possible with this app.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }, modifier = Modifier.fillMaxWidth()) {
             Text(text = "Change permissions")
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(text = "Other:", style = MaterialTheme.typography.headlineSmall)
-        Button(onClick = { /*TODO*/}, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Don´t consider app in assessment")
+        Button(
+            onClick = {
+                if (viewModel.stateApp.value.active) {
+                    Toast.makeText(
+                        mContext,
+                        "From now on, this app wont be tracked anymore",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        mContext,
+                        "From now on, this app will be tracked again!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                viewModel.onEvent(AppDetailsEvent.ToggleActive)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (viewModel.stateApp.value.active) {
+                Text(text = "Don´t consider app in assessment")
+            } else {
+                Text(text = "Consider app in assessment")
+            }
         }
     }
 }

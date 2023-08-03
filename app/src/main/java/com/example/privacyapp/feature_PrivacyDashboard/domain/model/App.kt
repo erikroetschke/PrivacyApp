@@ -12,7 +12,8 @@ data class App(
     val ACCESS_FINE_LOCATION: Boolean,
     val ACCESS_BACKGROUND_LOCATION: Boolean,
     val numberOfEstimatedRequests: Int,
-    val favorite: Boolean
+    val favorite: Boolean,
+    val active: Boolean
 )
 
 
