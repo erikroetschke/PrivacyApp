@@ -2,14 +2,20 @@ package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAs
 
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.POI
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
+import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
 class ExtractPOIs {
+
+    private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
     operator fun invoke(pyRoute: PyObject): List<POI>{
 
@@ -18,7 +24,7 @@ class ExtractPOIs {
         val stopDetection = py.getModule("stopDetection")
 
         //perform stop detection
-        val pois = stopDetection.callAttr("extract_pois", pyRoute).asList()
+        val pois = stopDetection.callAttr("extract_pois", pyRoute, sharedPrefs.getSetting(PreferencesManager.MIN_POI_TIME), sharedPrefs.getSetting(PreferencesManager.POI_RADIUS)).asList()
 
         //extract found pois from pyobject
         val regex = Regex("[+-]?\\d*\\.?\\d+")
@@ -27,8 +33,8 @@ class ExtractPOIs {
             val poi = pois[i].toString()
             val temp = regex.findAll(poi).map { it.value }.toList()
 
-            //timestamp is not the actual timestamp of the POI, timestamps are sequential numbers to order the locations. The lower the number, the earlier the POI was found
-            finalPois.add(POI(Math.toDegrees(temp[0].toDouble()),Math.toDegrees(temp[1].toDouble()), System.currentTimeMillis() - (i*60*60*1000), 1))
+            //timestamp is the hour where the poi occured
+            finalPois.add(POI(Math.toDegrees(temp[1].toDouble()),Math.toDegrees(temp[2].toDouble()), temp[0].toLong(), 0))
 
         }
         return finalPois

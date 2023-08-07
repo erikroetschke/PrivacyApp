@@ -34,6 +34,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.Fa
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.favorites.FavoritesViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapViewModel
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.SettingsScreen
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.SettingsScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
@@ -51,7 +53,8 @@ fun BottomNavigationBar(navController: NavHostController) {
         NavigationItem.Dashboard,
         NavigationItem.AllApps,
         NavigationItem.Favorites,
-        NavigationItem.Map
+        NavigationItem.Map,
+        NavigationItem.Settings
     )
 
     NavigationBar(modifier = Modifier, containerColor = MaterialTheme.colorScheme.secondary, tonalElevation = 5.dp) {
@@ -137,6 +140,11 @@ fun NavigationController(navController: NavHostController, mainActivity: MainAct
             ){
                 val appDetailsViewModel = hiltViewModel<AppDetailsViewModel>()
                 AppDetailsScreen(navController = navController, viewModel = appDetailsViewModel)
+            }
+
+            composable(NavigationItem.Settings.route) {
+                val settingsViewmodel = hiltViewModel<SettingsScreenViewModel>()
+                SettingsScreen(settingsViewmodel)
             }
         }
 

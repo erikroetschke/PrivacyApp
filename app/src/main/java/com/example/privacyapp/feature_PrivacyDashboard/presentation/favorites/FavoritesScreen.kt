@@ -30,7 +30,7 @@ fun FavoritesScreen(
             .fillMaxSize()
     ) {
 
-        Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
+        Box(modifier = Modifier.padding(10.dp, 8.dp, 0.dp, 0.dp)) {
             Text(
                 text = "Favorite Apps",
                 style = MaterialTheme.typography.headlineMedium

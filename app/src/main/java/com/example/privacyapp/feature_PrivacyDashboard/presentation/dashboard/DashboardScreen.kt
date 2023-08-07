@@ -33,6 +33,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -64,7 +67,6 @@ fun DashboardScreen(
     viewModel: DashboardViewModel,
     mainActivity: MainActivity
 ) {
-
 
     val dialogQueue = viewModel.visiblePermissionDialogQueue
     //Request Permissions
@@ -129,7 +131,7 @@ fun DashboardScreen(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Settings,
+                            imageVector = Icons.Default.Edit,
                             contentDescription = "Metric Settings"
                         )
                     }
@@ -159,9 +161,11 @@ fun DashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(state = scrollState),
+                .verticalScroll(state = scrollState)
+                .padding(0.dp, 0.dp, 0.dp, 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

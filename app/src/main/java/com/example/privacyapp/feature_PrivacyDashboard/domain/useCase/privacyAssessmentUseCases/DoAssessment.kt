@@ -3,12 +3,16 @@ package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAs
 
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAssessment1d
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.CallMetric
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.ExtractPOIs
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterval
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
@@ -16,12 +20,15 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 import kotlin.math.abs
 
 class DoAssessment(
     private val locationRepository: LocationRepository,
     private val privacyAssessmentRepository: PrivacyAssessmentRepository
 ) {
+
+    private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
     private val timeDate = Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime()
 
@@ -38,8 +45,7 @@ class DoAssessment(
 
                 val timestamp24HoursAgoRoundedToCompleteHour = getStartTimestamp(metricInterval)
                 //get locations for the last 24 Hours,
-                val locations =
-                    locationRepository.getUsedLocations(timestamp24HoursAgoRoundedToCompleteHour)
+                val locations = locationRepository.getUsedLocations(timestamp24HoursAgoRoundedToCompleteHour)
                         .sortedBy { it.timestamp }
                 if (locations.isEmpty()) {
                     return res
@@ -53,23 +59,12 @@ class DoAssessment(
                             .map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
                             .sortedBy { it.first }
 
-                        //convert timestamp into hour
-                        metricResult = metricResult.map { pair ->
-                            Pair(
-                                Instant.ofEpochMilli(pair.first)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalTime().hour.toLong(),
-                                pair.second
-                            )
-                        }.toMutableList()
-
-                        //group by hour and sum up value(second number of the pair) and map it back into a List of Pairs
-                        metricResult = metricResult.groupBy { it.first }
-                            .mapValues { entry -> entry.value.sumOf { it.second } }
-                            .map { entry -> Pair(entry.key, entry.value) }
-                        // check if there is a value for each hour, otherwise add 0
-
-                        resultData = mapListonList(res, metricResult)
+                        val startHour = res[0].first
+                        for (item in metricResult) {
+                            val index = ((item.first + 24 - startHour) % 24).toInt()
+                            res[index] = Pair(item.first.toInt(), res[index].second + item.second)
+                        }
+                        resultData = res
                     }
 
                     Metric.StopFrequency -> {
@@ -82,16 +77,6 @@ class DoAssessment(
             MetricInterval.WEEK -> {
 
                 var timestamp = getStartTimestamp(metricInterval)
-
-                //for debugging
-                /*val toDelete =
-                    privacyAssessmentRepository.getAssessment1dByMetricSinceTimestamp(
-                        metric,
-                        getStartTimestamp(MetricInterval.MONTH)
-                    ).sortedBy { it.timestampStart }.toMutableList()
-                for (item in toDelete) {
-                    privacyAssessmentRepository.deleteAssessment1d(item)
-                }*/
 
                 val res = createEmptyResultList(MetricInterval.WEEK)
 
@@ -152,43 +137,6 @@ class DoAssessment(
                     timestamp += (1000 * 60 * 60 * 24)
                 }
                 resultData = res
-
-                /*//get locations
-                val locations = locationRepository.getUsedLocations(timestampOneWeekAgoRoundedUpToFullDay).sortedBy { it.timestamp }
-                //compute metric
-                var metricResult = CallMetric().invoke(locations, metric).sortedBy { it.first }
-                //convert timestamp into day of Month
-                metricResult = metricResult.map { pair ->
-                    Pair(
-                        Instant.ofEpochMilli(pair.first)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime().dayOfMonth.toLong(),
-                        pair.second
-                    )
-                }
-                //group by day and sum up value(second number of the pair) and map it back into a List of Pairs
-                metricResult = metricResult.groupBy { it.first }.mapValues { entry -> entry.value.sumOf { it.second } }.map { entry -> Pair(entry.key, entry.value) }
-
-                // check if there is a value for each Day, otherwise add 0
-                //create list where every day has 0 as value
-                val zeros = mutableListOf<Pair<Int, Double>>()
-                for (i in 6 downTo 0) {
-                    zeros.add(Pair(timeDate.minusDays(i.toLong()).dayOfMonth, 0.toDouble()))
-                }
-                var index = 0
-                //map value from assessment on list
-                if (metricResult.isNotEmpty()) {
-                    for ((indexZeros, element) in zeros.withIndex()) {
-                        if(element.first == metricResult[index].first.toInt()) {
-                            zeros[indexZeros] = metricResult[index].let { pair -> Pair(pair.first.toInt(), pair.second) }
-                            if (metricResult.size > index + 1) {
-                                index++
-                            }
-                        }
-                    }
-                }
-
-                resultData = zeros*/
 
             }
 
@@ -255,86 +203,13 @@ class DoAssessment(
 
                 }
 
-                /*//get locations
-                val locations = locationRepository.getUsedLocations(timestamp).sortedBy { it.timestamp }
-                //compute metric
-                var metricResult = CallMetric().invoke(locations, metric).sortedBy { it.first }
-                //convert timestamp into day of Month
-                val temp = metricResult.map { pair ->
-                    Pair(
-                        //add also month, because day of month is not unique
-                        (Instant.ofEpochMilli(pair.first)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime().dayOfMonth.toString() + "X" +
-                                Instant.ofEpochMilli(pair.first)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime().month.toString()
-                                ),
-                        pair.second
-                    )
-                }
-
-                //group by and sum up
-                val tempMap = temp.groupBy { it.first }.mapValues { entry -> entry.value.sumOf { it.second } }
-                //convert back into resultData and remove month
-                val result = mutableListOf<Pair<Int, Double>>()
-                val regex = Regex("[0-9]+")
-                for ((key, value) in tempMap) {
-                    result.add(Pair(regex.find(key)?.value.toString().toInt(), value))
-                }
-
-                // check if there is a value for each Day, otherwise add 0
-                //create list where every day has 0 as value
-                var date = timeDate.minusMonths(1).plusDays(1)
-                val nextDay = timeDate.plusDays(1)
-                val zeros = mutableListOf<Pair<Int, Double>>()
-                while (date.month != nextDay.month || date.dayOfMonth != nextDay.dayOfMonth) {
-                    zeros.add(Pair(date.dayOfMonth, 0.toDouble()))
-                    date = date.plusDays(1)
-                }
-                var index = 0
-                //map value from assessment on list
-                if(result.isNotEmpty()) {
-                    for ((indexZeros, element) in zeros.withIndex()) {
-                        if(element.first == result[index].first) {
-                            zeros[indexZeros] = result[index]
-                            if (result.size > index + 1) {
-                                index++
-                            }
-                        }
-                    }
-                }
-                   */
                 resultData = res
             }
         }
 
-        return reformatData(resultData, metricType, metric)
+        return reformatData(resultData, metricType, metric, metricInterval)
     }
 
-    /**
-     * maps the first list on second list. When firstList[i].first == secondList[i].first -> firstList[i].second = secondList[i].second
-     * then returns firstlist
-     * requires both lists to be sorted by date (e.g. when Interval is Week a valid sorted list looks like: (28,x), (29,x), (30,x), (1,x), (2,x), (3,x), (4,x))
-     */
-    private fun mapListonList(
-        firstList: MutableList<Pair<Int, Double>>,
-        secondList: List<Pair<Long, Double>>
-    ): List<Pair<Int, Double>> {
-        var index = 0
-        if (secondList.isNotEmpty()) {
-            for ((indexFirst, element) in firstList.withIndex()) {
-                if (element.first == secondList[index].first.toInt()) {
-                    firstList[indexFirst] =
-                        secondList[index].let { pair -> Pair(pair.first.toInt(), pair.second) }
-                    if (secondList.size > index + 1) {
-                        index++
-                    }
-                }
-            }
-        }
-        return firstList
-    }
 
     /**
      * creates, depending on the Interval, a list with the same format as the result, but pair.second (the actual assessment) is 0
@@ -453,21 +328,35 @@ class DoAssessment(
     private fun reformatData(
         data: List<Pair<Int, Double>>,
         metricType: MetricType,
-        metric: Metric
+        metric: Metric,
+        metricInterval: MetricInterval
     ): List<Pair<Int, Double>> {
+        if(metricType == MetricType.CUMULATIVE) {
+            //no reformatting needed
+            return data
+        }
         //modify Data according to metric Type
         val data = data.toMutableList()
         var cumulativeScore = 0.toDouble()
+        //get value to scale results
+        val maxValue = when(metric) {
+            Metric.StopDetection -> {
+                when(metricInterval){
+                    MetricInterval.DAY -> sharedPrefs.getSetting(PreferencesManager.MAX_POI_PER_DAY)
+                    else -> sharedPrefs.getSetting(PreferencesManager.MAX_POI_PER_DAY) * data.size
+                }
+            }
+            Metric.StopFrequency -> TODO()
+        }
         for ((index, result) in data.withIndex()) {
-            if (metricType == MetricType.CUMULATIVE) {
+            if (metricType == MetricType.SCORE) {
                 data[index] = Pair(result.first, result.second + cumulativeScore)
                 cumulativeScore += result.second
-            } else if (metricType == MetricType.SCORE) {
 
-                data[index] = (if (result.second <= metric.maxValue) {
-                    Pair(result.first, result.second / metric.maxValue)
+                data[index] = (if (data[index].second <= maxValue) {
+                    Pair(data[index].first, data[index].second / maxValue)
                 } else {
-                    Pair(result.first, 1.toDouble())
+                    Pair(data[index].first, 1.toDouble())
                 })
 
             }

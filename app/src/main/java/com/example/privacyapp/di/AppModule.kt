@@ -1,16 +1,17 @@
 package com.example.privacyapp.di
 
 import android.app.Application
-import android.opengl.GLES10
 import androidx.room.Room
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppUsageRepositoryImpl
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.LocationRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.POIRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PrivacyAssessmentRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
@@ -36,11 +37,11 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DoAssessment
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.CallMetric
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,6 +55,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(app: Application): Database {
+        //get Application to provide it in other classes, as this method will be called even before onCreate() at the MainActivity
+        ApplicationProvider.initialize(app)
+        //provide db
         return Room.databaseBuilder(
             app,
             Database::class.java,
@@ -104,6 +108,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSharedPrefs(app: Application): PreferencesManager {
+        return PreferencesManagerImpl(app)
+    }
+
+    @Provides
+    @Singleton
     fun provideAppUseCases(repository: AppRepository): AppUseCases {
         return AppUseCases(
             getApps = GetApps(repository),
@@ -131,7 +141,6 @@ object AppModule {
     @Singleton
     fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository, locationRepository: LocationRepository): PrivacyAssessmentUseCases {
         return PrivacyAssessmentUseCases(
-            callMetric = CallMetric(),
             addPrivacyAssessment = AddPrivacyAssessment(repository),
             deletePrivacyAssessment = DeletePrivacyAssessment(repository),
             getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
