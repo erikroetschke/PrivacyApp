@@ -256,7 +256,7 @@ fun DashboardScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }else{
                     LineChartV2(
-                        data = viewModel.privacyLeakData.value,
+                        data = viewModel.privacyLeakData,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(10.dp)

@@ -7,10 +7,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.data.repository.Preferenc
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAssessment1d
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
-import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
-import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.ExtractPOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.Metric
@@ -20,7 +18,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import javax.inject.Inject
 import kotlin.math.abs
 
 class DoAssessment(
@@ -55,9 +52,20 @@ class DoAssessment(
                 //compute metric
                 when (metric) {
                     Metric.StopDetection -> {
-                        var metricResult = ExtractPOIs().invoke(pyRoute)
+                        val metricResult = ExtractPOIs().invoke(pyRoute)
                             .map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
                             .sortedBy { it.first }
+
+                        /*//convert timestamp into hour
+                        metricResult = metricResult.map { pair ->
+                            Pair(
+                                Instant.ofEpochMilli(pair.first)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalTime().hour.toLong(),
+                                pair.second
+                            )
+                        }.toMutableList()*/
+
 
                         val startHour = res[0].first
                         for (item in metricResult) {
@@ -331,7 +339,7 @@ class DoAssessment(
         metric: Metric,
         metricInterval: MetricInterval
     ): List<Pair<Int, Double>> {
-        if(metricType == MetricType.CUMULATIVE) {
+        if(metricType == MetricType.ABSOLUT) {
             //no reformatting needed
             return data
         }

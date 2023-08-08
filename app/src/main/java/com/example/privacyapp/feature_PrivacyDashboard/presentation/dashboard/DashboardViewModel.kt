@@ -55,7 +55,7 @@ class DashboardViewModel @Inject constructor(
     private val _metricInterval = mutableStateOf(MetricInterval.DAY)
     val metricInterval = _metricInterval
 
-    private val _privacyLeakData = mutableStateOf(emptyList<Pair<Int, Double>>())
+    private val _privacyLeakData = mutableStateListOf<Pair<Int, Double>>()
     val privacyLeakData = _privacyLeakData
 
     private val _top5Apps = mutableStateListOf<App>()
@@ -64,7 +64,7 @@ class DashboardViewModel @Inject constructor(
     private val _isLoading = mutableStateOf(false)
     val isLoading = _isLoading
 
-    private val _metricType = mutableStateOf(MetricType.CUMULATIVE)
+    private val _metricType = mutableStateOf(MetricType.ABSOLUT)
     val metricType = _metricType
 
     var maxLocationUsage = 0
@@ -103,6 +103,7 @@ class DashboardViewModel @Inject constructor(
                 _isLoading.value = true
             }
 
+            _privacyLeakData.clear()
             var result = mutableListOf<Pair<Int, Double>>()
             for ((index, metric) in _selectedMetrics.toList().withIndex()) {
 
@@ -126,17 +127,16 @@ class DashboardViewModel @Inject constructor(
                 }
             }
 
-            _privacyLeakData.value =
-                if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.CUMULATIVE) {
-                    result
+                if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.ABSOLUT) {
+                    _privacyLeakData.addAll(result)
                 } else {
                     //type is Score and there were mutiple metrics selected so avaerage the metrics, to maintain value range [0,1]
-                    result.map { pair ->
+                    _privacyLeakData.addAll(result.map { pair ->
                         Pair(
                             pair.first,
                             pair.second / _selectedMetrics.toList().size
                         )
-                    }
+                    })
                 }
 
             withContext(Dispatchers.Main) {
