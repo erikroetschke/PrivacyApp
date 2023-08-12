@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,9 +59,9 @@ fun SettingsScreen(
                     Text(text = "POI detection:", style = MaterialTheme.typography.headlineSmall)
                     Spacer(modifier = Modifier.height(10.dp))
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Max POI per day: " + viewModel.maxPOIPerDay.value.toInt())
+                        Text(text = "POI limit: " + viewModel.pOILimit.value.toInt())
                         Slider(
-                            value = viewModel.maxPOIPerDay.value,
+                            value = viewModel.pOILimit.value,
                             onValueChange = { sliderValue_ ->
                                 viewModel.onEvent(
                                     SettingsScreenEvent.ChangeMaxPOIPerDay(
@@ -72,6 +72,17 @@ fun SettingsScreen(
                             valueRange = 1f..20f,
                             steps = 18,
                             colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
+                        )
+                    }
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "Dynamic limit: " + viewModel.dynamicLimit.value)
+                        Switch(
+                            checked = viewModel.dynamicLimit.value,
+                            onCheckedChange = { viewModel.onEvent(SettingsScreenEvent.ToggleDynamicLimit) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = Color.Gray
+                            )
                         )
                     }
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -171,11 +182,18 @@ fun SettingsScreen(
                     .padding(10.dp)
             ) {
 
-                Button(onClick = { viewModel.onEvent(SettingsScreenEvent.SaveSettings) }, modifier = Modifier.fillMaxWidth(), enabled = viewModel.changed.value) {
+                Button(
+                    onClick = { viewModel.onEvent(SettingsScreenEvent.SaveSettings) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = viewModel.changed.value
+                ) {
                     Text(text = "Save")
                 }
                 Spacer(modifier = Modifier.height(5.dp))
-                Button(onClick = { viewModel.onEvent(SettingsScreenEvent.RestoreSettings) }, modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = { viewModel.onEvent(SettingsScreenEvent.RestoreSettings) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = "Reset to default")
                 }
             }

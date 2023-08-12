@@ -5,11 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,14 +17,17 @@ class SettingsScreenViewModel @Inject constructor(
 
     //states
     //POI detction
-    private val _maxPOIPerDay = mutableStateOf(6f)
-    val maxPOIPerDay = _maxPOIPerDay
+    private val _pOILimit = mutableStateOf(6f)
+    val pOILimit = _pOILimit
 
     private val _pOIRadius = mutableStateOf(200f)
     val pOIRadius = _pOIRadius
 
     private val _minPOITime = mutableStateOf(3f)
     val minPOITime = _minPOITime
+
+    private val _dynamicLimit =  mutableStateOf(false)
+    val dynamicLimit = _dynamicLimit
 
     //POI frequency
     private val _maxOccurrencePerDay = mutableStateOf(2f)
@@ -46,22 +44,23 @@ class SettingsScreenViewModel @Inject constructor(
 
     init {
         //get Settings
-        _maxPOIPerDay.value = preferences.getSetting(PreferencesManager.MAX_POI_PER_DAY).toFloat()
-        _pOIRadius.value = preferences.getSetting(PreferencesManager.POI_RADIUS).toFloat()
-        _minPOITime.value = preferences.getSetting(PreferencesManager.MIN_POI_TIME).toFloat()
+        _pOILimit.value = preferences.getSettingInt(PreferencesManager.POI_LIMIT).toFloat()
+        _pOIRadius.value = preferences.getSettingInt(PreferencesManager.POI_RADIUS).toFloat()
+        _minPOITime.value = preferences.getSettingInt(PreferencesManager.MIN_POI_TIME).toFloat()
         _maxOccurrencePerDay.value =
-            preferences.getSetting(PreferencesManager.MAX_OCCURRENCE_PER_DAY).toFloat()
+            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_DAY).toFloat()
         _maxOccurrencePerWeek.value =
-            preferences.getSetting(PreferencesManager.MAX_OCCURRENCE_PER_WEEK).toFloat()
+            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_WEEK).toFloat()
         _maxOccurrencePerMonth.value =
-            preferences.getSetting(PreferencesManager.MAX_OCCURRENCE_PER_MONTH).toFloat()
+            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_MONTH).toFloat()
+        _dynamicLimit.value = preferences.getSettingBool(PreferencesManager.DYNAMIC_LIMIT)
 
     }
 
     fun onEvent(event: SettingsScreenEvent) {
         when (event) {
             is SettingsScreenEvent.ChangeMaxPOIPerDay -> {
-                _maxPOIPerDay.value = event.value
+                _pOILimit.value = event.value
                 _changed.value = true
             }
 
@@ -90,47 +89,60 @@ class SettingsScreenViewModel @Inject constructor(
                 _changed.value = true
             }
 
+            is SettingsScreenEvent.ToggleDynamicLimit -> {
+                _dynamicLimit.value = !_dynamicLimit.value
+                _changed.value = true
+
+            }
+
             is SettingsScreenEvent.RestoreSettings -> {
 
-                _maxPOIPerDay.value = 6f
+                _pOILimit.value = 6f
                 _minPOITime.value = 3f
                 _pOIRadius.value = 200f
                 _maxOccurrencePerDay.value = 2f
                 _maxOccurrencePerMonth.value = 6f
                 _maxOccurrencePerWeek.value = 4f
+                _dynamicLimit.value = false
 
-                preferences.setSetting(PreferencesManager.MAX_OCCURRENCE_PER_DAY, 6)
-                preferences.setSetting(PreferencesManager.MIN_POI_TIME, 3)
-                preferences.setSetting(PreferencesManager.POI_RADIUS, 200)
-                preferences.setSetting(PreferencesManager.MAX_POI_PER_DAY, 2)
-                preferences.setSetting(PreferencesManager.MAX_OCCURRENCE_PER_WEEK, 4)
-                preferences.setSetting(PreferencesManager.MAX_OCCURRENCE_PER_MONTH, 6)
+                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_DAY, 6)
+                preferences.setSettingInt(PreferencesManager.MIN_POI_TIME, 3)
+                preferences.setSettingInt(PreferencesManager.POI_RADIUS, 200)
+                preferences.setSettingInt(PreferencesManager.POI_LIMIT, 2)
+                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_WEEK, 4)
+                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_MONTH, 6)
+                preferences.setSettingBool(PreferencesManager.DYNAMIC_LIMIT, false)
 
                 _changed.value = false
             }
 
             is SettingsScreenEvent.SaveSettings -> {
                 viewModelScope.launch {
-                    preferences.setSetting(
+                    preferences.setSettingInt(
                         PreferencesManager.MAX_OCCURRENCE_PER_DAY,
                         _maxOccurrencePerDay.value.toInt()
                     )
-                    preferences.setSetting(
+                    preferences.setSettingInt(
                         PreferencesManager.MIN_POI_TIME,
                         _minPOITime.value.toInt()
                     )
-                    preferences.setSetting(PreferencesManager.POI_RADIUS, _pOIRadius.value.toInt())
-                    preferences.setSetting(
-                        PreferencesManager.MAX_POI_PER_DAY,
-                        _maxPOIPerDay.value.toInt()
+                    preferences.setSettingInt(PreferencesManager.POI_RADIUS, _pOIRadius.value.toInt())
+                    preferences.setSettingInt(
+                        PreferencesManager.POI_LIMIT,
+                        _pOILimit.value.toInt()
                     )
-                    preferences.setSetting(
+                    preferences.setSettingInt(
                         PreferencesManager.MAX_OCCURRENCE_PER_WEEK,
                         _maxOccurrencePerWeek.value.toInt()
                     )
-                    preferences.setSetting(
+                    preferences.setSettingInt(
                         PreferencesManager.MAX_OCCURRENCE_PER_MONTH,
                         _maxOccurrencePerMonth.value.toInt()
+                    )
+
+                    preferences.setSettingBool(
+                        PreferencesManager.DYNAMIC_LIMIT,
+                        _dynamicLimit.value
                     )
                 }
                 _changed.value = false

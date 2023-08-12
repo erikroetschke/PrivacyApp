@@ -354,8 +354,13 @@ class DoAssessment(
         val maxValue = when(metric) {
             Metric.StopDetection -> {
                 when(metricInterval){
-                    MetricInterval.DAY -> sharedPrefs.getSetting(PreferencesManager.MAX_POI_PER_DAY)
-                    else -> sharedPrefs.getSetting(PreferencesManager.MAX_POI_PER_DAY) * data.size
+                    MetricInterval.DAY -> sharedPrefs.getSettingInt(PreferencesManager.POI_LIMIT)
+                    else -> {if (sharedPrefs.getSettingBool(PreferencesManager.DYNAMIC_LIMIT)){
+                        sharedPrefs.getSettingInt(PreferencesManager.POI_LIMIT) * data.size
+                    }else {
+                        sharedPrefs.getSettingInt(PreferencesManager.POI_LIMIT)
+                    }
+                    }
                 }
             }
             Metric.StopFrequency -> TODO()

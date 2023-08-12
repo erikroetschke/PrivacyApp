@@ -3,11 +3,9 @@ package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAs
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
-import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.POI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
-import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -24,7 +22,7 @@ class ExtractPOIs {
         val stopDetection = py.getModule("stopDetection")
 
         //perform stop detection
-        val pois = stopDetection.callAttr("extract_pois", pyRoute, sharedPrefs.getSetting(PreferencesManager.MIN_POI_TIME), sharedPrefs.getSetting(PreferencesManager.POI_RADIUS)).asList()
+        val pois = stopDetection.callAttr("extract_pois", pyRoute, sharedPrefs.getSettingInt(PreferencesManager.MIN_POI_TIME), sharedPrefs.getSettingInt(PreferencesManager.POI_RADIUS)).asList()
 
         //extract found pois from pyobject
         val regex = Regex("[+-]?\\d*\\.?\\d+")

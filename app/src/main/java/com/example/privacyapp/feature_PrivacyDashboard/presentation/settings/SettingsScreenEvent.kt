@@ -17,4 +17,6 @@ sealed class SettingsScreenEvent {
     object SaveSettings: SettingsScreenEvent()
 
     object RestoreSettings: SettingsScreenEvent()
+
+    object ToggleDynamicLimit: SettingsScreenEvent()
 }
