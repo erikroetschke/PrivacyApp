@@ -26,7 +26,7 @@ class SettingsScreenViewModel @Inject constructor(
     private val _minPOITime = mutableStateOf(3f)
     val minPOITime = _minPOITime
 
-    private val _dynamicLimit =  mutableStateOf(false)
+    private val _dynamicLimit =  mutableStateOf(true)
     val dynamicLimit = _dynamicLimit
 
     //POI frequency

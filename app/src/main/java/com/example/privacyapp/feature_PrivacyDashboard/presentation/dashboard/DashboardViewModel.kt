@@ -26,6 +26,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -96,6 +97,7 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun loadPrivacyLeakData() {
+        _privacyLeakData.clear()
         privacyAssessmentJob?.cancel()
 
         privacyAssessmentJob = viewModelScope.launch(Dispatchers.IO) {
@@ -103,7 +105,6 @@ class DashboardViewModel @Inject constructor(
                 _isLoading.value = true
             }
 
-            _privacyLeakData.clear()
             var result = mutableListOf<Pair<Int, Double>>()
             for ((index, metric) in _selectedMetrics.toList().withIndex()) {
 
@@ -126,7 +127,7 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
             }
-
+                ensureActive()
                 if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.ABSOLUT) {
                     _privacyLeakData.addAll(result)
                 } else {

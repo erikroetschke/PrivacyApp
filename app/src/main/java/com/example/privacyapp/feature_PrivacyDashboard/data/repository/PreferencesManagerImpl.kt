@@ -48,7 +48,7 @@ class PreferencesManagerImpl(context: Context) : PreferencesManager {
 
     private fun getDefaultValuesBool(key: String): Boolean {
         return when (key) {
-            "dynamicLimit" -> false
+            "dynamicLimit" -> true
             else -> throw NoDefaultSettingsDefinedForMetric("You must assign default values in the DataStoreImpl for metric Settings")
         }
     }
