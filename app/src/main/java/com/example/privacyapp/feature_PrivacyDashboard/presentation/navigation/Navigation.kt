@@ -37,8 +37,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.map.MapViewM
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.SettingsScreen
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.SettingsScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
 
 //import androidx.hilt.navigation.compose.hiltViewModel
 

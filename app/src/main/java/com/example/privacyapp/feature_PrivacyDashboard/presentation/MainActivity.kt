@@ -33,8 +33,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation.BottomNavigationBar
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.navigation.NavigationController
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenActivity
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.WelcomeScreenViewModel
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.welcome.welcomeScreen
 import com.example.privacyapp.ui.theme.PrivacyAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

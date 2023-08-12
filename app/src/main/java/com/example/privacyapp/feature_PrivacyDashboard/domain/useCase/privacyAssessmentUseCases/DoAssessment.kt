@@ -228,7 +228,7 @@ class DoAssessment(
         val zeros = mutableListOf<Pair<Int, Double>>()
         when (metricInterval) {
             MetricInterval.DAY -> {
-                val startHour = timeDate.hour + 1 % 24
+                val startHour = timeDate.hour + 1 % 24 //TODO try not to use time INstance
                 for (i in 0..23) {
                     zeros.add(Pair((startHour + i) % 24, 0.toDouble()))
                 }
@@ -366,7 +366,6 @@ class DoAssessment(
                 } else {
                     Pair(data[index].first, 1.toDouble())
                 })
-
             }
         }
         return data
