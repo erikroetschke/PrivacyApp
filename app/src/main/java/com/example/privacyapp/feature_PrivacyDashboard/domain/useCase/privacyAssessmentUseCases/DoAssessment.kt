@@ -1,6 +1,7 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases
 
 
+import android.icu.util.Calendar
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
@@ -228,7 +229,10 @@ class DoAssessment(
         val zeros = mutableListOf<Pair<Int, Double>>()
         when (metricInterval) {
             MetricInterval.DAY -> {
-                val startHour = timeDate.hour + 1 % 24 //TODO try not to use time INstance
+                //val startHour = (timeDate.hour + 1) % 24
+                val rightNow = Calendar.getInstance()
+                val startHour = (rightNow.get(Calendar.HOUR_OF_DAY) + 1) % 24
+
                 for (i in 0..23) {
                     zeros.add(Pair((startHour + i) % 24, 0.toDouble()))
                 }
