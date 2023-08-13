@@ -15,7 +15,7 @@ interface POIDao {
     @Query("SELECT * FROM poi WHERE timestamp >= :timestamp")
     suspend fun getPOIsSinceTimestamp(timestamp: Long): List<POI>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPOI(poi: POI)
 
     @Delete

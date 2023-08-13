@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.privacyapp.R
-import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
+import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDatabase
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.DefaultLocationClient
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
@@ -63,13 +63,14 @@ class LocationService : Service() {
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 //add location to db
-                val db = Database.getInstance(this)
+                val db = AppDatabase.getInstance(this)
                 db.locationDao.insertLocation(
                     Location(
                         location.longitude,
                         location.latitude,
                         System.currentTimeMillis(),
-                        null
+                        null,
+                        false
                     )
                 )
                 val lat = location.latitude.toString()

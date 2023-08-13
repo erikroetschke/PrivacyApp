@@ -8,11 +8,8 @@ sealed class SettingsScreenEvent {
 
     data class ChangeMinPOITime(val value: Float):SettingsScreenEvent()
 
-    data class ChangeMaxOccurrencePerDay(val value: Float):SettingsScreenEvent()
+    data class ChangeMaxPOIOccurrence(val value: Float):SettingsScreenEvent()
 
-    data class ChangeMaxOccurrencePerWeek(val value: Float):SettingsScreenEvent()
-
-    data class ChangeMaxOccurrencePerMonth(val value: Float):SettingsScreenEvent()
 
     object SaveSettings: SettingsScreenEvent()
 

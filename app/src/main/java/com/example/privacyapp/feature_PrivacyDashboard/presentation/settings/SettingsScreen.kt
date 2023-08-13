@@ -126,50 +126,18 @@ fun SettingsScreen(
                     Text(text = "POI frequency:", style = MaterialTheme.typography.headlineSmall)
                     Spacer(modifier = Modifier.height(10.dp))
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Max POI occurrence per day: " + viewModel.maxOccurrencePerDay.value.toInt())
+                        Text(text = "Max POI occurrence: " + viewModel.maxPOIOccurrence.value.toInt())
                         Slider(
-                            value = viewModel.maxOccurrencePerDay.value,
+                            value = viewModel.maxPOIOccurrence.value,
                             onValueChange = { sliderValue_ ->
                                 viewModel.onEvent(
-                                    SettingsScreenEvent.ChangeMaxOccurrencePerDay(
-                                        sliderValue_
-                                    )
-                                )
-                            },
-                            valueRange = 2f..5f,
-                            steps = 2,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
-                    }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Max POI occurrence per Week: " + viewModel.maxOccurrencePerWeek.value.toInt())
-                        Slider(
-                            value = viewModel.maxOccurrencePerWeek.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(
-                                    SettingsScreenEvent.ChangeMaxOccurrencePerWeek(
+                                    SettingsScreenEvent.ChangeMaxPOIOccurrence(
                                         sliderValue_
                                     )
                                 )
                             },
                             valueRange = 2f..10f,
                             steps = 7,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
-                    }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Max POI occurrence per Month: " + viewModel.maxOccurrencePerMonth.value.toInt())
-                        Slider(
-                            value = viewModel.maxOccurrencePerMonth.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(
-                                    SettingsScreenEvent.ChangeMaxOccurrencePerMonth(
-                                        sliderValue_
-                                    )
-                                )
-                            },
-                            valueRange = 2f..20f,
-                            steps = 17,
                             colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
                         )
                     }

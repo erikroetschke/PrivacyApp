@@ -2,6 +2,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.data.repository
 
 import android.content.Context
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 
 /**
  * Class handles Shared preferences for Settings
@@ -10,7 +11,6 @@ class PreferencesManagerImpl(context: Context) : PreferencesManager {
 
     private val sharedPref = context.getSharedPreferences(
         "PrivacyApp.Settings", Context.MODE_PRIVATE)
-
 
     override  fun setSettingInt(key: String, value: Int) {
         with (sharedPref.edit()) {
@@ -39,9 +39,7 @@ class PreferencesManagerImpl(context: Context) : PreferencesManager {
             "maxPOIPerDay" -> 6
             "pOIRadius" -> 200
             "minPOITime" -> 3
-            "maxOccurrencePerDay" -> 2
-            "maxOccurrencePerWeek" -> 4
-            "maxOccurrencePerMonth" -> 6
+            "maxPOIOccurrence" -> 4
             else -> throw NoDefaultSettingsDefinedForMetric("You must assign default values in the DataStoreImpl for metric Settings")
         }
     }

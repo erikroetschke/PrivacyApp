@@ -69,6 +69,16 @@ class ComputeUsage(
         if (diff < 1000 * 60 * 60 * 24) {
             //less than 24 h
             appStatusMap = updateAppStatusMap(getAppStatusMap(), endOfLastComputation, locations.first().timestamp)
+            //if user changed this recently this must be updated
+            val listAppsRecentlyDeactivated = mutableListOf<String>()
+            for ((name, status) in appStatusMap) {
+                if (listAppsWithForegroundPermission.any { it.packageName == name }) {
+                    listAppsRecentlyDeactivated.add(name)
+                }
+            }
+            for (key in listAppsRecentlyDeactivated) {
+                appStatusMap.remove(key)
+            }
         }
 
         for ((counter, location) in locations.withIndex()) {

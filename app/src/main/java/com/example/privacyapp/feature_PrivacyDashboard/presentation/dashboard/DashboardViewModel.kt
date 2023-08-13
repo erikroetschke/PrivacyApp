@@ -127,7 +127,7 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
             }
-                ensureActive()
+                ensureActive()//ensure job is still active before updating the state
                 if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.ABSOLUT) {
                     _privacyLeakData.addAll(result)
                 } else {

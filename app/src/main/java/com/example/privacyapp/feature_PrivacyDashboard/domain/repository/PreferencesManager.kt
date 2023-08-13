@@ -6,9 +6,7 @@ interface PreferencesManager {
         const val POI_LIMIT = "maxPOIPerDay"
         const val POI_RADIUS = "pOIRadius"
         const val MIN_POI_TIME = "minPOITime"
-        const val MAX_OCCURRENCE_PER_DAY = "maxOccurrencePerDay"
-        const val MAX_OCCURRENCE_PER_WEEK = "maxOccurrencePerWeek"
-        const val MAX_OCCURRENCE_PER_MONTH = "maxOccurrencePerMonth"
+        const val MAX_POI_OCCURRENCE = "maxPOIOccurrence"
         const val DYNAMIC_LIMIT = "dynamicLimit"
     }
 

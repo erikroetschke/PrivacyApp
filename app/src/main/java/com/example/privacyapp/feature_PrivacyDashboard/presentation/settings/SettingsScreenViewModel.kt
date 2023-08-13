@@ -30,15 +30,10 @@ class SettingsScreenViewModel @Inject constructor(
     val dynamicLimit = _dynamicLimit
 
     //POI frequency
-    private val _maxOccurrencePerDay = mutableStateOf(2f)
-    val maxOccurrencePerDay = _maxOccurrencePerDay
+    private val _maxPOIOccurrence = mutableStateOf(2f)
+    val maxPOIOccurrence = _maxPOIOccurrence
 
-    private val _maxOccurrencePerWeek = mutableStateOf(4f)
-    val maxOccurrencePerWeek = _maxOccurrencePerWeek
-
-    private val _maxOccurrencePerMonth = mutableStateOf(6f)
-    val maxOccurrencePerMonth = _maxOccurrencePerMonth
-
+    //other
     private var _changed = mutableStateOf(false)
     val changed = _changed
 
@@ -47,12 +42,8 @@ class SettingsScreenViewModel @Inject constructor(
         _pOILimit.value = preferences.getSettingInt(PreferencesManager.POI_LIMIT).toFloat()
         _pOIRadius.value = preferences.getSettingInt(PreferencesManager.POI_RADIUS).toFloat()
         _minPOITime.value = preferences.getSettingInt(PreferencesManager.MIN_POI_TIME).toFloat()
-        _maxOccurrencePerDay.value =
-            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_DAY).toFloat()
-        _maxOccurrencePerWeek.value =
-            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_WEEK).toFloat()
-        _maxOccurrencePerMonth.value =
-            preferences.getSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_MONTH).toFloat()
+        _maxPOIOccurrence.value =
+            preferences.getSettingInt(PreferencesManager.MAX_POI_OCCURRENCE).toFloat()
         _dynamicLimit.value = preferences.getSettingBool(PreferencesManager.DYNAMIC_LIMIT)
 
     }
@@ -64,20 +55,11 @@ class SettingsScreenViewModel @Inject constructor(
                 _changed.value = true
             }
 
-            is SettingsScreenEvent.ChangeMaxOccurrencePerDay -> {
-                _maxOccurrencePerDay.value = event.value
+            is SettingsScreenEvent.ChangeMaxPOIOccurrence -> {
+                _maxPOIOccurrence.value = event.value
                 _changed.value = true
             }
 
-            is SettingsScreenEvent.ChangeMaxOccurrencePerMonth -> {
-                _maxOccurrencePerMonth.value = event.value
-                _changed.value = true
-            }
-
-            is SettingsScreenEvent.ChangeMaxOccurrencePerWeek -> {
-                _maxOccurrencePerWeek.value = event.value
-                _changed.value = true
-            }
 
             is SettingsScreenEvent.ChangeMinPOITime -> {
                 _minPOITime.value = event.value
@@ -100,18 +82,14 @@ class SettingsScreenViewModel @Inject constructor(
                 _pOILimit.value = 6f
                 _minPOITime.value = 3f
                 _pOIRadius.value = 200f
-                _maxOccurrencePerDay.value = 2f
-                _maxOccurrencePerMonth.value = 6f
-                _maxOccurrencePerWeek.value = 4f
-                _dynamicLimit.value = false
+                _maxPOIOccurrence.value = 4f
+                _dynamicLimit.value = true
 
-                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_DAY, 6)
+                preferences.setSettingInt(PreferencesManager.MAX_POI_OCCURRENCE, 6)
                 preferences.setSettingInt(PreferencesManager.MIN_POI_TIME, 3)
                 preferences.setSettingInt(PreferencesManager.POI_RADIUS, 200)
-                preferences.setSettingInt(PreferencesManager.POI_LIMIT, 2)
-                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_WEEK, 4)
-                preferences.setSettingInt(PreferencesManager.MAX_OCCURRENCE_PER_MONTH, 6)
-                preferences.setSettingBool(PreferencesManager.DYNAMIC_LIMIT, false)
+                preferences.setSettingInt(PreferencesManager.POI_LIMIT, 4)
+                preferences.setSettingBool(PreferencesManager.DYNAMIC_LIMIT, true)
 
                 _changed.value = false
             }
@@ -119,8 +97,8 @@ class SettingsScreenViewModel @Inject constructor(
             is SettingsScreenEvent.SaveSettings -> {
                 viewModelScope.launch {
                     preferences.setSettingInt(
-                        PreferencesManager.MAX_OCCURRENCE_PER_DAY,
-                        _maxOccurrencePerDay.value.toInt()
+                        PreferencesManager.MAX_POI_OCCURRENCE,
+                        _maxPOIOccurrence.value.toInt()
                     )
                     preferences.setSettingInt(
                         PreferencesManager.MIN_POI_TIME,
@@ -131,15 +109,6 @@ class SettingsScreenViewModel @Inject constructor(
                         PreferencesManager.POI_LIMIT,
                         _pOILimit.value.toInt()
                     )
-                    preferences.setSettingInt(
-                        PreferencesManager.MAX_OCCURRENCE_PER_WEEK,
-                        _maxOccurrencePerWeek.value.toInt()
-                    )
-                    preferences.setSettingInt(
-                        PreferencesManager.MAX_OCCURRENCE_PER_MONTH,
-                        _maxOccurrencePerMonth.value.toInt()
-                    )
-
                     preferences.setSettingBool(
                         PreferencesManager.DYNAMIC_LIMIT,
                         _dynamicLimit.value
