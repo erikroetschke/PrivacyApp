@@ -18,7 +18,7 @@ class ExtractPOIs(
 
     private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
-    suspend operator fun invoke(pyRoute: PyObject): List<POI>{
+    suspend operator fun invoke(pyRoute: PyObject, saveToDB: Boolean): List<POI>{
 
         //get python instance
         val py = Python.getInstance()
@@ -38,10 +38,11 @@ class ExtractPOIs(
 
             finalPois.add(finalPOI)
 
-            if (i != pois.size - 1){
-                //add to db, except the last one as the timestamp might change in future computations
+            if(saveToDB) {
+                //add to db
                 poiRepository.insertPOI(finalPOI)
             }
+
         }
         return finalPois
     }

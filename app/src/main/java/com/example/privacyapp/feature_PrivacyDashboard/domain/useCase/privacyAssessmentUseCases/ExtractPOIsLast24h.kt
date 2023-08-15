@@ -53,6 +53,6 @@ private val poiRepository: POIRepository) {
             timestamps.toTypedArray()
         )
 
-        return ExtractPOIs(poiRepository).invoke(pyRoute)
+        return ExtractPOIs(poiRepository).invoke(pyRoute, false)
     }
 }

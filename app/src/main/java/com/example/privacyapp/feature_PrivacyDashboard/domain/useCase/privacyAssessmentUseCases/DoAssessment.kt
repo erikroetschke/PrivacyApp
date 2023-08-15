@@ -75,7 +75,7 @@ class DoAssessment(
                         //compute python route from locations
                         val pyRoute = createPythonRoute(locations)
 
-                        var metricResult = ExtractPOIs(poiRepository).invoke(pyRoute)
+                        var metricResult = ExtractPOIs(poiRepository).invoke(pyRoute, false)
                             .map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
                             .sortedBy { it.first }
 
@@ -102,28 +102,29 @@ class DoAssessment(
 
                         val pyRoute = createPythonRoute(locations.filter { !it.processed })
                         //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute)
+                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
                         //get all pois in th last 24h
                         val pOIsLast24h = poiRepository.getPOIsSinceTimestamp(
                             timestamp24HoursAgoRoundedToCompleteHour
                         )
                         // compute result data by finding duplicates
                         resultData = clusterPOIs(pOIsLast24h, metricInterval)
-                    }
-                }
-                //set all locations.processed to true
-                for (location in locations) {
-                    if (!location.processed) {
-                        //update them
-                        locationRepository.insertLocation(
-                            Location(
-                                location.longitude,
-                                location.latitude,
-                                location.timestamp,
-                                location.locationUsed,
-                                true
-                            )
-                        )
+
+                        //set all locations.processed to true
+                        for (location in locations) {
+                            if (!location.processed) {
+                                //update them
+                                locationRepository.insertLocation(
+                                    Location(
+                                        location.longitude,
+                                        location.latitude,
+                                        location.timestamp,
+                                        location.locationUsed,
+                                        true
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -143,7 +144,7 @@ class DoAssessment(
                         ).filter { !it.processed }
                         val pyRoute = createPythonRoute(locations)
                         //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute)
+                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
                         //get all pois
                         val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
                         // compute result data by finding duplicates
@@ -198,7 +199,7 @@ class DoAssessment(
                                         Metric.StopDetection -> {
                                             //compute metric
                                             val metricResult =
-                                                ExtractPOIs(poiRepository).invoke(pyRoute).size
+                                                ExtractPOIs(poiRepository).invoke(pyRoute, false).size
                                             res[i] = Pair(res[i].first, metricResult.toDouble())
                                             //if its not the current day(because the result might change over the day), add assessment to db
                                             if (i != 6) {
@@ -214,21 +215,6 @@ class DoAssessment(
 
                                         else -> {/*these have been considered even before this when block*/
                                         }
-                                    }
-                                }
-                                //set all locations.processed to true
-                                for (location in locations) {
-                                    if (!location.processed) {
-                                        //update them
-                                        locationRepository.insertLocation(
-                                            Location(
-                                                location.longitude,
-                                                location.latitude,
-                                                location.timestamp,
-                                                location.locationUsed,
-                                                true
-                                            )
-                                        )
                                     }
                                 }
                             }
@@ -255,7 +241,7 @@ class DoAssessment(
                         ).filter { !it.processed }
                         val pyRoute = createPythonRoute(locations)
                         //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute)
+                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
                         //get all pois
                         val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
                         // compute result data by finding duplicates
@@ -309,7 +295,7 @@ class DoAssessment(
                                         Metric.StopDetection -> {
                                             //compute metric
                                             val metricResult =
-                                                ExtractPOIs(poiRepository).invoke(pyRoute).size
+                                                ExtractPOIs(poiRepository).invoke(pyRoute, false).size
                                             res[i] = Pair(res[i].first, metricResult.toDouble())
                                             //if its not the current day(because the result might change over the day), add assessment to db
                                             if (i != res.size - 1) {
@@ -325,21 +311,6 @@ class DoAssessment(
 
                                         else -> {/*these have been considered even before this when block*/
                                         }
-                                    }
-                                }
-                                //set all locations.processed to true
-                                for (location in locations) {
-                                    if (!location.processed) {
-                                        //update them
-                                        locationRepository.insertLocation(
-                                            Location(
-                                                location.longitude,
-                                                location.latitude,
-                                                location.timestamp,
-                                                location.locationUsed,
-                                                true
-                                            )
-                                        )
                                     }
                                 }
                             }
@@ -373,16 +344,21 @@ class DoAssessment(
     ): List<Pair<Int, Double>> {
 
         val pOIs = pOIs.toMutableList()
+        /*var string = ""
+        for (poi in pOIs) {
+            string += poi.latitude.toString() + "," + poi.longitude.toString() + "\n"
+        }
+        println(string)*/
         val result = createEmptyResultList(metricInterval)
 
         val distanceThreshold =
-            (sharedPrefs.getSettingInt(PreferencesManager.POI_RADIUS) / 1f).toInt()
+            (sharedPrefs.getSettingInt(PreferencesManager.POI_RADIUS) / 2f).toInt()
 
         //find cluster
         val clusters = mutableListOf<MutableList<POI>>()
 
         for (poi in pOIs) {
-            val addedToCluster = false
+            var addedToCluster = false
             for (cluster in clusters) {
                 // you could go through all pois and check the condition and add the POI when at least one fulfills it.
                 // But i think in this special usecase, this works better
@@ -394,6 +370,7 @@ class DoAssessment(
                     ) * 1000 < distanceThreshold
                 ) {
                     cluster.add(poi)
+                    addedToCluster = true
                     break
                 }
             }

@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
@@ -123,6 +124,10 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             Instant.now().atZone(ZoneId.systemDefault()).minusMonths(1)
         )
         lifecycleScope.launch {
+/*            val locations = locationUseCases.getUsedLocationsLastSinceTimestamp(timestamp)
+            for (location in locations) {
+                locationUseCases.addLocation(Location(location.longitude, location.latitude, location.timestamp, location.locationUsed, false))
+            }*/
             privacyAssessmentUseCases.deletePrivacyAssessment(timestamp)
             locationUseCases.deleteLocationsOlderThanTimestamp(timestamp)
             appUsageUseCases.deleteAppUsageOlderThanTimestamp(timestamp)
