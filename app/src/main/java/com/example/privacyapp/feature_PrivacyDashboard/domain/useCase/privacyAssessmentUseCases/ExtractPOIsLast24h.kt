@@ -4,12 +4,14 @@ import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.POI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.ExtractPOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterval
 import java.time.Instant
 import java.time.ZoneId
 
-class ExtractPOIsLast24h(private val locationRepository: LocationRepository) {
+class ExtractPOIsLast24h(private val locationRepository: LocationRepository,
+private val poiRepository: POIRepository) {
 
     suspend operator fun invoke(): List<POI> {
 
@@ -51,6 +53,6 @@ class ExtractPOIsLast24h(private val locationRepository: LocationRepository) {
             timestamps.toTypedArray()
         )
 
-        return ExtractPOIs().invoke(pyRoute)
+        return ExtractPOIs(poiRepository).invoke(pyRoute, false)
     }
 }

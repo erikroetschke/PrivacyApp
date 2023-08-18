@@ -2,7 +2,7 @@ package com.example.privacyapp.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.Database
+import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDatabase
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.AppUsageRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
@@ -37,6 +37,8 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.DoAssessment
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetPOISinceTimestampAsFlow
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
@@ -54,20 +56,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): Database {
+    fun provideDatabase(app: Application): AppDatabase {
         //get Application to provide it in other classes, as this method will be called even before onCreate() at the MainActivity
         ApplicationProvider.initialize(app)
         //provide db
         return Room.databaseBuilder(
             app,
-            Database::class.java,
-            Database.DATABASE_NAME
-        ).fallbackToDestructiveMigration().build()
+            AppDatabase::class.java,
+            AppDatabase.DATABASE_NAME
+        )/*.fallbackToDestructiveMigration()*/.build()
     }
 
     @Provides
     @Singleton
-    fun provideLocationRepository(db: Database): LocationRepository {
+    fun provideLocationRepository(db: AppDatabase): LocationRepository {
         return LocationRepositoryImpl(db.locationDao)
     }
 
@@ -85,24 +87,24 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppRepository(db: Database): AppRepository {
+    fun provideAppRepository(db: AppDatabase): AppRepository {
         return AppRepositoryImpl(db.appDao)
     }
 
     @Provides
     @Singleton
-    fun provideAppUsageRepository(db: Database): AppUsageRepository {
+    fun provideAppUsageRepository(db: AppDatabase): AppUsageRepository {
         return AppUsageRepositoryImpl(db.appUsageDao)
     }
     @Provides
     @Singleton
-    fun providePrivacyAssessmentRepository(db: Database): PrivacyAssessmentRepository {
+    fun providePrivacyAssessmentRepository(db: AppDatabase): PrivacyAssessmentRepository {
         return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1dDao)
     }
 
     @Provides
     @Singleton
-    fun providePOIRepository(db: Database): POIRepository {
+    fun providePOIRepository(db: AppDatabase): POIRepository {
         return POIRepositoryImpl(db.pOIDao)
     }
 
@@ -139,13 +141,15 @@ object AppModule {
     }
     @Provides
     @Singleton
-    fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository, locationRepository: LocationRepository): PrivacyAssessmentUseCases {
+    fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository, locationRepository: LocationRepository, poiRepository: POIRepository): PrivacyAssessmentUseCases {
         return PrivacyAssessmentUseCases(
             addPrivacyAssessment = AddPrivacyAssessment(repository),
             deletePrivacyAssessment = DeletePrivacyAssessment(repository),
             getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
-            doAssessment = DoAssessment(locationRepository, repository),
-            extractPOIsLast24h = ExtractPOIsLast24h(locationRepository)
+            doAssessment = DoAssessment(repository, poiRepository),
+            extractPOIsLast24h = ExtractPOIsLast24h(locationRepository, poiRepository),
+            getPOISinceTimestampAsFlow = GetPOISinceTimestampAsFlow(poiRepository),
+            updatePOIs = UpdatePOIs(poiRepository, locationRepository)
         )
     }
 }

@@ -20,9 +20,7 @@ class AddPrivacyAssessment(
                     PrivacyAssessment1d(
                         timestampStart,
                         metric.metricName,
-                        metric.metricDescription,
-                        metricValue,
-                        metric.weighting
+                        metricValue
                     )
                 )
     }

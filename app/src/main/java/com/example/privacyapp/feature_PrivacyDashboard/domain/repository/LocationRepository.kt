@@ -17,6 +17,8 @@ interface LocationRepository {
 
     suspend fun getLocationsWithLocationUsedIsNull () : List<Location>
 
+    suspend fun getUsedAndNonProcessedLocations (): List<Location>
+
     suspend fun getUsedLocations (timestamp: Long): List<Location>
 
     suspend fun insertLocation(location: Location)

@@ -6,7 +6,5 @@ import androidx.room.Entity
 data class PrivacyAssessment1d(
     val timestampStart: Long,
     val metricName: String,
-    val metricDescription: String,
-    val metricValue: Double,
-    val weighting: Int
+    val metricValue: Double
 )

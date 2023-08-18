@@ -14,4 +14,6 @@ sealed class DashboardEvent {
 
     data class ChangeMetricType(val metricType: MetricType) :DashboardEvent()
 
+    object dismissEnergyDialog: DashboardEvent()
+
 }

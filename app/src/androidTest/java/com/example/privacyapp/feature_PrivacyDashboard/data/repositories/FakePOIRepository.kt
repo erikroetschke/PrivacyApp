@@ -1,28 +1,37 @@
-package com.example.privacyapp.feature_PrivacyDashboard.data.repository
+package com.example.privacyapp.feature_PrivacyDashboard.data.repositories
 
-import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.POIDao
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.POI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import kotlinx.coroutines.flow.Flow
 
-class POIRepositoryImpl(private val poiDao: POIDao): POIRepository {
+class FakePOIRepository: POIRepository {
+
+    private val pois = mutableListOf<POI>()
+
     override suspend fun getPOIsSinceTimestamp(timestamp: Long): List<POI> {
-        return poiDao.getPOIsSinceTimestamp(timestamp)
+        val list = mutableListOf<POI>()
+        for (poi in pois) {
+            if(poi.timestamp >= timestamp) {
+                list.add(poi)
+            }
+        }
+        return list
     }
 
     override fun getPOIsSinceTimestampAsFlow(timestamp: Long): Flow<List<POI>> {
-        return poiDao.getPOIsSinceTimestampAsFlow(timestamp)
+        TODO("Not yet implemented")
     }
 
     override suspend fun insertPOI(poi: POI) {
-        return poiDao.insertPOI(poi)
+        pois.add(poi)
     }
 
     override suspend fun deletePOI(poi: POI) {
-        return poiDao.deletePOI(poi)
+        pois.remove(poi)
     }
 
     override suspend fun deletePOIOlderThanTimestamp(timestamp: Long) {
-        return poiDao.deletePOIOlderThanTimestamp(timestamp)
+        //not needed for tests
     }
 }

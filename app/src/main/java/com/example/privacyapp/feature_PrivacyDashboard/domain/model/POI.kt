@@ -7,6 +7,5 @@ import androidx.room.PrimaryKey
 data class POI(
     val longitude: Double,
     val latitude: Double,
-    @PrimaryKey val timestamp: Long,
-    val count: Int
+    @PrimaryKey val timestamp: Long
 )

@@ -28,6 +28,10 @@ class LocationRepositoryImpl(
         return dao.getLocationsWithLocationUsedIsNull()
     }
 
+    override suspend fun getUsedAndNonProcessedLocations(): List<Location> {
+        return dao.getUsedAndNonProcessedLocations()
+    }
+
     override suspend fun getUsedLocations(timestamp: Long): List<Location> {
         return dao.getUsedLocations(timestamp)
     }
