@@ -35,4 +35,7 @@ interface LocationDao {
 
     @Query("DELETE FROM location WHERE timestamp < :timestamp")
     suspend fun deleteLocationOlderThanTimestamp(timestamp: Long)
+
+    @Query("SELECT * FROM location WHERE locationUsed = 1 AND processed = 0")
+    suspend fun getUsedAndNonProcessedLocations() : List<Location>
 }

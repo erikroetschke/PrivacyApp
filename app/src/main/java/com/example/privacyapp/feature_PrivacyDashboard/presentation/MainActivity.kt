@@ -123,6 +123,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             Instant.EPOCH,
             Instant.now().atZone(ZoneId.systemDefault()).minusMonths(1)
         )
+
         lifecycleScope.launch {
 /*            val locations = locationUseCases.getUsedLocationsLastSinceTimestamp(timestamp)
             for (location in locations) {
@@ -133,6 +134,7 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
             appUsageUseCases.deleteAppUsageOlderThanTimestamp(timestamp)
             poiRepository.deletePOIOlderThanTimestamp(timestamp)
         }
+
     }
 
     private fun initData() {

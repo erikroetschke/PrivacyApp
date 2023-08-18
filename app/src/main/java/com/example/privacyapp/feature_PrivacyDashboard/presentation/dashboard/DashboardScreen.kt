@@ -38,6 +38,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +48,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
@@ -67,6 +70,8 @@ fun DashboardScreen(
     viewModel: DashboardViewModel,
     mainActivity: MainActivity
 ) {
+
+    val mContext = LocalContext.current
 
     val dialogQueue = viewModel.visiblePermissionDialogQueue
     //Request Permissions
@@ -102,6 +107,42 @@ fun DashboardScreen(
     val scrollState = rememberScrollState()
 
     Column() {
+        if (viewModel.energySaverDialogVisible.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    viewModel.onEvent(DashboardEvent.dismissEnergyDialog)
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        val intent = Intent(
+                            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                            Uri.fromParts(
+                                "package",
+                                ApplicationProvider.application.packageName,
+                                null
+                            )
+                        )
+                        mContext.startActivity(intent)
+                        viewModel.onEvent(DashboardEvent.dismissEnergyDialog)
+                    }) {
+                        Text(text = "OK")
+                    }
+                },
+                title = {
+                    Text(text = "IMPORTANT")
+                },
+                text = {
+                    Text(text = "Please turn of the Battery Optimizations for this APP, otherwise it cant be guaranteed that this app works as intended.")
+                },
+                dismissButton = {
+                    Button(onClick = { viewModel.onEvent(DashboardEvent.dismissEnergyDialog) }) {
+                        Text(text = "No")
+                    }
+                }
+            )
+        }
+
+
         Column() {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -152,9 +193,21 @@ fun DashboardScreen(
                         )
                     },
                     metricType = viewModel.metricType.value,
-                    onMetricTypeChange = {metricType -> viewModel.onEvent(DashboardEvent.ChangeMetricType(metricType))},
+                    onMetricTypeChange = { metricType ->
+                        viewModel.onEvent(
+                            DashboardEvent.ChangeMetricType(
+                                metricType
+                            )
+                        )
+                    },
                     modifier = Modifier.padding(10.dp),
-                    onMetricIntervalChange = {metricInterval -> viewModel.onEvent(DashboardEvent.ChangeMetricInterval(metricInterval))}
+                    onMetricIntervalChange = { metricInterval ->
+                        viewModel.onEvent(
+                            DashboardEvent.ChangeMetricInterval(
+                                metricInterval
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -193,7 +246,8 @@ fun DashboardScreen(
                                         mainActivity,
                                         Manifest.permission.ACCESS_BACKGROUND_LOCATION
                                     ) == PackageManager.PERMISSION_GRANTED
-                                ) || Build.VERSION.SDK_INT < 29) {
+                                            ) || Build.VERSION.SDK_INT < 29
+                                ) {
                                     Intent(
                                         ApplicationProvider.application,
                                         LocationService::class.java
@@ -252,9 +306,9 @@ fun DashboardScreen(
                     .height(300.dp)
                 //.background(Color.Black)
             ) {
-                if (viewModel.isLoading.value){
+                if (viewModel.isLoading.value) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }else{
+                } else {
                     LineChartV2(
                         data = viewModel.privacyLeakData,
                         modifier = Modifier

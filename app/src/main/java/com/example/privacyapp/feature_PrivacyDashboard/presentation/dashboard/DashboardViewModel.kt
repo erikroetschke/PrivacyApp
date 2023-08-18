@@ -3,7 +3,9 @@ package com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
+import android.content.Context.POWER_SERVICE
 import android.content.pm.PackageManager
+import android.os.PowerManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,6 +71,9 @@ class DashboardViewModel @Inject constructor(
     private val _metricType = mutableStateOf(MetricType.ABSOLUT)
     val metricType = _metricType
 
+    private val _energySaverDialogVisible = mutableStateOf(false)
+    val energySaverDialogVisible = _energySaverDialogVisible
+
     var maxLocationUsage = 0
 
     private var privacyAssessmentJob: Job? = null
@@ -76,8 +82,16 @@ class DashboardViewModel @Inject constructor(
     init {
         _trackingActive.value =
             ApplicationProvider.application.isServiceRunning(LocationService::class.java)
-        loadPrivacyLeakData()
+        loadPrivacyLeakData(true)
         getTop5()
+
+
+        val packageName = ApplicationProvider.application.packageName
+        val powerManger = ApplicationProvider.application.getSystemService(POWER_SERVICE) as PowerManager
+        if(!powerManger.isIgnoringBatteryOptimizations(packageName)) {
+            _energySaverDialogVisible.value = true
+        }
+
     }
 
     private fun getTop5() {
@@ -96,13 +110,17 @@ class DashboardViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun loadPrivacyLeakData() {
+    private fun loadPrivacyLeakData(alsoRefreshPOIs: Boolean) {
         _privacyLeakData.clear()
         privacyAssessmentJob?.cancel()
 
         privacyAssessmentJob = viewModelScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 _isLoading.value = true
+            }
+
+            if (alsoRefreshPOIs) {
+                privacyAssessmentUseCases.updatePOIs()
             }
 
             var result = mutableListOf<Pair<Int, Double>>()
@@ -206,14 +224,15 @@ class DashboardViewModel @Inject constructor(
                 } else {
                     _selectedMetrics.add(event.metric)
                 }
-                loadPrivacyLeakData()
+                loadPrivacyLeakData(false)
             }
 
             is DashboardEvent.RefreshData -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _isLoading.value = true
-                    updateUsageStats()
-                    loadPrivacyLeakData()
+                    val usageStatsDeferred = async {updateUsageStats()}
+                    usageStatsDeferred.await() // Wait for updateUsageStats() to complete
+                    loadPrivacyLeakData(true)
                     //getTop5()
                     _isLoading.value = false
                 }
@@ -221,12 +240,16 @@ class DashboardViewModel @Inject constructor(
 
             is DashboardEvent.ChangeMetricType -> {
                 _metricType.value = event.metricType
-                loadPrivacyLeakData()
+                loadPrivacyLeakData(false)
             }
 
             is DashboardEvent.ChangeMetricInterval -> {
                 _metricInterval.value = event.metricInterval
-                loadPrivacyLeakData()
+                loadPrivacyLeakData(false)
+            }
+
+            is DashboardEvent.dismissEnergyDialog -> {
+                _energySaverDialogVisible.value = false
             }
         }
     }

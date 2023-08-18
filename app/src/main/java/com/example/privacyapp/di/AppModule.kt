@@ -38,6 +38,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetPOISinceTimestampAsFlow
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
@@ -145,9 +146,10 @@ object AppModule {
             addPrivacyAssessment = AddPrivacyAssessment(repository),
             deletePrivacyAssessment = DeletePrivacyAssessment(repository),
             getAssessment1dByMetricSinceTimestamp = GetAssessment1dByMetricSinceTimestamp(repository),
-            doAssessment = DoAssessment(locationRepository, repository, poiRepository),
+            doAssessment = DoAssessment(repository, poiRepository),
             extractPOIsLast24h = ExtractPOIsLast24h(locationRepository, poiRepository),
-            getPOISinceTimestampAsFlow = GetPOISinceTimestampAsFlow(poiRepository)
+            getPOISinceTimestampAsFlow = GetPOISinceTimestampAsFlow(poiRepository),
+            updatePOIs = UpdatePOIs(poiRepository, locationRepository)
         )
     }
 }

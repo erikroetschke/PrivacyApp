@@ -28,7 +28,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class DoAssessment(
-    private val locationRepository: LocationRepository,
     private val privacyAssessmentRepository: PrivacyAssessmentRepository,
     private val poiRepository: POIRepository
 ) {
@@ -59,37 +58,25 @@ class DoAssessment(
         when (metricInterval) {
             MetricInterval.DAY -> {
                 val res = createEmptyResultList(MetricInterval.DAY)
-
                 val timestamp24HoursAgoRoundedToCompleteHour = getStartTimestamp(metricInterval)
                 //get locations for the last 24 Hours,
-                val locations =
-                    locationRepository.getUsedLocations(timestamp24HoursAgoRoundedToCompleteHour)
-                        .sortedBy { it.timestamp }
-                if (locations.isEmpty()) {
+                val pois =
+                    poiRepository.getPOIsSinceTimestamp(timestamp24HoursAgoRoundedToCompleteHour)
+                if (pois.isEmpty()) {
                     return res
                 }
-
                 //compute metric
                 when (metric) {
                     Metric.StopDetection -> {
-                        //compute python route from locations
-                        val pyRoute = createPythonRoute(locations)
-
-                        var metricResult = ExtractPOIs(poiRepository).invoke(pyRoute, false)
-                            .map { poi -> Pair<Long, Double>(poi.timestamp, 1.toDouble()) }
-                            .sortedBy { it.first }
-
                         //convert timestamp into hour
-                        metricResult = metricResult.map { pair ->
+                        val metricResult = pois.map { poi ->
                             Pair(
-                                Instant.ofEpochMilli(pair.first)
+                                Instant.ofEpochMilli(poi.timestamp)
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalTime().hour.toLong(),
-                                pair.second
+                                1
                             )
                         }.toMutableList()
-
-
                         val startHour = res[0].first
                         for (item in metricResult) {
                             val index = ((item.first + 24 - startHour) % 24).toInt()
@@ -99,32 +86,9 @@ class DoAssessment(
                     }
 
                     Metric.StopFrequency -> {
-
-                        val pyRoute = createPythonRoute(locations.filter { !it.processed })
-                        //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
-                        //get all pois in th last 24h
-                        val pOIsLast24h = poiRepository.getPOIsSinceTimestamp(
-                            timestamp24HoursAgoRoundedToCompleteHour
-                        )
                         // compute result data by finding duplicates
-                        resultData = clusterPOIs(pOIsLast24h, metricInterval)
+                        resultData = clusterPOIs(pois, metricInterval)
 
-                        //set all locations.processed to true
-                        for (location in locations) {
-                            if (!location.processed) {
-                                //update them
-                                locationRepository.insertLocation(
-                                    Location(
-                                        location.longitude,
-                                        location.latitude,
-                                        location.timestamp,
-                                        location.locationUsed,
-                                        true
-                                    )
-                                )
-                            }
-                        }
                     }
                 }
             }
@@ -132,38 +96,15 @@ class DoAssessment(
             MetricInterval.WEEK -> {
 
                 var timestamp = getStartTimestamp(metricInterval)
-
                 var res = createEmptyResultList(MetricInterval.WEEK)
+                val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
 
                 when (metric) {
                     //separated from the rest, as this metric has dependencies to the days before, therefore need special treatment
                     Metric.StopFrequency -> {
-                        val locations = locationRepository.getUsedLocationsByInterval(
-                            timestamp,
-                            System.currentTimeMillis()
-                        ).filter { !it.processed }
-                        val pyRoute = createPythonRoute(locations)
-                        //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
-                        //get all pois
-                        val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
                         // compute result data by finding duplicates
                         res = clusterPOIs(pOIs, metricInterval).toMutableList()
-                        //set all locations.processed to true
-                        for (location in locations) {
-                            if (!location.processed) {
-                                //update them
-                                locationRepository.insertLocation(
-                                    Location(
-                                        location.longitude,
-                                        location.latitude,
-                                        location.timestamp,
-                                        location.locationUsed,
-                                        true
-                                    )
-                                )
-                            }
-                        }
+
                     }
 
                     else -> {
@@ -183,38 +124,26 @@ class DoAssessment(
                                 res[i] = Pair(res[i].first, existingAssessments[0].metricValue)
                                 existingAssessments.removeAt(0)
                             } else {
+                                when (metric) {
+                                    Metric.StopDetection -> {
+                                        //get pois fot this day
+                                        val filteredPois =
+                                            pOIs.filter { it.timestamp >= timestamp && it.timestamp <= timestamp + (1000 * 60 * 60 * 24) }
 
-                                //get location
-                                val locations = locationRepository.getUsedLocationsByInterval(
-                                    timestamp,
-                                    timestamp + (1000 * 60 * 60 * 24)
-                                ).sortedBy { it.timestamp }
-                                if (locations.isEmpty()) {
-                                    res[i] = Pair(res[i].first, 0.toDouble())
-                                } else {
-                                    //compute python route from locations
-                                    val pyRoute = createPythonRoute(locations)
-
-                                    when (metric) {
-                                        Metric.StopDetection -> {
-                                            //compute metric
-                                            val metricResult =
-                                                ExtractPOIs(poiRepository).invoke(pyRoute, false).size
-                                            res[i] = Pair(res[i].first, metricResult.toDouble())
-                                            //if its not the current day(because the result might change over the day), add assessment to db
-                                            if (i != 6) {
-                                                privacyAssessmentRepository.insertAssessment1d(
-                                                    PrivacyAssessment1d(
-                                                        timestamp,
-                                                        metric.metricName,
-                                                        metricResult.toDouble()
-                                                    )
+                                        res[i] = Pair(res[i].first, filteredPois.size.toDouble())
+                                        //if its not the current day(because the result might change over the day), add assessment to db
+                                        if (i != 6) {
+                                            privacyAssessmentRepository.insertAssessment1d(
+                                                PrivacyAssessment1d(
+                                                    timestamp,
+                                                    metric.metricName,
+                                                    filteredPois.size.toDouble()
                                                 )
-                                            }
+                                            )
                                         }
+                                    }
 
-                                        else -> {/*these have been considered even before this when block*/
-                                        }
+                                    else -> {/*these have been considered even before this when block*/
                                     }
                                 }
                             }
@@ -224,43 +153,18 @@ class DoAssessment(
                     }
                 }
                 resultData = res
-
             }
 
             MetricInterval.MONTH -> {
 
                 var timestamp = getStartTimestamp(metricInterval)
-
                 var res = createEmptyResultList(MetricInterval.MONTH)
+                val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
 
                 when (metric) {
                     Metric.StopFrequency -> {
-                        val locations = locationRepository.getUsedLocationsByInterval(
-                            timestamp,
-                            System.currentTimeMillis()
-                        ).filter { !it.processed }
-                        val pyRoute = createPythonRoute(locations)
-                        //locations are saved to db in this function
-                        ExtractPOIs(poiRepository).invoke(pyRoute, true)
-                        //get all pois
-                        val pOIs = poiRepository.getPOIsSinceTimestamp(timestamp)
                         // compute result data by finding duplicates
                         res = clusterPOIs(pOIs, metricInterval).toMutableList()
-                        //set all locations.processed to true
-                        for (location in locations) {
-                            if (!location.processed) {
-                                //update them
-                                locationRepository.insertLocation(
-                                    Location(
-                                        location.longitude,
-                                        location.latitude,
-                                        location.timestamp,
-                                        location.locationUsed,
-                                        true
-                                    )
-                                )
-                            }
-                        }
                     }
 
                     else -> {
@@ -279,38 +183,24 @@ class DoAssessment(
                                 res[i] = Pair(res[i].first, existingAssessments[0].metricValue)
                                 existingAssessments.removeAt(0)
                             } else {
+                                when (metric) {
+                                    Metric.StopDetection -> {
 
-                                //get location
-                                val locations = locationRepository.getUsedLocationsByInterval(
-                                    timestamp,
-                                    timestamp + (1000 * 60 * 60 * 24)
-                                ).sortedBy { it.timestamp }
-                                if (locations.isEmpty()) {
-                                    res[i] = Pair(res[i].first, 0.toDouble())
-                                } else {
-                                    //compute python route from locations
-                                    val pyRoute = createPythonRoute(locations)
-
-                                    when (metric) {
-                                        Metric.StopDetection -> {
-                                            //compute metric
-                                            val metricResult =
-                                                ExtractPOIs(poiRepository).invoke(pyRoute, false).size
-                                            res[i] = Pair(res[i].first, metricResult.toDouble())
-                                            //if its not the current day(because the result might change over the day), add assessment to db
-                                            if (i != res.size - 1) {
-                                                privacyAssessmentRepository.insertAssessment1d(
-                                                    PrivacyAssessment1d(
-                                                        timestamp,
-                                                        metric.metricName,
-                                                        metricResult.toDouble()
-                                                    )
+                                        val filteredPOIS =
+                                            pOIs.filter { it.timestamp >= timestamp && it.timestamp <= timestamp + (1000 * 60 * 60 * 24) }
+                                        res[i] = Pair(res[i].first, filteredPOIS.size.toDouble())
+                                        //if its not the current day(because the result might change over the day), add assessment to db
+                                        if (i != res.size - 1) {
+                                            privacyAssessmentRepository.insertAssessment1d(
+                                                PrivacyAssessment1d(
+                                                    timestamp,
+                                                    metric.metricName,
+                                                    filteredPOIS.size.toDouble()
                                                 )
-                                            }
+                                            )
                                         }
-
-                                        else -> {/*these have been considered even before this when block*/
-                                        }
+                                    }
+                                    else -> {/*these have been considered even before this when block*/
                                     }
                                 }
                             }
@@ -591,7 +481,7 @@ class DoAssessment(
             }
 
             Metric.StopFrequency -> {
-                numberOfClusters
+                numberOfClusters / 2 //when half of the POi-Types are visited above the threshold, the score is 1
             }
         }
         for ((index, result) in data.withIndex()) {
