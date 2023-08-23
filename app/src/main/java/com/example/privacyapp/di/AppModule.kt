@@ -9,12 +9,14 @@ import com.example.privacyapp.feature_PrivacyDashboard.data.repository.Preferenc
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.LocationRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.POIRepositoryImpl
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PrivacyAssessmentRepositoryImpl
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.UsageEventProviderImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.UsageEventProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.AddApp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.AddLocation
@@ -39,6 +41,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetPOISinceTimestampAsFlow
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.AddAppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
@@ -116,6 +119,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideUsageEventProvider(app: Application): UsageEventProvider {
+        return UsageEventProviderImpl(app)
+    }
+
+    @Provides
+    @Singleton
     fun provideAppUseCases(repository: AppRepository): AppUseCases {
         return AppUseCases(
             getApps = GetApps(repository),
@@ -131,12 +140,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppUsageUseCases(repository: AppUsageRepository, locationRepository: LocationRepository, appRepository: AppRepository): AppUsageUseCases {
+    fun provideAppUsageUseCases(repository: AppUsageRepository, locationRepository: LocationRepository, appRepository: AppRepository, usageEventProvider: UsageEventProvider): AppUsageUseCases {
         return AppUsageUseCases(
-            computeUsage = ComputeUsage(repository, locationRepository, appRepository),
+            computeUsage = ComputeUsage(repository, locationRepository, appRepository, usageEventProvider),
             updateAppUsageLast24Hours = UpdateAppUsageLast24Hours(repository, appRepository),
             getAppUsageSinceTimestamp = GetAppUsageSinceTimestamp(repository),
-            deleteAppUsageOlderThanTimestamp = DeleteAppUsageOlderThanTimestamp(repository)
+            deleteAppUsageOlderThanTimestamp = DeleteAppUsageOlderThanTimestamp(repository),
+            addAppUsage = AddAppUsage(repository)
         )
     }
     @Provides

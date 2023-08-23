@@ -16,6 +16,6 @@ import androidx.room.ForeignKey
 data class AppUsage(
     val packageName: String,
     val timestamp: Long,
-    val foreground: Boolean,
+    var foreground: Boolean,
     var background: Boolean
 )

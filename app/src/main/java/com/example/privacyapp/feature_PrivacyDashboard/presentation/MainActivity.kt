@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
@@ -125,10 +126,11 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
         )
 
         lifecycleScope.launch {
-/*            val locations = locationUseCases.getUsedLocationsLastSinceTimestamp(timestamp)
+           /*val locations = locationUseCases.getUsedLocationsLastSinceTimestamp(1692704700000)
             for (location in locations) {
-                locationUseCases.addLocation(Location(location.longitude, location.latitude, location.timestamp, location.locationUsed, false))
-            }*/
+                locationUseCases.addLocation(Location(location.longitude, location.latitude, location.timestamp, null, location.processed))
+            }
+            val usages = appUsageUseCases.deleteAppUsageOlderThanTimestamp(System.currentTimeMillis())*/
             privacyAssessmentUseCases.deletePrivacyAssessment(timestamp)
             locationUseCases.deleteLocationsOlderThanTimestamp(timestamp)
             appUsageUseCases.deleteAppUsageOlderThanTimestamp(timestamp)
@@ -137,6 +139,9 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
 
     }
 
+    /**
+     * Initialize data for the application.
+     */
     private fun initData() {
         //run blocking to make sure init completes before dashboard will be initialized
         runBlocking {
@@ -196,12 +201,18 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
         }
     }
 
+    /**
+     * Callback for shared preference changes.
+     */
     override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
         if (key.equals("USAGE_PERMISSION_GRANTED")) {
             initData()
         }
     }
 
+    /**
+     * Lifecycle callback for activity destruction.
+     */
     override fun onDestroy() {
         super.onDestroy()
         val sharedPreferences = getSharedPreferences("PREFS_NAME", 0)

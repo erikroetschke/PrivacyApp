@@ -23,7 +23,7 @@ class UpdatePOIs(
      * locations are updated accordingly.
      */
     suspend operator fun invoke(){
-        val locations = locationRepository.getUsedAndNonProcessedLocations().toMutableList()
+        val locations = locationRepository.getUsedAndNonProcessedLocations().sortedBy { it.timestamp }.toMutableList()
         if (locations.isEmpty()){
             return
         }

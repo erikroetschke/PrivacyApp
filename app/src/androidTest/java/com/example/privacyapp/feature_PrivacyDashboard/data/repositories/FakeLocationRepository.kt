@@ -46,6 +46,16 @@ class FakeLocationRepository: LocationRepository {
         return list
     }
 
+    override suspend fun getUsedAndNonProcessedLocations(): List<Location> {
+        val list = mutableListOf<Location>()
+        for (location in locations) {
+            if(location.locationUsed == true && !location.processed) {
+                list.add(location)
+            }
+        }
+        return list
+    }
+
     override suspend fun getUsedLocations(timestamp: Long): List<Location> {
         val list = mutableListOf<Location>()
         for (location in locations) {
@@ -57,6 +67,9 @@ class FakeLocationRepository: LocationRepository {
     }
 
     override suspend fun insertLocation(location: Location) {
+        if(locations.find { it.timestamp == location.timestamp } != null){
+            locations.remove(locations.find { it.timestamp == location.timestamp })
+        }
         locations.add(location)
     }
 
