@@ -9,11 +9,13 @@ import androidx.core.app.NotificationCompat
 import com.example.privacyapp.R
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDatabase
 import com.example.privacyapp.feature_PrivacyDashboard.data.data_source.DefaultLocationClient
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.LocationUseCases
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.util.LOCATION_CHANNEL_ID
-import com.example.privacyapp.feature_PrivacyDashboard.util.LOCATION_INTERVAL
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,8 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class LocationService : Service() {
+
+    private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var locationClient: LocationClient
@@ -50,6 +54,9 @@ class LocationService : Service() {
     }
 
     private fun start() {
+
+        val locationInterval = sharedPrefs.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL) * 1000L // in milliseconds
+
         val notification = NotificationCompat.Builder(this, LOCATION_CHANNEL_ID)
             .setContentTitle("Tracking location...")
             .setContentText("Location: null")
@@ -59,7 +66,7 @@ class LocationService : Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         locationClient
-            .getLocationUpdates(LOCATION_INTERVAL)
+            .getLocationUpdates(locationInterval)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
                 //add location to db

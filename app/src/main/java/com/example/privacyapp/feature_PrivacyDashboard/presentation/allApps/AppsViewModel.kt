@@ -9,7 +9,6 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
-import com.example.privacyapp.feature_PrivacyDashboard.util.LOCATION_INTERVAL
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn

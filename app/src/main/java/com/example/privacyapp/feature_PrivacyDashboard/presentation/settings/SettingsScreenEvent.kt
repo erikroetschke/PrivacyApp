@@ -4,9 +4,11 @@ sealed class SettingsScreenEvent {
 
     data class ChangeMaxPOIPerDay(val value: Float) :SettingsScreenEvent()
 
-    data class ChangePOIRadius(val value: Float):SettingsScreenEvent()
+    data class ChangeLocationTrackingInterval(val value: Float): SettingsScreenEvent()
 
-    data class ChangeMinPOITime(val value: Float):SettingsScreenEvent()
+    data class ChangePOIRadius(val value: Int):SettingsScreenEvent()
+
+    data class ChangeMinPOITime(val value: Int):SettingsScreenEvent()
 
     data class ChangeMaxPOIOccurrence(val value: Float):SettingsScreenEvent()
 
@@ -16,4 +18,6 @@ sealed class SettingsScreenEvent {
     object RestoreSettings: SettingsScreenEvent()
 
     object ToggleDynamicLimit: SettingsScreenEvent()
+
+    object ToggleCoarseLocationIsRelevant: SettingsScreenEvent()
 }

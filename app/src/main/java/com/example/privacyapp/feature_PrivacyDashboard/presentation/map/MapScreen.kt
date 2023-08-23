@@ -61,30 +61,16 @@ fun MapScreen(viewModel: MapViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
+            Box(modifier = Modifier.padding(10.dp, 10.dp, 0.dp, 0.dp)) {
                 Text(
                     text = "Found POIs:",
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
-            IconButton(
-                onClick = {
-                    viewModel.onToggleMetricSection()
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit"
-                )
-            }
         }
-        AnimatedVisibility(
-            visible = viewModel.isMetricSectionVisible.value,
-            enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically()
-        ) {
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(10.dp, 0.dp, 0.dp, 0.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Interval: ")
@@ -112,7 +98,7 @@ fun MapScreen(viewModel: MapViewModel) {
                     }
                 )
             }
-        }
+
         Spacer(modifier = Modifier.height(10.dp))
         Box(modifier = Modifier.fillMaxSize()) {
             if (viewModel.isLoading.value) {

@@ -35,8 +35,6 @@ class MapViewModel @Inject constructor(
     private val _metricInterval = mutableStateOf(MetricInterval.DAY)
     val metricInterval = _metricInterval
 
-    private val _isMetricSectionVisible = mutableStateOf(false)
-    val isMetricSectionVisible = _isMetricSectionVisible
 
     init {
         getPOi(getStartTimestamp(_metricInterval.value))
@@ -47,9 +45,6 @@ class MapViewModel @Inject constructor(
         getPOi((getStartTimestamp(_metricInterval.value)))
     }
 
-    fun onToggleMetricSection() {
-        _isMetricSectionVisible.value = !_isMetricSectionVisible.value
-    }
 
     private fun getPOi(timestamp: Long) {
 

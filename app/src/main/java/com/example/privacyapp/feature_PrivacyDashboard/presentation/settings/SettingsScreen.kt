@@ -10,18 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.IntegerSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.Section
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SliderSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SwitchSetting
 
 @Composable
 fun SettingsScreen(
@@ -32,7 +29,7 @@ fun SettingsScreen(
         modifier = Modifier
     ) {
 
-        Box(modifier = Modifier.padding(10.dp, 8.dp, 0.dp, 0.dp)) {
+        Box(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = "Settings",
                 style = MaterialTheme.typography.headlineMedium
@@ -44,105 +41,74 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
+            Section(title = "General Settings") {
+                SwitchSetting(
+                    label = "Coarse location relevant",
+                    isChecked = viewModel.isCoarseLocationRelevant.value,
+                    onCheckedChange = { viewModel.onEvent(SettingsScreenEvent.ToggleCoarseLocationIsRelevant) }
+                )
 
+                SliderSetting(
+                    label = "Tracking Interval in s",
+                    value = viewModel.locationTrackingInterval.value,
+                    onValueChange = { value -> viewModel.onEvent(SettingsScreenEvent.ChangeLocationTrackingInterval(value)) },
+                    valueRange = 15f..300f,
+                    steps = 18
+                )
+            }
 
-            Spacer(modifier = Modifier.height(10.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "POI detection:", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "POI limit: " + viewModel.pOILimit.value.toInt())
-                        Slider(
-                            value = viewModel.pOILimit.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(
-                                    SettingsScreenEvent.ChangeMaxPOIPerDay(
-                                        sliderValue_
-                                    )
-                                )
-                            },
-                            valueRange = 1f..20f,
-                            steps = 18,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
-                    }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Dynamic limit: " + viewModel.dynamicLimit.value)
-                        Switch(
-                            checked = viewModel.dynamicLimit.value,
-                            onCheckedChange = { viewModel.onEvent(SettingsScreenEvent.ToggleDynamicLimit) },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = Color.Gray
+            Section(title = "POI Detection") {
+                SliderSetting(
+                    label = "POI Limit",
+                    value = viewModel.pOILimit.value,
+                    onValueChange = { sliderValue_ ->
+                        viewModel.onEvent(
+                            SettingsScreenEvent.ChangeMaxPOIPerDay(
+                                sliderValue_
                             )
                         )
+                    },
+                    valueRange = 1f..20f,
+                    steps = 18,
+                )
+
+                SwitchSetting(
+                    label = "Dynamic Limit",
+                    isChecked = viewModel.dynamicLimit.value,
+                    onCheckedChange = { viewModel.onEvent(SettingsScreenEvent.ToggleDynamicLimit) }
+                )
+
+                IntegerSetting(label = "POI radius in m",
+                    value = viewModel.pOIRadius.value,
+                    onValueChange = { intVal ->
+                        viewModel.onEvent(SettingsScreenEvent.ChangePOIRadius(intVal))
                     }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "POI radius in m: " + viewModel.pOIRadius.value.toInt())
-                        Slider(
-                            value = viewModel.pOIRadius.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(SettingsScreenEvent.ChangePOIRadius(sliderValue_))
-                            },
-                            valueRange = 20f..500f,
-                            steps = 47,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
+                )
+
+                IntegerSetting(label = "POI time threshold in min",
+                    value = viewModel.minPOITime.value,
+                    onValueChange = { intVal ->
+                        viewModel.onEvent(SettingsScreenEvent.ChangeMinPOITime(intVal))
                     }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "POI time threshold in min: " + viewModel.minPOITime.value.toInt())
-                        Slider(
-                            value = viewModel.minPOITime.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(SettingsScreenEvent.ChangeMinPOITime(sliderValue_))
-                            },
-                            valueRange = 1f..20f,
-                            steps = 18,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
-                    }
-                }
+                )
             }
 
-
-            Spacer(modifier = Modifier.height(10.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "POI frequency:", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Max POI occurrence: " + viewModel.maxPOIOccurrence.value.toInt())
-                        Slider(
-                            value = viewModel.maxPOIOccurrence.value,
-                            onValueChange = { sliderValue_ ->
-                                viewModel.onEvent(
-                                    SettingsScreenEvent.ChangeMaxPOIOccurrence(
-                                        sliderValue_
-                                    )
-                                )
-                            },
-                            valueRange = 2f..10f,
-                            steps = 7,
-                            colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
+            Section(title = "POI Frequency") {
+                SliderSetting(
+                    label = "Max POI occurrence",
+                    value = viewModel.maxPOIOccurrence.value,
+                    onValueChange = { sliderValue_ ->
+                        viewModel.onEvent(
+                            SettingsScreenEvent.ChangeMaxPOIOccurrence(
+                                sliderValue_
+                            )
                         )
-                    }
-                }
+                    },
+                    valueRange = 2f..10f,
+                    steps = 7,
+                )
             }
+
             Spacer(modifier = Modifier.height(10.dp))
             Column(
                 Modifier

@@ -6,20 +6,18 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.UsageEventProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppStatus
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppStatusTracker
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.UsageEvent
-import com.example.privacyapp.feature_PrivacyDashboard.util.LOCATION_INTERVAL
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class ComputeUsage(
     private val repository: AppUsageRepository,
@@ -27,6 +25,8 @@ class ComputeUsage(
     private val appRepository: AppRepository,
     private val usageEventProvider: UsageEventProvider
 ) {
+
+    val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
     /**
      * Processes a list of [Location] objects along with associated usage events to update app status and usage information.
@@ -48,7 +48,7 @@ class ComputeUsage(
 
         /*val eventListDebug = usageEventProvider.getUsageEventsByInterval(System.currentTimeMillis()- 1000*60*60*24*3, System.currentTimeMillis())
         for (item in eventListDebug){
-            if(item.packageName.contains("com.ezviz") && (item.eventType == 19 || item.eventType == 20|| item.eventType == 23|| item.eventType == 1|| item.eventType == 2)) {
+            if(item.packageName.contains("com.ezviz") *//*&& (item.eventType == 19 || item.eventType == 20|| item.eventType == 23|| item.eventType == 1|| item.eventType == 2)*//*) {
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = item.timeStamp
 
@@ -63,6 +63,8 @@ class ComputeUsage(
                     Log.v("hello", "background: $dateFormat")
                 }else if (item.eventType == 23) {
                     Log.v("hello", "Stop: $dateFormat")
+                }else {
+                    Log.v("hello", "${item.eventType}: $dateFormat")
                 }
             }
         }*/
@@ -75,16 +77,19 @@ class ComputeUsage(
         val appUsages = HashMap<String, AppUsage>() // Store app usage objects
         var locationUsed = false
 
-        //Get apps of which usage is relevant, ACCESS_CORSE_LOCATION is not considered as relevant, as it has am accuracy of 2km
-        val listAppsWithForegroundPermission =
+        //Get apps of which usage is relevant
+        val listAppsWithForegroundPermission = if(sharedPrefs.getSettingBool(PreferencesManager.IS_COARSE_LOCATION_RELEVANT)){
+            appRepository.getAppsSuspend().filter { it.ACCESS_COARSE_LOCATION }
+        }else {
             appRepository.getAppsSuspend().filter { it.ACCESS_FINE_LOCATION }
+        }
         val listAppsWithBackgroundPermission =
             appRepository.getAppsSuspend().filter { it.ACCESS_BACKGROUND_LOCATION }
 
         //get usage Stats NOTE: Events are only kept by the system for a few days.
         val eventList = usageEventProvider.getUsageEventsByInterval(
             locations.first().timestamp,
-            locations.last().timestamp + LOCATION_INTERVAL
+            locations.last().timestamp + sharedPrefs.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL) * 1000L // in milliseconds
         )
 
         //get appStatusMap from last computation if needed, so if there were long running services/apps, they wont be missed
@@ -242,7 +247,7 @@ class ComputeUsage(
 
         }
         //save appStatusMap for future computations
-        appStatusTracker.saveAppStatusMapAndEndPoint(locations.last().timestamp + LOCATION_INTERVAL)
+        appStatusTracker.saveAppStatusMapAndEndPoint(locations.last().timestamp + sharedPrefs.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL) * 1000L)
     }
 
     /**
@@ -266,9 +271,12 @@ class ComputeUsage(
         )
         val eventIterator = eventList.iterator()
 
-        //Get apps of which usage is relevant, ACCESS_CORSE_LOCATION is not considered as relevant, as it has am accuracy of 2km
-        val listAppsWithForegroundPermission =
+        //Get apps of which usage is relevant
+        val listAppsWithForegroundPermission = if(sharedPrefs.getSettingBool(PreferencesManager.IS_COARSE_LOCATION_RELEVANT)){
+            appRepository.getAppsSuspend().filter { it.ACCESS_COARSE_LOCATION }
+        }else {
             appRepository.getAppsSuspend().filter { it.ACCESS_FINE_LOCATION }
+        }
         val listAppsWithBackgroundPermission =
             appRepository.getAppsSuspend().filter { it.ACCESS_BACKGROUND_LOCATION }
 

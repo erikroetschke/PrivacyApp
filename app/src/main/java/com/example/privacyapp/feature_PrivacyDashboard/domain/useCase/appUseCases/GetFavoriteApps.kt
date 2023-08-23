@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 class GetFavoriteApps(private val repository: AppRepository) {
 
     operator fun invoke(): Flow<List<App>> {
-        return repository.getFavoriteApps().map { apps -> apps.sortedBy { it.appName.lowercase() }
+        return repository.getFavoriteApps().map { apps -> apps.sortedBy { it.numberOfEstimatedRequests }
         }
     }
 }
