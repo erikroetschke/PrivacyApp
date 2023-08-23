@@ -27,6 +27,7 @@ class FavoritesViewModel @Inject constructor(
     private var getAppsJob: Job? = null
 
     var maxLocationUsage = 0
+    var cumulativeUsage = 0
 
     init {
         getAppsFromDB()
@@ -39,10 +40,11 @@ class FavoritesViewModel @Inject constructor(
             _state.value = state.value.copy(
                 apps = apps
             )
-            maxLocationUsage = if (apps.isEmpty()){
-                0
+            if (apps.isEmpty()){
+                maxLocationUsage = 0
             }else {
-                apps.maxOf { it.numberOfEstimatedRequests }
+                maxLocationUsage = apps.maxOf { it.numberOfEstimatedRequests }
+                cumulativeUsage = apps.sumOf { it.numberOfEstimatedRequests }
             }
 
         }

@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
@@ -32,12 +32,12 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 @Composable
 fun AppItem(
     @PreviewParameter(SampleAppProvider::class) app: App,
-    maxLocationUsage: Int,
+    cumulativeUsage: Int,
     modifier: Modifier = Modifier
     ){
     var locationUsedBoxWidthInPercentage = 0f
-    if (maxLocationUsage != 0) {
-        locationUsedBoxWidthInPercentage = (100/maxLocationUsage.toFloat()) * app.numberOfEstimatedRequests
+    if (cumulativeUsage != 0) {
+        locationUsedBoxWidthInPercentage = (100/cumulativeUsage.toFloat()) * app.numberOfEstimatedRequests
     }
 
 
@@ -50,13 +50,23 @@ fun AppItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Box(Modifier.height(45.dp).width(45.dp)) {
+            Box(
+                Modifier
+                    .height(45.dp)
+                    .width(45.dp)) {
                 Image(painter = rememberDrawablePainter(getAppIcon(app.packageName)), contentDescription = null)
             }
 
             Spacer(modifier = Modifier.width(10.dp))
             Column() {
-                Text(text = app.appName, style = MaterialTheme.typography.bodyLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = app.appName, style = MaterialTheme.typography.bodyLarge)
+                    Text(text = String.format("%.2f", locationUsedBoxWidthInPercentage) + "%", style = MaterialTheme.typography.bodyLarge)
+                }
                 Spacer(modifier = Modifier.height(10.dp))
                 Box() {
                     Box(modifier = Modifier
@@ -68,7 +78,7 @@ fun AppItem(
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(2.dp))
                         .height(10.dp)
-                        .fillMaxWidth(locationUsedBoxWidthInPercentage/100)
+                        .fillMaxWidth(locationUsedBoxWidthInPercentage / 100)
                         .background(color = MaterialTheme.colorScheme.primary)
                     )
                 }

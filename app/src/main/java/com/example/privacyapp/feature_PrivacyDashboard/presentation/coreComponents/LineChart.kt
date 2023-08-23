@@ -19,16 +19,16 @@ import kotlin.math.roundToInt
 @Composable
 fun LineChart(
     data: List<Pair<Int, Int>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxValue: Int
 ) {
     val spacing = 100f
     val graphColor = MaterialTheme.colorScheme.primary
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
-    var upperValueWithoutSpacing = (data.maxOfOrNull { it.second }) ?: 1
-    if(upperValueWithoutSpacing == 0) {
-        upperValueWithoutSpacing = 1
-    }
-    val upperValue = upperValueWithoutSpacing + upperValueWithoutSpacing/5.toFloat()
+    val upperValueWithoutSpacing = maxValue.coerceAtLeast(1)
+    val upperValueWithoutSpacingThisDataSet = (data.maxOfOrNull { it.second }) ?: 1
+    val finalUpperValueWithoutSpacing = upperValueWithoutSpacing.coerceAtLeast(upperValueWithoutSpacingThisDataSet)
+    val upperValue = finalUpperValueWithoutSpacing + finalUpperValueWithoutSpacing/5.toFloat()
     val lowerValue = 0
     val density = LocalDensity.current
     val textColor = MaterialTheme.colorScheme.onBackground

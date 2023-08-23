@@ -101,7 +101,8 @@ fun AppDetailsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp)
-                    .align(Center)
+                    .align(Center),
+                maxValue = viewModel.diagramMaxScale
             )
             //lineDiagram(yPoints = entriesOf(*viewModel.appUsagePerHour.toTypedArray()), modifier = Modifier.fillMaxWidth().padding(5.dp))
         }

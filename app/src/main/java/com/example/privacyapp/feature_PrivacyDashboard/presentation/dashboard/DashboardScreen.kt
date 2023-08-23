@@ -33,11 +33,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -330,7 +327,7 @@ fun DashboardScreen(
                 (viewModel.top5Apps).forEach { app ->
                     AppItem(
                         app = app,
-                        maxLocationUsage = viewModel.maxLocationUsage,
+                        cumulativeUsage = viewModel.cumulativeUsage,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp, 10.dp, 10.dp, 0.dp)

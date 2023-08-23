@@ -76,6 +76,8 @@ class DashboardViewModel @Inject constructor(
 
     var maxLocationUsage = 0
 
+    var cumulativeUsage = 0
+
     private var privacyAssessmentJob: Job? = null
     private var getTop5AppsJob: Job? = null
 
@@ -102,10 +104,11 @@ class DashboardViewModel @Inject constructor(
                 val appTop5 = apps.take(5)
                     .filter { it.numberOfEstimatedRequests > 0 }
                 _top5Apps.addAll(appTop5)
-                maxLocationUsage = if (_top5Apps.isNotEmpty()) {
-                    _top5Apps.maxOf { it.numberOfEstimatedRequests }
+                 if (_top5Apps.isNotEmpty()) {
+                     maxLocationUsage =_top5Apps.maxOf { it.numberOfEstimatedRequests }
+                     cumulativeUsage = _top5Apps.sumOf { it.numberOfEstimatedRequests }
                 } else {
-                    0
+                     maxLocationUsage = 0
                 }
             }.launchIn(viewModelScope)
     }

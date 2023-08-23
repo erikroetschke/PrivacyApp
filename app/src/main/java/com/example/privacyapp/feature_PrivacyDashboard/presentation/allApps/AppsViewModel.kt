@@ -27,6 +27,8 @@ class AppsViewModel @Inject constructor(
 
     var maxLocationUsage = 0
 
+    var cumulativeUsage = 0
+
     private var getAppsJob: Job? = null
 
     init {
@@ -63,14 +65,8 @@ class AppsViewModel @Inject constructor(
         getAppsJob = appUseCases.getApps(appOrder).onEach { apps ->
             _state.value = state.value.copy(apps = apps)
             maxLocationUsage = _state.value.apps.maxOf { it.numberOfEstimatedRequests }
+            cumulativeUsage = _state.value.apps.sumOf { it.numberOfEstimatedRequests }
         }.launchIn(viewModelScope)
-
-        /*viewModelScope.launch {
-            _state.value = state.value.copy(apps = appUseCases.getApps(appOrder))
-            //get the Maximum location usage to scale accordingly
-            maxLocationUsage = _state.value.apps.maxOf { it.numberOfEstimatedRequests }
-
-        }*/
     }
 
 }
