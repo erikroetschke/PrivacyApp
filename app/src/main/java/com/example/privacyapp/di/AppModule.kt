@@ -43,6 +43,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.AddAppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageByPackageNameAndTimeStampInterval
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.DeleteAppUsageOlderThanTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
@@ -146,7 +147,8 @@ object AppModule {
             updateAppUsageLast24Hours = UpdateAppUsageLast24Hours(repository, appRepository),
             getAppUsageSinceTimestamp = GetAppUsageSinceTimestamp(repository),
             deleteAppUsageOlderThanTimestamp = DeleteAppUsageOlderThanTimestamp(repository),
-            addAppUsage = AddAppUsage(repository)
+            addAppUsage = AddAppUsage(repository),
+            deleteAppUsageByPackageNameAndTimeStampInterval = DeleteAppUsageByPackageNameAndTimeStampInterval(repository)
         )
     }
     @Provides

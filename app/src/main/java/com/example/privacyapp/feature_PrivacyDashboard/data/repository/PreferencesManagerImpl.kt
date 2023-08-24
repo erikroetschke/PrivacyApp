@@ -71,6 +71,7 @@ class PreferencesManagerImpl(context: Context) : PreferencesManager {
             "pOIRadius" -> 200
             "minPOITime" -> 3
             "maxPOIOccurrence" -> 4
+            "locationTrackingInterval" -> 45
             else -> throw NoDefaultSettingsDefinedForMetric("You must assign default values in the DataStoreImpl for metric Settings")
         }
     }
@@ -85,7 +86,8 @@ class PreferencesManagerImpl(context: Context) : PreferencesManager {
     private fun getDefaultValuesBool(key: String): Boolean {
         return when (key) {
             "dynamicLimit" -> true
-            else -> throw NoDefaultSettingsDefinedForMetric("You must assign default values in the DataStoreImpl for metric Settings")
+            "isCoarseLocationRelevant" -> false
+            else -> throw NoDefaultSettingsDefinedForMetric("You must assign default values")
         }
     }
 }

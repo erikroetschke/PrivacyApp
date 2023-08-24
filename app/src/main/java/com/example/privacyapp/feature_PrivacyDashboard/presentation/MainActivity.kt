@@ -178,6 +178,8 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
                     appsFromPhone.removeAt(indexFromPhone)
                 } else {
                     //App is not in the DB but not on the phone anymore, so delete it from the db
+                    //first delete Usages
+                    appUsageUseCases.deleteAppUsageByPackageNameAndTimeStampInterval(app.packageName, 0, System.currentTimeMillis())
                     appUseCases.deleteApp(app)
                 }
             }

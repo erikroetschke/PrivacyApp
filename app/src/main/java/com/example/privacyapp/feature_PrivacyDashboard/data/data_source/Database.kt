@@ -7,6 +7,8 @@ import androidx.room.DeleteColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
@@ -21,7 +23,11 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAsses
             from = 13,
             to = 14,
             spec = AppDatabase.Migration13t014::class
-                )
+                ),
+    AutoMigration (
+        from = 14,
+        to = 15
+            )
     ]
 )
 abstract class AppDatabase: RoomDatabase() {
@@ -47,6 +53,12 @@ abstract class AppDatabase: RoomDatabase() {
                 INSTANCE = Room.databaseBuilder(context, com.example.privacyapp.feature_PrivacyDashboard.data.data_source.AppDatabase::class.java, "privacy_db").build()
             }
             return INSTANCE!!
+        }
+
+        val MIGRATION_14_15: Migration = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // No explicit changes needed, Room will handle the foreign key constraint change
+            }
         }
 
         fun destroyInstance() {

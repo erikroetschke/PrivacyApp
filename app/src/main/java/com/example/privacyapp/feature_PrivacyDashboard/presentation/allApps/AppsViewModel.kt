@@ -16,6 +16,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel class responsible for managing the state and business logic of the apps screen.
+ *
+ * This ViewModel handles interactions related to the apps screen, including sorting and managing
+ * application data based on different criteria. It exposes the current state of the screen,
+ * including the list of apps, ordering criteria, and visibility of order section.
+ *
+ * @param appUseCases The use case class providing access to application-related data and actions.
+ */
 @HiltViewModel
 class AppsViewModel @Inject constructor(
     private val appUseCases: AppUseCases
@@ -24,17 +33,29 @@ class AppsViewModel @Inject constructor(
     private val _state = mutableStateOf(AppsState())
     val state: MutableState<AppsState> = _state
 
-    var maxLocationUsage = 0
-
     var cumulativeUsage = 0
 
     private var getAppsJob: Job? = null
 
+    /**
+     * Initializes the ViewModel by fetching and ordering apps data.
+     *
+     * This function is called during ViewModel initialization to retrieve the list of apps
+     * and order them based on location usage in descending order.
+     */
     init {
         //get apps
         getAppsFromDB(AppOrder.LocationUsage(OrderType.Descending))
     }
 
+    /**
+     * Handles events triggered by user interactions on the apps screen.
+     *
+     * This function processes user events such as changing the ordering criteria and toggling
+     * the visibility of the order section.
+     *
+     * @param event The event representing the user interaction.
+     */
     fun onEvent(event: AppsEvent) {
         when (event) {
             is AppsEvent.Order -> {
@@ -59,11 +80,18 @@ class AppsViewModel @Inject constructor(
     }
 
 
+    /**
+     * Fetches and updates the list of apps based on the given app ordering criteria.
+     *
+     * This function retrieves the list of apps from the data source using the provided
+     * app ordering criteria. It also calculates and updates the statistics related to location usage.
+     *
+     * @param appOrder The criteria for ordering the list of apps.
+     */
     private fun getAppsFromDB(appOrder: AppOrder) {
         getAppsJob?.cancel()
         getAppsJob = appUseCases.getApps(appOrder).onEach { apps ->
             _state.value = state.value.copy(apps = apps)
-            maxLocationUsage = _state.value.apps.maxOf { it.numberOfEstimatedRequests }
             cumulativeUsage = _state.value.apps.sumOf { it.numberOfEstimatedRequests }
         }.launchIn(viewModelScope)
     }

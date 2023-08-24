@@ -1,9 +1,12 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases
 
+import android.app.AppOpsManager
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 
@@ -11,64 +14,115 @@ class InitApps(
 
 ) {
 
+    /**
+     * Invokes the [getInstalledApps] function to retrieve a list of installed applications
+     * along with their location-related permissions.
+     *
+     * This operator function provides a more concise way to call the [getInstalledApps] function
+     * to obtain a sorted list of installed applications with location-related permissions.
+     *
+     * @return A sorted list of [App] instances representing the installed applications with
+     *         location-related permissions.
+     * @see getInstalledApps
+     */
     operator fun invoke(): List<App> {
         return getInstalledApps()
     }
 
+    /**
+     * Retrieves a list of installed apps along with their permission details related to location.
+     *
+     * This function gathers information about installed applications, including app name,
+     * package name, and location-related permissions. It also determines the visibility
+     * of apps based on their installation status and location permission requests.
+     *
+     * @return A list of [App] objects containing app information and location permissions.
+     */
     private fun getInstalledApps(): List<App> {
+        // Get the application's package manager
         val packageManager: PackageManager =
             ApplicationProvider.application.applicationContext.packageManager
 
+        // List to store the retrieved app information
         val appsList = mutableListOf<App>()
-        // get list of all the apps installed
-        var packages: List<ApplicationInfo> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
-            )
-        } else {
-            packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-        }
+
+        // Get the list of all installed applications
+        val packages: List<ApplicationInfo> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Use enhanced API for Android 12 (API level 31) or higher
+                packageManager.getInstalledApplications(
+                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                )
+            } else {
+                // Use standard API for earlier Android versions
+                packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+            }
+
+        // Loop through each installed application
         for (applicationInfo in packages) {
             var packageName = ""
             var appName = ""
             var ACCESS_COARSE_LOCATION = false
             var ACCESS_FINE_LOCATION = false
             var ACCESS_BACKGROUND_LOCATION = false
-            var nonSystemAppOrSystemAppWithLocationPermission = false
+            var visible = false
 
-            var packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
-            } else {
-                packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS)
-            }
+            // Get detailed package information
+            val packageInfo: PackageInfo =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    // Use enhanced API for Android 12 (API level 31) or higher
+                    packageManager.getPackageInfo(
+                        applicationInfo.packageName,
+                        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+                    )
+                } else {
+                    // Use standard API for earlier Android versions
+                    packageManager.getPackageInfo(
+                        applicationInfo.packageName,
+                        PackageManager.GET_PERMISSIONS
+                    )
+                }
 
+            // Extract package name and app name
             packageName = packageInfo.packageName
             appName = packageManager.getApplicationLabel(applicationInfo) as String
 
-            //Get Permissions
+            // Get requested permissions and their flags
             val requestedPermissions = packageInfo.requestedPermissions
+            val requestedPermissionsFlags = packageInfo.requestedPermissionsFlags
+
             if (requestedPermissions != null) {
-                for (i in requestedPermissions.indices) {
-                    if (requestedPermissions[i].contains("android.permission.ACCESS_COARSE_LOCATION")) {
-                        ACCESS_COARSE_LOCATION = true
-                    } else if (requestedPermissions[i].contains("android.permission.ACCESS_FINE_LOCATION")) {
-                        ACCESS_FINE_LOCATION = true
-                    } else if (requestedPermissions[i].contains("android.permission.ACCESS_BACKGROUND_LOCATION")) {
-                        ACCESS_BACKGROUND_LOCATION = true
+                // Loop through each requested permission and its corresponding flags
+                for ((index, per) in requestedPermissions.withIndex()) {
+                    // Check if the permission is granted (by comparing flags using bitwise AND)
+                    if ((requestedPermissionsFlags[index] and PackageInfo.REQUESTED_PERMISSION_GRANTED) == PackageInfo.REQUESTED_PERMISSION_GRANTED) {
+                        // Assign corresponding location permission based on the permission name
+                        when (per) {
+                            "android.permission.ACCESS_COARSE_LOCATION" -> ACCESS_COARSE_LOCATION = true
+                            "android.permission.ACCESS_FINE_LOCATION" -> ACCESS_FINE_LOCATION = true
+                            "android.permission.ACCESS_BACKGROUND_LOCATION" -> ACCESS_BACKGROUND_LOCATION = true
+                        }
+                    }
+
+                    // Check if the app requested coarse location permission
+                    if (per == "android.permission.ACCESS_COARSE_LOCATION") {
+                        visible = true
                     }
                 }
             }
 
+            // Determine app visibility based on system status or user installation
             if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
-                if(ACCESS_COARSE_LOCATION && ACCESS_FINE_LOCATION) {
-                    //preinstalled
-                    nonSystemAppOrSystemAppWithLocationPermission = true
-                }
-            }else {
+                // Preinstalled app
+                // Only visible when app requested location, but not necessarily granted
+            } else {
                 // Installed by user
-                nonSystemAppOrSystemAppWithLocationPermission = true
+                // Always visible
+                visible = true
             }
-            if(nonSystemAppOrSystemAppWithLocationPermission) {
 
+            // Create an App object with extracted details and add it to the list
+            if (visible) {
                 val app = App(
                     packageName,
                     appName,
@@ -79,13 +133,13 @@ class InitApps(
                     false,
                     true
                 )
-                if (app.packageName != ""){
+                if (app.packageName != "") {
                     appsList.add(app)
                 }
             }
-
-
         }
+
+        // Sort the list of apps by their lowercase app names
         return appsList.sortedBy { it.appName.lowercase() }
     }
 }
