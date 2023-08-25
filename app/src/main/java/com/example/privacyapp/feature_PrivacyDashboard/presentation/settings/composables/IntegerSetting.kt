@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -18,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun IntegerSetting(label: String, value: Int, onValueChange: (Int) -> Unit) {
+fun IntegerSetting(label: String, value: Int, onValueChange: (Int) -> Unit, infoText:String, onInfoClick: () -> Unit, infoDialogVisible: Boolean) {
 
     Row(
         modifier = Modifier
@@ -52,5 +57,17 @@ fun IntegerSetting(label: String, value: Int, onValueChange: (Int) -> Unit) {
             modifier = Modifier.weight(0.5f),
             singleLine = true
         )
+
+        IconButton(
+            onClick = {
+                onInfoClick()
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+        }
+
+        if(infoDialogVisible){
+            InfoDialog(infoText = infoText, onDismiss = {onInfoClick()})
+        }
     }
 }

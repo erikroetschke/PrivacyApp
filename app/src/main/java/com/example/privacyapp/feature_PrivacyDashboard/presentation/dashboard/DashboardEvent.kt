@@ -43,4 +43,9 @@ sealed class DashboardEvent {
      * Event indicating the user's intention to dismiss the energy dialog.
      */
     object DismissEnergyDialog : DashboardEvent()
+
+    /**
+     * Event indicating the user's intention to view the info dialog.
+     */
+    object ToggleInfoDialog : DashboardEvent()
 }

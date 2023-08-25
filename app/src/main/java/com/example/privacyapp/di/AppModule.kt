@@ -54,10 +54,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Dagger Hilt module that provides various dependencies to the application.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    /**
+     * Provides the application's database using Room.
+     *
+     * @param app The application instance.
+     * @return An instance of the AppDatabase.
+     */
     @Provides
     @Singleton
     fun provideDatabase(app: Application): AppDatabase {
@@ -71,12 +80,24 @@ object AppModule {
         )/*.fallbackToDestructiveMigration()*/.build()
     }
 
+    /**
+     * Provides the LocationRepository using the LocationRepositoryImpl implementation.
+     *
+     * @param db The AppDatabase instance.
+     * @return An instance of LocationRepository.
+     */
     @Provides
     @Singleton
     fun provideLocationRepository(db: AppDatabase): LocationRepository {
         return LocationRepositoryImpl(db.locationDao)
     }
 
+    /**
+     * Provides the LocationUseCases using the LocationUseCases implementation.
+     *
+     * @param repository The LocationRepository instance.
+     * @return An instance of LocationUseCases.
+     */
     @Provides
     @Singleton
     fun provideLocationUseCases(repository: LocationRepository): LocationUseCases {
@@ -89,41 +110,84 @@ object AppModule {
         )
     }
 
+    /**
+     * Provides the AppRepository using the AppRepositoryImpl implementation.
+     *
+     * @param db The AppDatabase instance.
+     * @return An instance of AppRepository.
+     */
     @Provides
     @Singleton
     fun provideAppRepository(db: AppDatabase): AppRepository {
         return AppRepositoryImpl(db.appDao)
     }
 
+    /**
+     * Provides the AppUsageRepository using the AppUsageRepositoryImpl implementation.
+     *
+     * @param db The AppDatabase instance.
+     * @return An instance of AppUsageRepository.
+     */
     @Provides
     @Singleton
     fun provideAppUsageRepository(db: AppDatabase): AppUsageRepository {
         return AppUsageRepositoryImpl(db.appUsageDao)
     }
-    @Provides
-    @Singleton
-    fun providePrivacyAssessmentRepository(db: AppDatabase): PrivacyAssessmentRepository {
-        return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1dDao)
-    }
 
+    /**
+     * Provides the POIRepository using the POIRepositoryImpl implementation.
+     *
+     * @param db The AppDatabase instance.
+     * @return An instance of POIRepository.
+     */
     @Provides
     @Singleton
     fun providePOIRepository(db: AppDatabase): POIRepository {
         return POIRepositoryImpl(db.pOIDao)
     }
 
+    /**
+     * Provides the PrivacyAssessmentRepository using the PrivacyAssessmentRepositoryImpl implementation.
+     *
+     * @param db The AppDatabase instance.
+     * @return An instance of PrivacyAssessmentRepository.
+     */
+    @Provides
+    @Singleton
+    fun providePrivacyAssessmentRepository(db: AppDatabase): PrivacyAssessmentRepository {
+        return PrivacyAssessmentRepositoryImpl(db.privacyAssessment1dDao)
+    }
+
+    /**
+     * Provides the PreferencesManager using the PreferencesManagerImpl implementation.
+     *
+     * @param app The application instance.
+     * @return An instance of PreferencesManager.
+     */
     @Provides
     @Singleton
     fun provideSharedPrefs(app: Application): PreferencesManager {
         return PreferencesManagerImpl(app)
     }
 
+    /**
+     * Provides the UsageEventProvider using the UsageEventProviderImpl implementation.
+     *
+     * @param app The application instance.
+     * @return An instance of UsageEventProvider.
+     */
     @Provides
     @Singleton
     fun provideUsageEventProvider(app: Application): UsageEventProvider {
         return UsageEventProviderImpl(app)
     }
 
+    /**
+     * Provides the AppUseCases using the AppUseCases implementation.
+     *
+     * @param repository The AppRepository instance.
+     * @return An instance of AppUseCases.
+     */
     @Provides
     @Singleton
     fun provideAppUseCases(repository: AppRepository): AppUseCases {
@@ -139,6 +203,15 @@ object AppModule {
         )
     }
 
+    /**
+     * Provides the AppUsageUseCases using the AppUsageUseCases implementation.
+     *
+     * @param repository The AppUsageRepository instance.
+     * @param locationRepository The LocationRepository instance.
+     * @param appRepository The AppRepository instance.
+     * @param usageEventProvider The UsageEventProvider instance.
+     * @return An instance of AppUsageUseCases.
+     */
     @Provides
     @Singleton
     fun provideAppUsageUseCases(repository: AppUsageRepository, locationRepository: LocationRepository, appRepository: AppRepository, usageEventProvider: UsageEventProvider): AppUsageUseCases {
@@ -151,6 +224,15 @@ object AppModule {
             deleteAppUsageByPackageNameAndTimeStampInterval = DeleteAppUsageByPackageNameAndTimeStampInterval(repository)
         )
     }
+
+    /**
+     * Provides the PrivacyAssessmentUseCases using the PrivacyAssessmentUseCases implementation.
+     *
+     * @param repository The PrivacyAssessmentRepository instance.
+     * @param locationRepository The LocationRepository instance.
+     * @param poiRepository The POIRepository instance.
+     * @return An instance of PrivacyAssessmentUseCases.
+     */
     @Provides
     @Singleton
     fun providePrivacyAssessmentUseCases(repository: PrivacyAssessmentRepository, locationRepository: LocationRepository, poiRepository: POIRepository): PrivacyAssessmentUseCases {

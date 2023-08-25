@@ -82,6 +82,9 @@ class DashboardViewModel @Inject constructor(
     private val _energySaverDialogVisible = mutableStateOf(false)
     val energySaverDialogVisible = _energySaverDialogVisible
 
+    private val _infoDialogVisible = mutableStateOf(false)
+    val infoDialogVisible = _infoDialogVisible
+
     var cumulativeUsage = 0
 
     private var privacyAssessmentJob: Job? = null
@@ -280,6 +283,10 @@ class DashboardViewModel @Inject constructor(
 
             is DashboardEvent.DismissEnergyDialog -> {
                 _energySaverDialogVisible.value = false
+            }
+
+            DashboardEvent.ToggleInfoDialog -> {
+                _infoDialogVisible.value = !_infoDialogVisible.value
             }
         }
     }

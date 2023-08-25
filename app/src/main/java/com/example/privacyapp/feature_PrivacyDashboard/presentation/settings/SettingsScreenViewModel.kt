@@ -7,6 +7,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.Prefere
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 
 @HiltViewModel
@@ -43,6 +44,10 @@ class SettingsScreenViewModel @Inject constructor(
     private var _changed = mutableStateOf(false)
     val changed = _changed
 
+    //Infodialog
+    private val _infoDialogState = mutableStateOf(SettingsInfoDialogState())
+    val infoDialogState = _infoDialogState
+
     init {
         //get Settings
         _pOILimit.value = preferences.getSettingInt(PreferencesManager.POI_LIMIT).toFloat()
@@ -51,7 +56,8 @@ class SettingsScreenViewModel @Inject constructor(
         _maxPOIOccurrence.value =
             preferences.getSettingInt(PreferencesManager.MAX_POI_OCCURRENCE).toFloat()
         _dynamicLimit.value = preferences.getSettingBool(PreferencesManager.DYNAMIC_LIMIT)
-
+        _locationTrackingInterval.value = preferences.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL).toFloat()
+        _isCoarseLocationRelevant.value = preferences.getSettingBool(PreferencesManager.IS_COARSE_LOCATION_RELEVANT)
     }
 
     fun onEvent(event: SettingsScreenEvent) {
@@ -117,7 +123,7 @@ class SettingsScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     preferences.setSettingInt(
                         PreferencesManager.MAX_POI_OCCURRENCE,
-                        _maxPOIOccurrence.value.toInt()
+                        _maxPOIOccurrence.value.roundToInt()
                     )
                     preferences.setSettingInt(
                         PreferencesManager.MIN_POI_TIME,
@@ -126,7 +132,7 @@ class SettingsScreenViewModel @Inject constructor(
                     preferences.setSettingInt(PreferencesManager.POI_RADIUS, _pOIRadius.value)
                     preferences.setSettingInt(
                         PreferencesManager.POI_LIMIT,
-                        _pOILimit.value.toInt()
+                        _pOILimit.value.roundToInt()
                     )
                     preferences.setSettingBool(
                         PreferencesManager.DYNAMIC_LIMIT,
@@ -138,10 +144,22 @@ class SettingsScreenViewModel @Inject constructor(
                     )
                     preferences.setSettingInt(
                         PreferencesManager.LOCATION_TRACKING_INTERVAL,
-                        _locationTrackingInterval.value.toInt()
+                        _locationTrackingInterval.value.roundToInt()
                     )
                 }
                 _changed.value = false
+            }
+
+            is SettingsScreenEvent.TriggerInfoDialog -> {
+                when (event.pref) {
+                    PreferencesManager.IS_COARSE_LOCATION_RELEVANT -> {_infoDialogState.value = _infoDialogState.value.copy(coarseLocationRelevantInfoDialogVisible = !_infoDialogState.value.coarseLocationRelevantInfoDialogVisible)}
+                    PreferencesManager.MIN_POI_TIME -> {_infoDialogState.value = _infoDialogState.value.copy(minPOITimeInfoDialogVisible = !_infoDialogState.value.minPOITimeInfoDialogVisible)}
+                    PreferencesManager.LOCATION_TRACKING_INTERVAL -> {_infoDialogState.value = _infoDialogState.value.copy(locationTrackingIntervalInfoDialogVisible = !_infoDialogState.value.locationTrackingIntervalInfoDialogVisible)}
+                    PreferencesManager.DYNAMIC_LIMIT -> {_infoDialogState.value = _infoDialogState.value.copy(dynamicLimitInfoDialogVisible = !_infoDialogState.value.dynamicLimitInfoDialogVisible)}
+                    PreferencesManager.MAX_POI_OCCURRENCE -> {_infoDialogState.value = _infoDialogState.value.copy(maxPOIOccurrenceInfoDialogVisible = !_infoDialogState.value.maxPOIOccurrenceInfoDialogVisible)}
+                    PreferencesManager.POI_RADIUS -> {_infoDialogState.value = _infoDialogState.value.copy(pOIRadiusInfoDialogVisible = !_infoDialogState.value.pOIRadiusInfoDialogVisible)}
+                    PreferencesManager.POI_LIMIT -> {_infoDialogState.value = _infoDialogState.value.copy(pOILimitInfoDialogVisible = !_infoDialogState.value.pOILimitInfoDialogVisible)}
+                }
             }
         }
     }

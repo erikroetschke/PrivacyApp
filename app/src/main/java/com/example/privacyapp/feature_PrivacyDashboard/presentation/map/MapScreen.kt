@@ -41,6 +41,11 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 
 
+/**
+ * Composable function to display the map screen with Points of Interest (POIs).
+ *
+ * @param viewModel The ViewModel containing the map data and logic.
+ */
 @Composable
 fun MapScreen(viewModel: MapViewModel) {
 

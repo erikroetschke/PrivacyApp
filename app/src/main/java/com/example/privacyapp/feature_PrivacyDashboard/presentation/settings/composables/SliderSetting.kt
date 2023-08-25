@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -13,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
+import kotlin.math.roundToInt
 
 @Composable
 fun SliderSetting(
@@ -20,7 +26,8 @@ fun SliderSetting(
     value: Float,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float>,
-    steps: Int
+    steps: Int,
+    infoText:String, onInfoClick: () -> Unit, infoDialogVisible: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -32,7 +39,14 @@ fun SliderSetting(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
             Text(text = label)
-            Text(text = value.toInt().toString())
+            Text(text = value.roundToInt().toString())
+            IconButton(
+                onClick = {
+                    onInfoClick()
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+            }
         }
         Slider(
             value = value,
@@ -41,5 +55,9 @@ fun SliderSetting(
             steps = steps,
             colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.tertiary)
         )
+
+        if(infoDialogVisible){
+            InfoDialog(infoText = infoText, onDismiss = {onInfoClick()})
+        }
     }
 }

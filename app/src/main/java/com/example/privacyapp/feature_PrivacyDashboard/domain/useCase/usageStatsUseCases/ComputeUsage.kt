@@ -171,9 +171,9 @@ class ComputeUsage(
                     background = true
                 }
 
-                //check if event is too for away from location(more than 3 minutes),
+                //check if event is too for away from location,
                 //this could happen when the location could not be tracked for while and there is a bigger gap between two locations
-                if (currentEvent.timeStamp >= locations[counter].timestamp + 180000) {
+                if (currentEvent.timeStamp >= locations[counter].timestamp + sharedPrefs.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL) * 3) {
                     // in this case still  update appusageMap but dont create appUsages
                     skip = true
                 }

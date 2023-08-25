@@ -34,6 +34,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -52,6 +53,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationS
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.AppItem
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChartV2
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChartV2YAxisRight
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.BackgroundLocationPermissionTextProvider
@@ -147,6 +149,9 @@ fun DashboardScreen(
             )
         }
 
+        if (viewModel.infoDialogVisible.value) {
+            InfoDialog(infoText = "Tbd", onDismiss = {viewModel.onEvent(DashboardEvent.ToggleInfoDialog)})
+        }
 
         Column() {
             Row(
@@ -180,6 +185,13 @@ fun DashboardScreen(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Metric Settings"
                         )
+                    }
+                    IconButton(
+                        onClick = {
+                            viewModel.onEvent(DashboardEvent.ToggleInfoDialog)
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
                     }
                 }
             }

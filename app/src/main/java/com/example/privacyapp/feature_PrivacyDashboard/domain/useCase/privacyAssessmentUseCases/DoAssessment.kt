@@ -371,42 +371,6 @@ class DoAssessment(
         return zeros
     }
 
-    /**
-     * creates a Route which can be interpreted by python as a de4l_geodata/geodata/route.py.
-     * For more information see https://git.informatik.uni-leipzig.de/scads/de4l/privacy/de4l-geodata/-/blob/main/de4l_geodata/geodata/route.py
-     * @param locations list of location which will be appended to the route
-     * @return PyObject
-     */
-    private fun createPythonRoute(locations: List<Location>): PyObject {
-
-        //prepare route
-        //get python instance
-        val py = Python.getInstance()
-        val routeCreation = py.getModule("routeCreation")
-
-        //convert list of locations into python points
-        val pyPoints: MutableList<PyObject> = mutableListOf()
-        for (point in locations) {
-            pyPoints.add(
-                routeCreation.callAttr(
-                    "create_Point",
-                    point.latitude,
-                    point.longitude,
-                    point.timestamp
-                )
-            )
-        }
-
-        //extract timestamps from locations
-        val timestamps = locations.map { location -> location.timestamp }
-
-        //create route from points
-        return routeCreation.callAttr(
-            "create_Route",
-            pyPoints.toTypedArray(),
-            timestamps.toTypedArray()
-        )
-    }
 
     /**
      * returns the timestamp where the assessment should start, depending on the metricInterval

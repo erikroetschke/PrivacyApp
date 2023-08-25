@@ -10,6 +10,15 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.Prefere
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.metrics.ExtractPOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 
+/**
+ * This class is responsible for processing location data to extract Points of Interest (POIs).
+ * It retrieves location data from the repository, combines it with previous locations within a specified interval,
+ * and then creates a Python route for POI extraction. Extracted POIs are saved to the database, and the processed
+ * locations are updated accordingly.
+ *
+ * @property poiRepository The repository for handling Points of Interest (POI) data.
+ * @property locationRepository The repository for handling location data.
+ */
 class UpdatePOIs(
     private val poiRepository: POIRepository,
     private val locationRepository: LocationRepository
