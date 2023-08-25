@@ -15,15 +15,22 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterva
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.DefaultRadioButton
 
+/**
+ * Composable function to display a section for selecting metrics and metric intervals.
+ *
+ * @param modifier The modifier to be applied to the layout.
+ * @param metrics The list of available metrics to select from.
+ * @param metricInterval The currently selected metric interval.
+ * @param onMetricChange Callback function when a metric is selected or deselected.
+ * @param onMetricIntervalChange Callback function when a metric interval is selected.
+ */
 @Composable
 fun MetricSection(
     modifier: Modifier = Modifier,
     metrics: List<Metric>,
     metricInterval: MetricInterval,
     onMetricChange: (Metric) -> Unit,
-    onMetricTypeChange: (MetricType) -> Unit,
     onMetricIntervalChange: (MetricInterval) -> Unit,
-    metricType: MetricType
 ) {
     Column(
         modifier = modifier
@@ -43,30 +50,6 @@ fun MetricSection(
             }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Text(text = "Mode: ")
-            DefaultRadioButton(
-                text = "Absolut",
-                selected = metricType == MetricType.ABSOLUT,
-                onSelect = {
-                    onMetricTypeChange(MetricType.ABSOLUT)
-                }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            DefaultRadioButton(
-                text = "Score",
-                selected = metricType == MetricType.SCORE,
-                onSelect = {
-                    onMetricTypeChange(MetricType.SCORE)
-                }
-            )
-
-
-        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

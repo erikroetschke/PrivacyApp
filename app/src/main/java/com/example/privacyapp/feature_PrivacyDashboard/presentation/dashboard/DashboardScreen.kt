@@ -53,6 +53,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationPr
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.AppItem
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChartV2
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChartV2YAxisRight
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.BackgroundLocationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.LocationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.MetricSection
@@ -61,6 +62,13 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.co
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 
 
+/**
+ * Composable function to display the main dashboard screen.
+ *
+ * @param navController The NavController to handle navigation.
+ * @param viewModel The ViewModel containing the dashboard data and logic.
+ * @param mainActivity The MainActivity instance.
+ */
 @Composable
 fun DashboardScreen(
     navController: NavController,
@@ -107,7 +115,7 @@ fun DashboardScreen(
         if (viewModel.energySaverDialogVisible.value) {
             AlertDialog(
                 onDismissRequest = {
-                    viewModel.onEvent(DashboardEvent.dismissEnergyDialog)
+                    viewModel.onEvent(DashboardEvent.DismissEnergyDialog)
                 },
                 confirmButton = {
                     Button(onClick = {
@@ -120,7 +128,7 @@ fun DashboardScreen(
                             )
                         )
                         mContext.startActivity(intent)
-                        viewModel.onEvent(DashboardEvent.dismissEnergyDialog)
+                        viewModel.onEvent(DashboardEvent.DismissEnergyDialog)
                     }) {
                         Text(text = "OK")
                     }
@@ -132,7 +140,7 @@ fun DashboardScreen(
                     Text(text = "Please turn of the Battery Optimizations for this APP, otherwise it cant be guaranteed that this app works as intended.")
                 },
                 dismissButton = {
-                    Button(onClick = { viewModel.onEvent(DashboardEvent.dismissEnergyDialog) }) {
+                    Button(onClick = { viewModel.onEvent(DashboardEvent.DismissEnergyDialog) }) {
                         Text(text = "No")
                     }
                 }
@@ -187,14 +195,6 @@ fun DashboardScreen(
                     onMetricChange = { metric ->
                         viewModel.onEvent(
                             DashboardEvent.ChangeMetric(metric)
-                        )
-                    },
-                    metricType = viewModel.metricType.value,
-                    onMetricTypeChange = { metricType ->
-                        viewModel.onEvent(
-                            DashboardEvent.ChangeMetricType(
-                                metricType
-                            )
                         )
                     },
                     modifier = Modifier.padding(10.dp),
@@ -307,11 +307,18 @@ fun DashboardScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 } else {
                     LineChartV2(
-                        data = viewModel.privacyLeakData,
+                        data = viewModel.privacyLeakDataAbsolut,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(10.dp)
                             .align(Alignment.Center)
+                    )
+                    LineChartV2YAxisRight(
+                            data = viewModel.privacyLeakDataScore,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp)
+                        .align(Alignment.Center)
                     )
                 }
             }

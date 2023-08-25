@@ -18,26 +18,23 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricType
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.DashboardEvent
-import java.lang.Math.round
 import kotlin.math.roundToInt
-
 
 /**
  * A Jetpack Compose composable function that displays a line chart with given data points.
- * It has y axis labels on the right
+ * It meant to be used together with a [LineChartV2], as it has no x axis by itself.
+ * It should be Used to draw a second Line above the existing chart.
  *
  * @param data List of data points represented as pairs of X (hour) and Y (value) coordinates.
  * @param modifier Modifier to apply to the composable.
  */
 @Composable
-fun LineChartV2(
+fun LineChartV2YAxisRight(
     data: List<Pair<Int, Double>>,
     modifier: Modifier = Modifier
 ) {
     val spacing = 100f
-    val graphColor = MaterialTheme.colorScheme.primary
+    val graphColor = Color(5, 189, 245, 255)
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
 
     var upperValueWithoutSpacing = (data.maxOfOrNull { it.second })?.toInt() ?: 1
@@ -59,78 +56,38 @@ fun LineChartV2(
 
     Canvas(modifier = modifier) {
         val spacePerHour = (size.width - spacing*1.5f) / data.size
-        val stepSize = if(data.size < 10) { 1} else {2}
-        (data.indices step stepSize).forEach { i ->
-            val hour = data[i].first
-            drawContext.canvas.nativeCanvas.apply {
-                drawText(
-                    hour.toString(),
-                    spacing + i * spacePerHour,
-                    size.height,
-                    textPaint
-                )
-            }
-        }
 
         //lable
         drawContext.canvas.nativeCanvas.apply{
             drawText(
-                "Time:",
-                0f,
-                size.height,
-                textPaint
-            )
-        }
-
-        //x-axis
-        drawLine(
-            color = textColor,
-            start = Offset(0f, size.height - spacing),
-            end = Offset(size.width -10 , size.height - spacing),
-            strokeWidth = 5f
-        )
-        (data.indices step stepSize).forEach {i ->
-            drawLine(
-                color = textColor,
-                start = Offset(spacing + i * spacePerHour, size.height - spacing +30),
-                end = Offset(spacing + i * spacePerHour , size.height - spacing - 10),
-                strokeWidth = 5f
-            )
-        }
-
-
-
-        //lable
-        drawContext.canvas.nativeCanvas.apply{
-            drawText(
-                "Absolut:",
-                30f,
+                "Score:",
+                size.width - 30f,
                 0f,
                 textPaint
             )
         }
 
         //y axis labels
-                val priceStep = (upperValueWithoutSpacing - lowerValue) / 4f
-                (0..4).forEach { i ->
-                    drawContext.canvas.nativeCanvas.apply {
-                        if (priceStep > 1){
-                            drawText(
-                                (lowerValue + priceStep * i).roundToInt().toString(),
-                                30f,
-                                size.height - spacing - i * size.height / 5f,
-                                textPaint
-                            )
-                        }else {
-                            drawText(
-                                (((lowerValue + priceStep * i * 100).roundToInt())/100f).toString(),
-                                30f,
-                                size.height - spacing - i * size.height / 5f - 10,
-                                textPaint
-                            )
-                        }
-                    }
+        val priceStep = (upperValueWithoutSpacing - lowerValue) / 4f
+        (0..4).forEach { i ->
+            drawContext.canvas.nativeCanvas.apply {
+                if (priceStep > 1){
+                    drawText(
+                        (lowerValue + priceStep * i).roundToInt().toString(),
+                        size.width - 30f,
+                        size.height - spacing - i * size.height / 5f,
+                        textPaint
+                    )
+                }else {
+                    drawText(
+                        (((lowerValue + priceStep * i * 100).roundToInt())/100f).toString(),
+                        size.width - 30f,
+                        size.height - spacing - i * size.height / 5f - 10,
+                        textPaint
+                    )
                 }
+            }
+        }
 
         val strokePath = Path().apply {
             val height = size.height

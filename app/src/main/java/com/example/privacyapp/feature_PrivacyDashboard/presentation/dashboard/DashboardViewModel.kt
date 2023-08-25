@@ -36,6 +36,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * ViewModel class for managing dashboard-related data and events.
+ *
+ * @property appUseCases Use cases for interacting with app data.
+ * @property privacyAssessmentUseCases Use cases for performing privacy assessments.
+ * @property locationUseCases Use cases for managing location-related data.
+ * @property appUsageUseCases Use cases for managing app usage data.
+ */
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val appUseCases: AppUseCases,
@@ -59,8 +67,11 @@ class DashboardViewModel @Inject constructor(
     private val _metricInterval = mutableStateOf(MetricInterval.DAY)
     val metricInterval = _metricInterval
 
-    private val _privacyLeakData = mutableStateListOf<Pair<Int, Double>>()
-    val privacyLeakData = _privacyLeakData
+    private val _privacyLeakDataAbsolut = mutableStateListOf<Pair<Int, Double>>()
+    val privacyLeakDataAbsolut = _privacyLeakDataAbsolut
+
+    private val _privacyLeakDataScore = mutableStateListOf<Pair<Int, Double>>()
+    val privacyLeakDataScore = _privacyLeakDataScore
 
     private val _top5Apps = mutableStateListOf<App>()
     val top5Apps = _top5Apps
@@ -68,13 +79,8 @@ class DashboardViewModel @Inject constructor(
     private val _isLoading = mutableStateOf(false)
     val isLoading = _isLoading
 
-    private val _metricType = mutableStateOf(MetricType.ABSOLUT)
-    val metricType = _metricType
-
     private val _energySaverDialogVisible = mutableStateOf(false)
     val energySaverDialogVisible = _energySaverDialogVisible
-
-    var maxLocationUsage = 0
 
     var cumulativeUsage = 0
 
@@ -89,8 +95,9 @@ class DashboardViewModel @Inject constructor(
 
 
         val packageName = ApplicationProvider.application.packageName
-        val powerManger = ApplicationProvider.application.getSystemService(POWER_SERVICE) as PowerManager
-        if(!powerManger.isIgnoringBatteryOptimizations(packageName)) {
+        val powerManger =
+            ApplicationProvider.application.getSystemService(POWER_SERVICE) as PowerManager
+        if (!powerManger.isIgnoringBatteryOptimizations(packageName)) {
             _energySaverDialogVisible.value = true
         }
 
@@ -104,56 +111,66 @@ class DashboardViewModel @Inject constructor(
                 val appTop5 = apps.take(5)
                     .filter { it.numberOfEstimatedRequests > 0 }
                 _top5Apps.addAll(appTop5)
-                 if (_top5Apps.isNotEmpty()) {
-                     maxLocationUsage =_top5Apps.maxOf { it.numberOfEstimatedRequests }
-                     cumulativeUsage = _top5Apps.sumOf { it.numberOfEstimatedRequests }
+                cumulativeUsage = if (_top5Apps.isNotEmpty()) {
+                    _top5Apps.sumOf { it.numberOfEstimatedRequests }
                 } else {
-                     maxLocationUsage = 0
+                    0
                 }
             }.launchIn(viewModelScope)
     }
 
     private fun loadPrivacyLeakData(alsoRefreshPOIs: Boolean) {
-        _privacyLeakData.clear()
+        _privacyLeakDataAbsolut.clear()
+        _privacyLeakDataScore.clear()
         privacyAssessmentJob?.cancel()
 
+
         privacyAssessmentJob = viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {
-                _isLoading.value = true
-            }
+            var type = MetricType.ABSOLUT
+            for (i in 0 until 2) {
+                if (i == 1) {
+                    type = MetricType.SCORE
+                }
+                withContext(Dispatchers.Main) {
+                    _isLoading.value = true
+                }
 
-            if (alsoRefreshPOIs) {
-                privacyAssessmentUseCases.updatePOIs()
-            }
+                if (alsoRefreshPOIs) {
+                    privacyAssessmentUseCases.updatePOIs()
+                }
 
-            var result = mutableListOf<Pair<Int, Double>>()
-            for ((index, metric) in _selectedMetrics.toList().withIndex()) {
+                var result = mutableListOf<Pair<Int, Double>>()
+                for ((index, metric) in _selectedMetrics.toList().withIndex()) {
 
-                if (index == 0) {
-                    result = privacyAssessmentUseCases.doAssessment(
-                        metric,
-                        _metricInterval.value,
-                        _metricType.value
-                    ).toMutableList()
-                } else {
-                    val otherMetric = privacyAssessmentUseCases.doAssessment(
-                        metric,
-                        _metricInterval.value,
-                        _metricType.value
-                    ).toMutableList()
-                    //add other metrics to the first
-                    for ((index, point) in otherMetric.withIndex()) {
-                        result[index] =
-                            Pair(result[index].first, result[index].second + point.second)
+                    if (index == 0) {
+                        result = privacyAssessmentUseCases.doAssessment(
+                            metric,
+                            _metricInterval.value,
+                            type
+                        ).toMutableList()
+                    } else {
+                        val otherMetric = privacyAssessmentUseCases.doAssessment(
+                            metric,
+                            _metricInterval.value,
+                            type
+                        ).toMutableList()
+                        //add other metrics to the first
+                        for ((index, point) in otherMetric.withIndex()) {
+                            result[index] =
+                                Pair(result[index].first, result[index].second + point.second)
+                        }
                     }
                 }
-            }
                 ensureActive()//ensure job is still active before updating the state
-                if (_selectedMetrics.toList().size == 1 || _metricType.value == MetricType.ABSOLUT) {
-                    _privacyLeakData.addAll(result)
+                if (_selectedMetrics.toList().size == 1 || type == MetricType.ABSOLUT) {
+                    if (type == MetricType.ABSOLUT) {
+                        _privacyLeakDataAbsolut.addAll(result)
+                    } else {
+                        _privacyLeakDataScore.addAll(result)
+                    }
                 } else {
                     //type is Score and there were mutiple metrics selected so avaerage the metrics, to maintain value range [0,1]
-                    _privacyLeakData.addAll(result.map { pair ->
+                    _privacyLeakDataScore.addAll(result.map { pair ->
                         Pair(
                             pair.first,
                             pair.second / _selectedMetrics.toList().size
@@ -161,8 +178,9 @@ class DashboardViewModel @Inject constructor(
                     })
                 }
 
-            withContext(Dispatchers.Main) {
-                _isLoading.value = false
+                withContext(Dispatchers.Main) {
+                    _isLoading.value = false
+                }
             }
         }
 
@@ -189,10 +207,19 @@ class DashboardViewModel @Inject constructor(
             .any { it.service.className == service.name }
 
 
+    /**
+     * Dismisses the permission dialog from the queue.
+     */
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
     }
 
+    /**
+     * Handles the result of a permission request and updates the visibility of permission dialogs.
+     *
+     * @param permission The permission being checked.
+     * @param mainActivity The reference to the MainActivity.
+     */
     fun onPermissionResult(
         permission: String,
         mainActivity: MainActivity
@@ -209,6 +236,11 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Handles various events triggered in the dashboard.
+     *
+     * @param event The dashboard event to handle.
+     */
     fun onEvent(event: DashboardEvent) {
         when (event) {
             is DashboardEvent.ToggleTracking -> {
@@ -233,7 +265,7 @@ class DashboardViewModel @Inject constructor(
             is DashboardEvent.RefreshData -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _isLoading.value = true
-                    val usageStatsDeferred = async {updateUsageStats()}
+                    val usageStatsDeferred = async { updateUsageStats() }
                     usageStatsDeferred.await() // Wait for updateUsageStats() to complete
                     loadPrivacyLeakData(true)
                     //getTop5()
@@ -241,33 +273,15 @@ class DashboardViewModel @Inject constructor(
                 }
             }
 
-            is DashboardEvent.ChangeMetricType -> {
-                _metricType.value = event.metricType
-                loadPrivacyLeakData(false)
-            }
-
             is DashboardEvent.ChangeMetricInterval -> {
                 _metricInterval.value = event.metricInterval
                 loadPrivacyLeakData(false)
             }
 
-            is DashboardEvent.dismissEnergyDialog -> {
+            is DashboardEvent.DismissEnergyDialog -> {
                 _energySaverDialogVisible.value = false
             }
         }
     }
 
 }
-
-/* for test
-val locations = listOf(
-            Location(54.5200066, 13.404954, System.currentTimeMillis(), false),
-            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 1, false),
-            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 2, false),
-            Location(52.5200065, 13.404954, System.currentTimeMillis() - 1000 * 60 * 4, false),
-            Location(52.5200067, 13.404954, System.currentTimeMillis() - 1000 * 60 * 8, false),
-            Location(52.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 9, false),
-            Location(54.5200066, 13.404954, System.currentTimeMillis() - 1000 * 60 * 15, false)
-        )
-        privacyAssessmentUseCases.stopDetection(locations)
- */
