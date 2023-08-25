@@ -1,5 +1,7 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings
 
+import android.app.ActivityManager
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,19 +13,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.IntegerSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.LoadingDialog
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.POIChangeDialog
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.Section
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SliderSetting
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SwitchSetting
 
+/**
+ * Composable function that displays the settings screen, allowing the user to configure various settings.
+ *
+ * @param viewModel The ViewModel instance that holds the settings state and handles user interactions.
+ */
 @Composable
 fun SettingsScreen(
     viewModel: SettingsScreenViewModel
@@ -47,7 +59,6 @@ fun SettingsScreen(
                     Text(text = "Save")
                 }
             }
-
         }
 
         Column(
@@ -61,7 +72,8 @@ fun SettingsScreen(
                     isChecked = viewModel.isCoarseLocationRelevant.value,
                     onCheckedChange = { viewModel.onEvent(SettingsScreenEvent.ToggleCoarseLocationIsRelevant) },
                     infoDialogVisible = viewModel.infoDialogState.value.coarseLocationRelevantInfoDialogVisible,
-                    infoText = "When active, app usages from apps which only have coarse location granted (aprox. 2km accuracy), will also be taken into account when computing the privacy score.",
+                    infoText = "When active, app usages from apps which only have coarse location granted (aprox. 2km accuracy), will also be taken into account when computing the privacy score." +
+                            "\n Please be aware, when changing this setting it will only effect future data, not the existing one",
                     onInfoClick = {viewModel.onEvent(SettingsScreenEvent.TriggerInfoDialog(PreferencesManager.IS_COARSE_LOCATION_RELEVANT))}
                 )
 
@@ -72,7 +84,8 @@ fun SettingsScreen(
                     valueRange = 15f..300f,
                     steps = 18,
                     infoDialogVisible = viewModel.infoDialogState.value.locationTrackingIntervalInfoDialogVisible,
-                    infoText = "This defines how often this app will get your location. With every location the AppUsages will be assessed. So moving it up will decrease the accuracy, but moving it down will increase battery and memory consumption.",
+                    infoText = "This defines how often this app will get your location. With every location the AppUsages will be assessed. " +
+                            "So moving it up will decrease the accuracy, but moving it down will increase battery and memory consumption.",
                     onInfoClick = {viewModel.onEvent(SettingsScreenEvent.TriggerInfoDialog(PreferencesManager.LOCATION_TRACKING_INTERVAL))}
                 )
             }
@@ -161,5 +174,79 @@ fun SettingsScreen(
                 }
             }
         }
+
+        //Dialogs when changing specific values
+        if (viewModel.valuesSaved.value) {
+            when {
+                viewModel.trackingIntervalChanged.value -> {
+                    ShowTrackingIntervalChangedDialog(viewModel)
+                }
+                viewModel.pOISettingsChanged.value -> {
+                    ShowPOISettingsChangedDialog(viewModel)
+                }
+                else -> {
+                    viewModel.onEvent(SettingsScreenEvent.ToggleValuesSaved)
+                }
+            }
+        }
+        //Loading dialog
+        if(viewModel.loading.value) {
+            LoadingDialog()
+        }
+
     }
 }
+
+/**
+ * Composable function that displays a dialog when the tracking interval is changed, providing information and instructions.
+ *
+ * @param viewModel The ViewModel instance managing the settings state and logic.
+ */
+@Composable
+fun ShowTrackingIntervalChangedDialog(viewModel: SettingsScreenViewModel) {
+    if (ApplicationProvider.application.isServiceRunning(LocationService::class.java)) {
+        InfoDialog(
+            infoText = "Successfully Saved! \n" +
+                    "Please restart the tracking manually from the dashboard to apply the new location tracking interval!",
+            onDismiss = {
+                viewModel.onEvent(SettingsScreenEvent.ToggleValuesSaved)
+                viewModel.onEvent(SettingsScreenEvent.ToggleTrackingIntervalChanged)
+            }
+        )
+    } else {
+        viewModel.onEvent(SettingsScreenEvent.ToggleValuesSaved)
+        viewModel.onEvent(SettingsScreenEvent.ToggleTrackingIntervalChanged)
+    }
+}
+
+/**
+ * Composable function that displays a dialog when the POI settings are changed, allowing the user to confirm recomputing POIs.
+ *
+ * @param viewModel The ViewModel instance managing the settings state and logic.
+ */
+@Composable
+fun ShowPOISettingsChangedDialog(viewModel: SettingsScreenViewModel) {
+        POIChangeDialog(
+            onDismiss = {
+                viewModel.onEvent(SettingsScreenEvent.ToggleValuesSaved)
+                viewModel.onEvent(SettingsScreenEvent.TogglePOISettingsChanged)
+            },
+            onConfirm = {
+                viewModel.onEvent(SettingsScreenEvent.RecomputePOIsWithNewParameters)
+                viewModel.onEvent(SettingsScreenEvent.ToggleValuesSaved)
+                viewModel.onEvent(SettingsScreenEvent.TogglePOISettingsChanged)
+            }
+        )
+}
+
+/**
+ * Checks if a specified service is currently running in the background.
+ *
+ * @param service The class of the service to check.
+ * @return `true` if the service is running, `false` otherwise.
+ */
+@Suppress("DEPRECATION") // Deprecated for third party Services.
+private fun Context.isServiceRunning(service: Class<LocationService>) =
+    (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+        .getRunningServices(Integer.MAX_VALUE)
+        .any { it.service.className == service.name }

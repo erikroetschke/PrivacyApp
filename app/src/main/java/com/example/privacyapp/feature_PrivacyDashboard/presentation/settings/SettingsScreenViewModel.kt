@@ -1,18 +1,32 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings
 
+import android.app.ActivityManager
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationService
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.PrivacyAssessmentUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 
+/**
+ * ViewModel class for the settings screen, responsible for managing UI states and events related to settings.
+ *
+ * @param preferences The manager for interacting with user preferences.
+ * @param privacyAssessmentUseCases Use cases related to privacy assessment operations.
+ */
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
-    private val preferences: PreferencesManager
+    private val preferences: PreferencesManager,
+    private val privacyAssessmentUseCases: PrivacyAssessmentUseCases
 ) : ViewModel() {
 
     //states
@@ -40,13 +54,26 @@ class SettingsScreenViewModel @Inject constructor(
     private val _maxPOIOccurrence = mutableStateOf(2f)
     val maxPOIOccurrence = _maxPOIOccurrence
 
-    //other
-    private var _changed = mutableStateOf(false)
+    //value changes
+    private val _changed = mutableStateOf(false)
     val changed = _changed
 
-    //Infodialog
+    private val _trackingIntervalChanged = mutableStateOf(false)
+    val trackingIntervalChanged = _trackingIntervalChanged
+
+    private val _pOISettingsChanged = mutableStateOf(false)
+    val pOISettingsChanged = _pOISettingsChanged
+
+    private val _valuesSaved = mutableStateOf(false)
+    val valuesSaved = _valuesSaved
+
+    //InfoDialog
     private val _infoDialogState = mutableStateOf(SettingsInfoDialogState())
     val infoDialogState = _infoDialogState
+
+    //loading
+    private val _loading = mutableStateOf(false)
+    val loading = _loading
 
     init {
         //get Settings
@@ -60,6 +87,11 @@ class SettingsScreenViewModel @Inject constructor(
         _isCoarseLocationRelevant.value = preferences.getSettingBool(PreferencesManager.IS_COARSE_LOCATION_RELEVANT)
     }
 
+    /**
+     * Handles events triggered by UI interactions.
+     *
+     * @param event The event triggered by the UI interaction.
+     */
     fun onEvent(event: SettingsScreenEvent) {
         when (event) {
             is SettingsScreenEvent.ChangeMaxPOIPerDay -> {
@@ -76,11 +108,13 @@ class SettingsScreenViewModel @Inject constructor(
             is SettingsScreenEvent.ChangeMinPOITime -> {
                 _minPOITime.value = event.value
                 _changed.value = true
+                _pOISettingsChanged.value = true
             }
 
             is SettingsScreenEvent.ChangePOIRadius -> {
                 _pOIRadius.value = event.value
                 _changed.value = true
+                _pOISettingsChanged.value = true
             }
 
             is SettingsScreenEvent.ToggleDynamicLimit -> {
@@ -91,6 +125,7 @@ class SettingsScreenViewModel @Inject constructor(
             is SettingsScreenEvent.ChangeLocationTrackingInterval -> {
                 _locationTrackingInterval.value = event.value
                 _changed.value = true
+                _trackingIntervalChanged.value = true
             }
 
             is SettingsScreenEvent.ToggleCoarseLocationIsRelevant -> {
@@ -148,6 +183,7 @@ class SettingsScreenViewModel @Inject constructor(
                     )
                 }
                 _changed.value = false
+                _valuesSaved.value = true
             }
 
             is SettingsScreenEvent.TriggerInfoDialog -> {
@@ -159,6 +195,29 @@ class SettingsScreenViewModel @Inject constructor(
                     PreferencesManager.MAX_POI_OCCURRENCE -> {_infoDialogState.value = _infoDialogState.value.copy(maxPOIOccurrenceInfoDialogVisible = !_infoDialogState.value.maxPOIOccurrenceInfoDialogVisible)}
                     PreferencesManager.POI_RADIUS -> {_infoDialogState.value = _infoDialogState.value.copy(pOIRadiusInfoDialogVisible = !_infoDialogState.value.pOIRadiusInfoDialogVisible)}
                     PreferencesManager.POI_LIMIT -> {_infoDialogState.value = _infoDialogState.value.copy(pOILimitInfoDialogVisible = !_infoDialogState.value.pOILimitInfoDialogVisible)}
+                }
+            }
+
+            SettingsScreenEvent.ToggleValuesSaved -> {
+                _valuesSaved.value = !_valuesSaved.value
+            }
+
+            SettingsScreenEvent.TogglePOISettingsChanged -> {
+                _pOISettingsChanged.value = !_pOISettingsChanged.value
+            }
+            SettingsScreenEvent.ToggleTrackingIntervalChanged -> {
+                _trackingIntervalChanged.value = !_trackingIntervalChanged.value
+            }
+
+            SettingsScreenEvent.RecomputePOIsWithNewParameters -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    withContext(Dispatchers.Main){
+                        _loading.value = true
+                    }
+                    privacyAssessmentUseCases.recomputePOIs()
+                    withContext(Dispatchers.Main){
+                        _loading.value = false
+                    }
                 }
             }
         }

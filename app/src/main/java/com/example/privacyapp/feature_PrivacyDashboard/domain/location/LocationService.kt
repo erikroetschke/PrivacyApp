@@ -26,10 +26,17 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
+
+/**
+ * Service responsible for tracking the user's location in the background.
+ * This service uses the FusedLocationProviderClient to receive location updates at a specified interval.
+ * It stores the received location data in the database and displays an ongoing notification showing the tracked location.
+ */
 class LocationService : Service() {
 
     private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
+    // Coroutine scope to manage location updates
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var locationClient: LocationClient
 
@@ -39,6 +46,7 @@ class LocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        // Initialize the location client using DefaultLocationClient
         locationClient = DefaultLocationClient(
             applicationContext,
             LocationServices.getFusedLocationProviderClient(applicationContext)
@@ -53,10 +61,15 @@ class LocationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    /**
+     * Starts the location tracking process.
+     */
     private fun start() {
 
+        // Get the location tracking interval from preferences and convert it to milliseconds
         val locationInterval = sharedPrefs.getSettingInt(PreferencesManager.LOCATION_TRACKING_INTERVAL) * 1000L // in milliseconds
 
+        // Build a notification indicating ongoing location tracking
         val notification = NotificationCompat.Builder(this, LOCATION_CHANNEL_ID)
             .setContentTitle("Tracking location...")
             .setContentText("Location: null")
@@ -65,6 +78,7 @@ class LocationService : Service() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+        // Start receiving location updates
         locationClient
             .getLocationUpdates(locationInterval)
             .catch { e -> e.printStackTrace() }
@@ -89,9 +103,13 @@ class LocationService : Service() {
             }
             .launchIn(serviceScope)
 
+        // Start the service in the foreground with the ongoing notification
         startForeground(1, notification.build())
     }
 
+    /**
+     * Stops the service and removes it from the foreground.
+     */
     private fun stop() {
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -99,6 +117,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Cancel the service's coroutine scope when the service is destroyed
         serviceScope.cancel()
     }
 

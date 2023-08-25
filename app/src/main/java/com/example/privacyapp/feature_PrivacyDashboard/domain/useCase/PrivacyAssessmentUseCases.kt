@@ -6,6 +6,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetPOISinceTimestampAsFlow
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.RecomputePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 
 data class PrivacyAssessmentUseCases(
@@ -15,5 +16,6 @@ data class PrivacyAssessmentUseCases(
     val doAssessment: DoAssessment,
     val extractPOIsLast24h: ExtractPOIsLast24h,
     val getPOISinceTimestampAsFlow: GetPOISinceTimestampAsFlow,
-    val updatePOIs: UpdatePOIs
+    val updatePOIs: UpdatePOIs,
+    val recomputePOIs: RecomputePOIs
 )

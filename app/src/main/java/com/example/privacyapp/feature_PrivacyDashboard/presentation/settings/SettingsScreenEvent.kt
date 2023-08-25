@@ -1,7 +1,5 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings
 
-import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
-
 sealed class SettingsScreenEvent {
 
     data class ChangeMaxPOIPerDay(val value: Float) :SettingsScreenEvent()
@@ -24,4 +22,12 @@ sealed class SettingsScreenEvent {
     object ToggleDynamicLimit: SettingsScreenEvent()
 
     object ToggleCoarseLocationIsRelevant: SettingsScreenEvent()
+
+    object ToggleValuesSaved : SettingsScreenEvent()
+
+    object ToggleTrackingIntervalChanged : SettingsScreenEvent()
+
+    object TogglePOISettingsChanged : SettingsScreenEvent()
+
+    object RecomputePOIsWithNewParameters : SettingsScreenEvent()
 }

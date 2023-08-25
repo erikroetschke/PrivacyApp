@@ -40,6 +40,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.ExtractPOIsLast24h
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetAssessment1dByMetricSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.GetPOISinceTimestampAsFlow
+import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.RecomputePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.AddAppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.ComputeUsage
@@ -243,7 +244,8 @@ object AppModule {
             doAssessment = DoAssessment(repository, poiRepository),
             extractPOIsLast24h = ExtractPOIsLast24h(locationRepository, poiRepository),
             getPOISinceTimestampAsFlow = GetPOISinceTimestampAsFlow(poiRepository),
-            updatePOIs = UpdatePOIs(poiRepository, locationRepository)
+            updatePOIs = UpdatePOIs(poiRepository, locationRepository),
+            recomputePOIs = RecomputePOIs(poiRepository, locationRepository)
         )
     }
 }
