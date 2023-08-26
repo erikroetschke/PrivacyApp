@@ -29,6 +29,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for the Welcome Screen that guides users through permissions setup.
+ */
 @HiltViewModel
 class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
 
@@ -51,6 +54,12 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
     private var _onFirstPage = mutableStateOf(true)
     var onFirstPage = _onFirstPage
 
+    /**
+     * Handle the click event of the "Next" button on the welcome screen.
+     *
+     * @param welcomeActivity The WelcomeScreenActivity instance.
+     * @return true if the action was handled successfully, false otherwise.
+     */
     fun onNextButtonClick(welcomeActivity: WelcomeScreenActivity): Boolean {
         if (_onFirstPage.value) {
             if (checkIfUsagePermissionIsGranted()) {
@@ -87,10 +96,19 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
     }
 
 
+    /**
+     * Dismiss the permission dialog.
+     */
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
     }
 
+    /**
+     * Handle the result of a permission request.
+     *
+     * @param permission       The permission that was requested.
+     * @param welcomeActivity The WelcomeScreenActivity instance.
+     */
     fun onPermissionResult(
         permission: String,
         welcomeActivity: WelcomeScreenActivity
@@ -106,6 +124,11 @@ class WelcomeScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Check if the usage permission is granted.
+     *
+     * @return true if the usage permission is granted, false otherwise.
+     */
     private fun checkIfUsagePermissionIsGranted(): Boolean {
         try {
             val packageManager: PackageManager =

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,12 +23,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.location.LocationS
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.IntegerSetting
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.LoadingDialog
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.POIChangeDialog
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.Section
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SliderSetting
-import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables.SwitchSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.IntegerSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.LoadingDialog
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.POIChangeDialog
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.Section
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.SliderSetting
+import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components.SwitchSetting
 
 /**
  * Composable function that displays the settings screen, allowing the user to configure various settings.

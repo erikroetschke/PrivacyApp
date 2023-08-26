@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +20,18 @@ import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 import kotlin.math.roundToInt
 
+/**
+ * Composable function that creates a slider setting with a label, slider, and optional info dialog.
+ *
+ * @param label The label for the slider setting.
+ * @param value The current value of the slider.
+ * @param onValueChange The callback function to be called when the value of the slider changes.
+ * @param valueRange The range of values that the slider can take.
+ * @param steps The number of steps for the slider.
+ * @param infoText The text to be displayed in the info dialog.
+ * @param onInfoClick The callback function to be called when the info icon is clicked.
+ * @param infoDialogVisible A boolean indicating whether the info dialog is visible or not.
+ */
 @Composable
 fun SliderSetting(
     label: String,

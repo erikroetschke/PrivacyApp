@@ -7,10 +7,14 @@ import android.content.Context
 import com.example.privacyapp.feature_PrivacyDashboard.util.LOCATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
 
+/**
+ * The main Application class for the PrivacyApp.
+ */
 @HiltAndroidApp
 class PrivacyApp: Application() {
     override fun onCreate() {
         super.onCreate()
+        // Create a notification channel for location-related notifications
         val channel = NotificationChannel(
             LOCATION_CHANNEL_ID,
             "Location",

@@ -17,6 +17,12 @@ import androidx.navigation.NavController
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.AppItem
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 
+/**
+ * A Composable function that displays the list of favorite apps.
+ *
+ * @param navController The navigation controller for navigating between screens.
+ * @param viewModel The ViewModel associated with the favorites screen.
+ */
 @Composable
 fun FavoritesScreen(
     navController: NavController,

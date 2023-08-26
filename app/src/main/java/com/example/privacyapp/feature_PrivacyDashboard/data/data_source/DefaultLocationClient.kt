@@ -17,11 +17,25 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Default implementation of the [LocationClient] interface, providing location updates using
+ * the FusedLocationProviderClient from Google Play Services.
+ *
+ * @param context The application context.
+ * @param client The FusedLocationProviderClient instance.
+ */
 class DefaultLocationClient(
     private val context: Context,
     private val client: FusedLocationProviderClient
 ): LocationClient {
 
+    /**
+     * Requests location updates at the specified interval.
+     *
+     * @param interval The interval in milliseconds between location updates.
+     * @return A Flow emitting the received Location updates.
+     * @throws LocationClient.LocationException if location permission is missing or GPS is disabled.
+     */
     @SuppressLint("MissingPermission")
     override fun getLocationUpdates(interval: Long): Flow<Location> {
         return callbackFlow {
@@ -36,8 +50,10 @@ class DefaultLocationClient(
                 throw LocationClient.LocationException("GPS is disabled")
             }
 
+            // Build the location request
             val request = LocationRequest.Builder(interval).build()
 
+            // Define the location callback
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     super.onLocationResult(result)
@@ -47,12 +63,14 @@ class DefaultLocationClient(
                 }
             }
 
+            // Request location updates
             client.requestLocationUpdates(
                 request,
                 locationCallback,
                 Looper.getMainLooper()
             )
 
+            // Remove location updates when the Flow is closed
             awaitClose {
                 client.removeLocationUpdates(locationCallback)
             }

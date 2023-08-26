@@ -36,9 +36,10 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.co
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.NotificationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.PermissionDialog
 
+/**
+ * Welcome screen activity that guides users through permissions setup.
+ */
 class WelcomeScreenActivity : ComponentActivity() {
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,9 @@ class WelcomeScreenActivity : ComponentActivity() {
 
             val dialogQueue = viewModel.visiblePermissionDialogQueue
 
+            /**
+             * The list of permissions to request from the user.
+             */
             val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
                 arrayOf(
                     //Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -69,6 +73,9 @@ class WelcomeScreenActivity : ComponentActivity() {
                 )
             }
 
+            /**
+             * A launcher for requesting multiple permissions.
+             */
             val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestMultiplePermissions(),
                 onResult = { _ ->
@@ -82,6 +89,7 @@ class WelcomeScreenActivity : ComponentActivity() {
             )
 
             Box(modifier = Modifier.fillMaxSize()) {
+                // Display headline
                 Text(
                     text = viewModel.headline.value,
                     style = MaterialTheme.typography.headlineLarge,
@@ -90,6 +98,7 @@ class WelcomeScreenActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .padding(10.dp)
                 )
+                // Display main text
                 Text(
                     text = viewModel.text.value,
                     style = MaterialTheme.typography.bodyLarge,
@@ -99,6 +108,7 @@ class WelcomeScreenActivity : ComponentActivity() {
                         .align(Alignment.Center)
                         .padding(25.dp, 0.dp)
                 )
+                // Action buttons
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -187,6 +197,9 @@ class WelcomeScreenActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Open the app's settings.
+     */
     private fun openAppSettings() {
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,

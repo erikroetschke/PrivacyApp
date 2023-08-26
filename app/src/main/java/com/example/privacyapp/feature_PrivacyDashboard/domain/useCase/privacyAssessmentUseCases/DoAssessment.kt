@@ -27,6 +27,12 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+
+/**
+ * The `DoAssessment` class performs privacy assessment computations based on different metrics
+ * and intervals for the user's point of interest (POI) data. It calculates various privacy metrics
+ * and produces assessment results based on the provided parameters.
+ */
 class DoAssessment(
     private val privacyAssessmentRepository: PrivacyAssessmentRepository,
     private val poiRepository: POIRepository

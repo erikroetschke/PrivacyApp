@@ -1,5 +1,12 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.util
 
+/**
+ * Represents different metrics used in privacy assessment.
+ * @param metricName The name of the metric.
+ * @param metricDescription The description of the metric.
+ * @param weighting The weighting of the metric (used for combination).
+ * @param maxValue The maximum value of the metric.
+ */
 enum class Metric(
     var metricName: String,
     var metricDescription: String,

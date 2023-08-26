@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

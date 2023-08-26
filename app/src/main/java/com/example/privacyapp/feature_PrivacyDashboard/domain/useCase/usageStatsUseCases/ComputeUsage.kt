@@ -19,6 +19,15 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppStatusTrac
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.UsageEvent
 
+/**
+ * The `ComputeUsage` class encapsulates the use case of processing user location data along with associated usage events
+ * to update app status and usage information.
+ *
+ * @param repository Repository for app usage data.
+ * @param locationRepository Repository for location data.
+ * @param appRepository Repository for app data.
+ * @param usageEventProvider Provider for usage events.
+ */
 class ComputeUsage(
     private val repository: AppUsageRepository,
     private val locationRepository: LocationRepository,

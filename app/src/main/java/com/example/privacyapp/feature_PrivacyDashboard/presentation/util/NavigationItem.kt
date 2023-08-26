@@ -9,17 +9,35 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
-sealed class NavigationItem(val route:String, val label:String, val icon: ImageVector){
+sealed class NavigationItem(val route: String, val label: String, val icon: ImageVector) {
 
-    //object Dashboard : NavigationItem(Resources.getSystem().getString(R.string.dashboard), Resources.getSystem().getString(R.string.dashboard), Icons.Default.Home)
+    /**
+     * Represents the dashboard navigation item.
+     */
     object Dashboard : NavigationItem("Dashboard", "Dashboard", Icons.Default.Home)
-    //object AllApps : NavigationItem(Resources.getSystem().getString(R.string.app_deatails), Resources.getSystem().getString(R.string.app_deatails), Icons.Default.Info)
+
+    /**
+     * Represents the all apps navigation item.
+     */
     object AllApps : NavigationItem("All Apps", "All Apps", Icons.Default.List)
-    //object Favorites : NavigationItem(Resources.getSystem().getString(R.string.favorites), Resources.getSystem().getString(R.string.favorites), Icons.Default.Favorite)
+
+    /**
+     * Represents the favorites navigation item.
+     */
     object Favorites : NavigationItem("Favorites", "Favorites", Icons.Default.Favorite)
-    //object Map : NavigationItem(Resources.getSystem().getString(R.string.map), Resources.getSystem().getString(R.string.map), Icons.Default.LocationOn)
+
+    /**
+     * Represents the map navigation item.
+     */
     object Map : NavigationItem("Map", "Map", Icons.Default.LocationOn)
+
+    /**
+     * Represents the app details navigation item.
+     */
     object AppDetails : NavigationItem("AppDetails", "AppDetails", Icons.Default.LocationOn)
 
-    object Settings : NavigationItem("Settings", "Settings", Icons.Default.Settings )
+    /**
+     * Represents the settings navigation item.
+     */
+    object Settings : NavigationItem("Settings", "Settings", Icons.Default.Settings)
 }

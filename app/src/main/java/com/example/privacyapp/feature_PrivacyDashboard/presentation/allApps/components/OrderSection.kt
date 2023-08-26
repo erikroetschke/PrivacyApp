@@ -9,10 +9,17 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.DefaultRadioButton
 
 
+/**
+ * A Composable function representing a section for selecting sorting orders for app notes.
+ *
+ * @param modifier The modifier to apply to the layout.
+ * @param appOrder The current order of the apps.
+ * @param onOrderChange The callback function to invoke when the order changes.
+ */
 @Composable
 fun OrderSection(
     modifier: Modifier = Modifier,
-    noteOrder: AppOrder = AppOrder.Title(OrderType.Ascending),
+    appOrder: AppOrder = AppOrder.Title(OrderType.Ascending),
     onOrderChange: (AppOrder) -> Unit
 ) {
     Column(
@@ -23,14 +30,14 @@ fun OrderSection(
         ) {
             DefaultRadioButton(
                 text = "Title",
-                selected = noteOrder is AppOrder.Title,
-                onSelect = { onOrderChange(AppOrder.Title(noteOrder.orderType)) }
+                selected = appOrder is AppOrder.Title,
+                onSelect = { onOrderChange(AppOrder.Title(appOrder.orderType)) }
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
                 text = "Possible location usage",
-                selected = noteOrder is AppOrder.LocationUsage,
-                onSelect = { onOrderChange(AppOrder.LocationUsage(noteOrder.orderType)) }
+                selected = appOrder is AppOrder.LocationUsage,
+                onSelect = { onOrderChange(AppOrder.LocationUsage(appOrder.orderType)) }
             )
 
         }
@@ -40,17 +47,17 @@ fun OrderSection(
         ) {
             DefaultRadioButton(
                 text = "Ascending",
-                selected = noteOrder.orderType is OrderType.Ascending,
+                selected = appOrder.orderType is OrderType.Ascending,
                 onSelect = {
-                    onOrderChange(noteOrder.copy(OrderType.Ascending))
+                    onOrderChange(appOrder.copy(OrderType.Ascending))
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
                 text = "Descending",
-                selected = noteOrder.orderType is OrderType.Descending,
+                selected = appOrder.orderType is OrderType.Descending,
                 onSelect = {
-                    onOrderChange(noteOrder.copy(OrderType.Descending))
+                    onOrderChange(appOrder.copy(OrderType.Descending))
                 }
             )
         }

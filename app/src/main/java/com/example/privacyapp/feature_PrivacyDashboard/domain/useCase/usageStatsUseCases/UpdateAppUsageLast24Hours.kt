@@ -4,11 +4,20 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 
+/**
+ * A use case class for updating app usage statistics for the last 24 hours.
+ *
+ * @param appUsageRepository The repository responsible for app usage data.
+ * @param appRepository The repository responsible for app data.
+ */
 class UpdateAppUsageLast24Hours(
     private val appUsageRepository: AppUsageRepository,
     private val appRepository: AppRepository
 ) {
 
+    /**
+     * Updates app usage statistics for the last 24 hours and inserts or updates app data accordingly.
+     */
     suspend operator fun invoke() {
         val appList = appRepository.getAppsSuspend()
         //getLast24Hours

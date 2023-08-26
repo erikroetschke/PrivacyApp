@@ -3,11 +3,20 @@ package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStat
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.AppUsage
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.AppUsageRepository
 
-class DeleteAppUsageOlderThanTimestamp(
-    private val appUsageRepository: AppUsageRepository
-) {
+/**
+ * A use case class for deleting app usage statistics older than a specified timestamp.
+ *
+ * @param appUsageRepository The repository responsible for app usage data.
+ */
+class DeleteAppUsageOlderThanTimestamp(private val appUsageRepository: AppUsageRepository) {
 
+    /**
+     * Deletes app usage statistics that are older than the provided timestamp.
+     *
+     * @param timestamp The timestamp indicating the threshold for deletion.
+     */
     suspend operator fun invoke(timestamp: Long) {
-        return appUsageRepository.deleteAppUsageOlderThanTimestamp(timestamp)
+        // Implementation details
+        appUsageRepository.deleteAppUsageOlderThanTimestamp(timestamp)
     }
 }

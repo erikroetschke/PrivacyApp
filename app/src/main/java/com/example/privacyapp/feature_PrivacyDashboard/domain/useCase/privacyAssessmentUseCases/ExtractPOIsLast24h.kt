@@ -10,9 +10,23 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.MetricInterva
 import java.time.Instant
 import java.time.ZoneId
 
-class ExtractPOIsLast24h(private val locationRepository: LocationRepository,
-private val poiRepository: POIRepository) {
+/**
+ * The `ExtractPOIsLast24h` class extracts Points of Interest (POIs) from user locations within the last 24 hours.
+ * It uses location data from the repository to create a route and extract POIs using Python-based processing.
+ *
+ * @param locationRepository Repository for location data.
+ * @param poiRepository Repository for POI data.
+ */
+class ExtractPOIsLast24h(
+    private val locationRepository: LocationRepository,
+    private val poiRepository: POIRepository
+) {
 
+    /**
+     * Extracts Points of Interest (POIs) from user locations within the last 24 hours.
+     *
+     * @return A list of extracted POIs.
+     */
     suspend operator fun invoke(): List<POI> {
 
         val currentTime = System.currentTimeMillis()

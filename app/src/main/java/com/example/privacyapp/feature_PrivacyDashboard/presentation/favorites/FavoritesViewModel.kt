@@ -16,6 +16,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel class responsible for managing the state and business logic of the Favorites screen.
+ *
+ * @param appUseCases The use cases related to app operations.
+ */
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val appUseCases: AppUseCases
@@ -26,14 +31,19 @@ class FavoritesViewModel @Inject constructor(
 
     private var getAppsJob: Job? = null
 
-    var maxLocationUsage = 0
     var cumulativeUsage = 0
 
+    /**
+     * Initializes the ViewModel by fetching favorite apps from the database.
+     */
     init {
         getAppsFromDB()
     }
 
 
+    /**
+     * Fetches favorite apps from the database and updates the state accordingly.
+     */
     private fun getAppsFromDB() {
         getAppsJob?.cancel()
         getAppsJob = appUseCases.getFavoriteApps().onEach { apps ->
@@ -41,9 +51,8 @@ class FavoritesViewModel @Inject constructor(
                 apps = apps
             )
             if (apps.isEmpty()){
-                maxLocationUsage = 0
+                cumulativeUsage = 0
             }else {
-                maxLocationUsage = apps.maxOf { it.numberOfEstimatedRequests }
                 cumulativeUsage = apps.sumOf { it.numberOfEstimatedRequests }
             }
 

@@ -4,6 +4,7 @@ import android.app.usage.UsageEvents
 import android.app.usage.UsageEvents.Event
 import android.app.usage.UsageStats
 import android.content.Context
+import androidx.compose.ui.input.pointer.PointerIcon
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.example.privacyapp.feature_PrivacyDashboard.data.repositories.FakeLocationRepository
@@ -11,6 +12,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.data.repositories.FakePOI
 import com.example.privacyapp.feature_PrivacyDashboard.data.repositories.FakePrivacyAssessmentRepository
 import com.example.privacyapp.feature_PrivacyDashboard.data.repository.PreferencesManagerImpl
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
+import com.example.privacyapp.feature_PrivacyDashboard.domain.model.POI
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PreferencesManager
@@ -230,5 +232,34 @@ class DoAssessmentTest {
             assertEquals(1/(4.toDouble()), resultMonthScore[resultWeek.size - 2].second, 0.01)
 
         }
+    }
+
+    @Test
+    fun testClustering(){
+        runBlocking {
+            //cluster
+            poiRepository.insertPOI(POI(-122.4194, 37.7749, System.currentTimeMillis()))
+            poiRepository.insertPOI(POI(-122.4189, 37.7751, System.currentTimeMillis()))
+            poiRepository.insertPOI(POI(-122.4192, 37.7747, System.currentTimeMillis()))
+            //cluster
+            poiRepository.insertPOI(POI(-122.4180, 37.7730, System.currentTimeMillis()))
+            poiRepository.insertPOI(POI(-122.4178, 37.7732, System.currentTimeMillis()))
+            //random
+            poiRepository.insertPOI(POI(-122.4210, 37.7770, System.currentTimeMillis()))
+            poiRepository.insertPOI(POI(-122.4215, 37.7720, System.currentTimeMillis()))
+            poiRepository.insertPOI(POI(-122.4160, 37.7650, System.currentTimeMillis()))
+
+            sharedPrefs.setSettingInt(PreferencesManager.MAX_POI_OCCURRENCE, 2)
+
+            val resultTwoClusters = DoAssessment(privacyAssessmentRepository, poiRepository).invoke(Metric.StopFrequency, MetricInterval.DAY, MetricType.ABSOLUT)
+
+            sharedPrefs.setSettingInt(PreferencesManager.MAX_POI_OCCURRENCE, 3)
+
+            val resultOneCluster = DoAssessment(privacyAssessmentRepository, poiRepository).invoke(Metric.StopFrequency, MetricInterval.DAY, MetricType.ABSOLUT)
+
+            assertEquals(2.toDouble(), resultTwoClusters.sumOf { it.second }, 0.1)
+            assertEquals(1.toDouble(), resultOneCluster.sumOf { it.second }, 0.1)
+        }
+
     }
 }

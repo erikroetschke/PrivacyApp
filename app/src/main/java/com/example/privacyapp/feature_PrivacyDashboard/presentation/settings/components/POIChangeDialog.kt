@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button

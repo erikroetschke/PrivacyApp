@@ -16,6 +16,13 @@ import androidx.compose.ui.unit.sp
 import kotlin.math.round
 import kotlin.math.roundToInt
 
+/**
+ * A custom Composable function that draws a line chart to visualize data points.
+ *
+ * @param data A list of pairs representing data points (x, y).
+ * @param modifier The modifier to apply to the layout.
+ * @param maxValue The maximum value to be displayed on the y-axis.
+ */
 @Composable
 fun LineChart(
     data: List<Pair<Int, Int>>,
@@ -117,6 +124,7 @@ fun LineChart(
             }
         }*/
 
+        //line
         val strokePath = Path().apply {
             val height = size.height
             data.indices.forEach { i ->
@@ -130,6 +138,7 @@ fun LineChart(
             }
         }
 
+        //draw line
         drawPath(
             path = strokePath,
             color = graphColor,
@@ -139,12 +148,12 @@ fun LineChart(
             )
         )
 
+        //fill below line
         val fillPath = android.graphics.Path(strokePath.asAndroidPath()).asComposePath().apply {
             lineTo(size.width - spacePerHour, size.height - spacing)
             lineTo(spacing, size.height - spacing)
             close()
         }
-
         drawPath(
             path = fillPath,
             brush = Brush.verticalGradient(

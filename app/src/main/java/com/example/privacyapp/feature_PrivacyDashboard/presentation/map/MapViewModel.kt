@@ -20,32 +20,48 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
+/**
+ * ViewModel class responsible for managing the state and business logic of the Map screen.
+ *
+ * @param privacyAssessmentUseCases The use cases related to privacy assessment operations.
+ */
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val privacyAssessmentUseCases: PrivacyAssessmentUseCases
 ) : ViewModel() {
 
-    //state
+    // State for the list of Points of Interest (POIs)
     private val _pois = mutableStateListOf<POI>()
     val pois = _pois
 
+    // State for tracking loading status
     private val _isLoading = mutableStateOf(false)
     val isLoading = _isLoading
 
+    // State for the selected metric interval
     private val _metricInterval = mutableStateOf(MetricInterval.DAY)
     val metricInterval = _metricInterval
 
-
+    /**
+     * Initializes the ViewModel by fetching POIs based on the selected metric interval.
+     */
     init {
         getPOi(getStartTimestamp(_metricInterval.value))
     }
 
+    /**
+     * Handles the change of the metric interval and fetches corresponding POIs.
+     */
     fun onMetricIntervalChange(metricInterval: MetricInterval) {
         _metricInterval.value = metricInterval
         getPOi((getStartTimestamp(_metricInterval.value)))
     }
 
-
+    /**
+     * Fetches Points of Interest (POIs) based on the provided timestamp.
+     *
+     * @param timestamp The timestamp to fetch POIs since.
+     */
     private fun getPOi(timestamp: Long) {
 
         //viewModelScope.launch {

@@ -31,6 +31,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.comp
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 
 
+/**
+ * A Composable function representing the screen displaying all apps and their details.
+ *
+ * @param navController The NavController used for navigating between different screens.
+ * @param viewModel The ViewModel containing the data and logic for apps.
+ */
 @Composable
 fun AllAppsScreen(
     navController: NavController,
@@ -38,62 +44,61 @@ fun AllAppsScreen(
 ) {
     val state = viewModel.state.value
 
-    //TODO if  lower than Android 10 (API level 29), background location access is always allowed, therefore the permission not needed
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
-                    Text(
-                        text = "All Apps",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                }
-                IconButton(
-                    onClick = {
-                        viewModel.onEvent(AppsEvent.ToggleOrderSection)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Sort"
-                    )
-                }
-            }
-            AnimatedVisibility(
-                visible = state.isOrderSectionVisible,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
-            ) {
-                OrderSection(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    noteOrder = state.appOrder,
-                    onOrderChange = {
-                        viewModel.onEvent(AppsEvent.Order(it))
-                    }
+            Box(modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
+                Text(
+                    text = "All Apps",
+                    style = MaterialTheme.typography.headlineMedium
                 )
             }
-
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.apps) { app ->
-                    AppItem(
-                        app = app,
-                        cumulativeUsage = viewModel.cumulativeUsage,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp, 10.dp, 10.dp, 0.dp)
-                            .clickable {
-                                navController.navigate(NavigationItem.AppDetails.route + "/${app.packageName}")
-                            }
-                    )
-                }
+            IconButton(
+                onClick = {
+                    viewModel.onEvent(AppsEvent.ToggleOrderSection)
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Sort"
+                )
             }
         }
+        AnimatedVisibility(
+            visible = state.isOrderSectionVisible,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically()
+        ) {
+            OrderSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                appOrder = state.appOrder,
+                onOrderChange = {
+                    viewModel.onEvent(AppsEvent.Order(it))
+                }
+            )
+        }
+
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(state.apps) { app ->
+                AppItem(
+                    app = app,
+                    cumulativeUsage = viewModel.cumulativeUsage,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 10.dp, 10.dp, 0.dp)
+                        .clickable {
+                            navController.navigate(NavigationItem.AppDetails.route + "/${app.packageName}")
+                        }
+                )
+            }
+        }
+    }
 }

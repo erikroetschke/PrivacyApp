@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +24,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 
+/**
+ * Composable function that displays an integer setting with a label, input field, and info button.
+ *
+ * @param label The label text describing the setting.
+ * @param value The current value of the setting.
+ * @param onValueChange The callback function to be called when the value changes.
+ * @param infoText The information text to be shown in the info dialog.
+ * @param onInfoClick The callback function to be called when the info button is clicked.
+ * @param infoDialogVisible A boolean indicating whether the info dialog is currently visible.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntegerSetting(label: String, value: Int, onValueChange: (Int) -> Unit, infoText:String, onInfoClick: () -> Unit, infoDialogVisible: Boolean) {

@@ -12,39 +12,76 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationPr
 import kotlinx.coroutines.flow.Flow
 import java.sql.Timestamp
 
-class AppRepositoryImpl(
-    private val dao: AppDao
-) : AppRepository {
+/**
+ * Implementation of the AppRepository interface that interacts with the AppDao.
+ *
+ * @param dao The AppDao used for data operations.
+ */
+class AppRepositoryImpl(private val dao: AppDao) : AppRepository {
+
+    /**
+     * Retrieves a flow of all apps.
+     */
     override fun getApps(): Flow<List<App>> {
         return dao.getApps()
     }
 
+    /**
+     * Retrieves a list of all apps synchronously.
+     */
     override suspend fun getAppsSuspend(): List<App> {
         return dao.getAppsSuspend()
     }
 
+    /**
+     * Retrieves an AppAndAppUsage entity for a specific app by package name.
+     *
+     * @param packageName The package name of the app.
+     */
     override suspend fun getAppWithUsage(packageName: String): AppAndAppUsage {
         return dao.getAppWithUsage(packageName)
     }
 
+    /**
+     * Retrieves an app entity for a specific package name.
+     *
+     * @param packageName The package name of the app.
+     */
     override suspend fun getAppByName(packageName: String): App? {
         return dao.getAppByName(packageName)
     }
 
+    /**
+     * Retrieves a flow of favorite apps.
+     */
     override fun getFavoriteApps(): Flow<List<App>> {
         return dao.getFavoriteApps()
     }
 
+    /**
+     * Inserts an app entity into the database.
+     *
+     * @param app The app entity to be inserted.
+     */
     override suspend fun insertApp(app: App) {
-        return dao.insertApp(app)
+        dao.insertApp(app)
     }
 
+    /**
+     * Deletes an app entity from the database.
+     *
+     * @param app The app entity to be deleted.
+     */
     override suspend fun deleteApp(app: App) {
-        return dao.deleteApp(app)
+        dao.deleteApp(app)
     }
 
+    /**
+     * Deletes all app entities from the database.
+     */
     override suspend fun deleteAllApps() {
-        return dao.deleteAllApps()
+        dao.deleteAllApps()
     }
 }
+
 

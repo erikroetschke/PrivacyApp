@@ -1,4 +1,4 @@
-package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.composables
+package com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +18,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.InfoDialog
 
+/**
+ * Composable function that creates a switch setting with a label, switch, and optional info dialog.
+ *
+ * @param label The label for the switch setting.
+ * @param isChecked The current state of the switch (checked or unchecked).
+ * @param onCheckedChange The callback function to be called when the switch state changes.
+ * @param infoText The text to be displayed in the info dialog.
+ * @param onInfoClick The callback function to be called when the info icon is clicked.
+ * @param infoDialogVisible A boolean indicating whether the info dialog is visible or not.
+ */
 @Composable
 fun SwitchSetting(
     label: String,

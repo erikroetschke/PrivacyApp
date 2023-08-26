@@ -6,6 +6,15 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetLocationsWithLocationUsedIsNull
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.locationUseCases.GetUsedLocationsLastSinceTimestamp
 
+/**
+ * Encapsulates the use cases related to location data.
+ *
+ * @see GetLocations
+ * @see AddLocation
+ * @see GetLocationsWithLocationUsedIsNull
+ * @see GetUsedLocationsLastSinceTimestamp
+ * @see DeleteLocationsOlderThanTimestamp
+ */
 data class LocationUseCases(
     val getLocations : GetLocations,
     val addLocation: AddLocation,

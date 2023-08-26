@@ -38,12 +38,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.Set
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.settings.SettingsScreenViewModel
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.util.NavigationItem
 
-//import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
- * Function with composable for the bottom navigation bar
+ * Composable function that displays a bottom navigation bar for navigating between different screens.
+ *
+ * @param navController The NavController used for navigation.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
 
@@ -100,7 +100,10 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 
 /**
- * Function with the Route/Navigation logic
+ * Composable function that manages the navigation logic for different screens.
+ *
+ * @param navController The NavController used for navigation.
+ * @param mainActivity The reference to the MainActivity for context.
  */
 @Composable
 fun NavigationController(navController: NavHostController, mainActivity: MainActivity) {

@@ -8,6 +8,16 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStats
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.GetAppUsageSinceTimestamp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.usageStatsUseCases.UpdateAppUsageLast24Hours
 
+/**
+ * Encapsulates the use cases related to app usage.
+ *
+ * @see ComputeUsage
+ * @see UpdateAppUsageLast24Hours
+ * @see GetAppUsageSinceTimestamp
+ * @see DeleteAppUsageOlderThanTimestamp
+ * @see AddAppUsage
+ * @see DeleteAppUsageByPackageNameAndTimeStampInterval
+ */
 data class AppUsageUseCases(
     val computeUsage: ComputeUsage,
     val updateAppUsageLast24Hours: UpdateAppUsageLast24Hours,

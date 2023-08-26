@@ -12,12 +12,24 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+/**
+ * Use case for extracting Points of Interest (POIs) using stop detection and optionally saving them to the database.
+ *
+ * @param poiRepository The repository for managing Points of Interest (POIs).
+ */
 class ExtractPOIs(
     private val poiRepository: POIRepository
 ) {
 
     private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
+    /**
+     * Extracts Points of Interest (POIs) using stop detection and optionally saves them to the database.
+     *
+     * @param pyRoute The route data in PyObject format.
+     * @param saveToDB Whether to save the extracted POIs to the database.
+     * @return A list of extracted POIs.
+     */
     suspend operator fun invoke(pyRoute: PyObject, saveToDB: Boolean): List<POI>{
 
         //get python instance

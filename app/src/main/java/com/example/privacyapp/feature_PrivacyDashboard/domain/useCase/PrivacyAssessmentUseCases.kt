@@ -9,6 +9,18 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAss
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.RecomputePOIs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAssessmentUseCases.UpdatePOIs
 
+/**
+ * Encapsulates the use cases related to privacy assessments.
+ *
+ * @see AddPrivacyAssessment
+ * @see DeletePrivacyAssessment
+ * @see GetAssessment1dByMetricSinceTimestamp
+ * @see DoAssessment
+ * @see ExtractPOIsLast24h
+ * @see GetPOISinceTimestampAsFlow
+ * @see UpdatePOIs
+ * @see RecomputePOIs
+ */
 data class PrivacyAssessmentUseCases(
     val addPrivacyAssessment: AddPrivacyAssessment,
     val deletePrivacyAssessment: DeletePrivacyAssessment,

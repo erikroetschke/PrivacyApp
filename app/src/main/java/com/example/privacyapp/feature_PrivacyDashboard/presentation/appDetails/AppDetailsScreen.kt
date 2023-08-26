@@ -40,7 +40,12 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationPr
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.MainActivity
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.LineChart
 
-
+/**
+ * Composable function for displaying the details screen of a specific app.
+ *
+ * @param navController The NavController used for navigation.
+ * @param viewModel The ViewModel for the app details screen.
+ */
 @Composable
 fun AppDetailsScreen(
     navController: NavController,

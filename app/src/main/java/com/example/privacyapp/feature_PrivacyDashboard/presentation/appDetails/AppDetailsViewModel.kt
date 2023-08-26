@@ -18,7 +18,12 @@ import java.util.Calendar
 import javax.inject.Inject
 
 /**
- * ViewModel for the AppDetails screen.
+ * ViewModel for the App Details screen. This ViewModel is responsible for managing the state and handling
+ * interactions related to the App Details screen.
+ *
+ * @param appUseCases The use cases related to app operations.
+ * @param appUsageUseCases The use cases related to app usage operations.
+ * @param savedStateHandle The handle to saved state information.
  */
 @HiltViewModel
 class AppDetailsViewModel @Inject constructor(
@@ -122,6 +127,8 @@ class AppDetailsViewModel @Inject constructor(
 
     /**
      * Function to handle events triggered in the AppDetails screen.
+     *
+     * @param event The event to be handled.
      */
     fun onEvent(event: AppDetailsEvent) {
         when (event) {

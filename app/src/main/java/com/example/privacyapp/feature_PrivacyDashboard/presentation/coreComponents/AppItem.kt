@@ -24,17 +24,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
-import com.example.privacyapp.feature_PrivacyDashboard.domain.model.samples.SampleAppProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
-//@Preview(showSystemUi = true, showBackground = true)
+/**
+ * A composable that represents an individual app item in the list, displaying its icon, name, and usage visualization.
+ *
+ * @param app The App object representing the app to display.
+ * @param cumulativeUsage The total cumulative usage across all apps for scaling purposes.
+ * @param modifier The modifier to apply to the layout.
+ */
 @Composable
 fun AppItem(
-    @PreviewParameter(SampleAppProvider::class) app: App,
+    app: App,
     cumulativeUsage: Int,
     modifier: Modifier = Modifier
     ){
+    // Calculate the width of the location usage box based on the percentage of total usage
     var locationUsedBoxWidthInPercentage = 0f
     if (cumulativeUsage != 0) {
         locationUsedBoxWidthInPercentage = (100/cumulativeUsage.toFloat()) * app.numberOfEstimatedRequests
@@ -50,6 +56,7 @@ fun AppItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            // Display the app icon
             Box(
                 Modifier
                     .height(45.dp)
@@ -68,6 +75,7 @@ fun AppItem(
                     Text(text = String.format("%.2f", locationUsedBoxWidthInPercentage) + "%", style = MaterialTheme.typography.bodyLarge)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
+                // Display the usage visualization bar
                 Box() {
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(2.dp))
@@ -87,6 +95,12 @@ fun AppItem(
     }
 }
 
+/**
+ * Retrieves the app icon based on the provided package name.
+ *
+ * @param packageName The package name of the app.
+ * @return The Drawable representing the app icon.
+ */
 private fun getAppIcon(packageName: String): Drawable? {
     val packageManager: PackageManager =
         ApplicationProvider.application.applicationContext.packageManager

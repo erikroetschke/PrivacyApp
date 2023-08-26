@@ -9,6 +9,18 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCase
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.GetFavoriteApps
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.appUseCases.InitApps
 
+/**
+ * Encapsulates the use cases related to app management.
+ *
+ * @see GetApps
+ * @see AddApp
+ * @see DeleteAllApps
+ * @see InitApps
+ * @see GetApp
+ * @see GetFavoriteApps
+ * @see DeleteApp
+ * @see GetAppsSuspend
+ */
 data class AppUseCases(
     val getApps: GetApps,
     val addApp: AddApp,

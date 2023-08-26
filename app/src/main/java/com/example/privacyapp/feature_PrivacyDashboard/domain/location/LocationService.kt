@@ -71,12 +71,10 @@ class LocationService : Service() {
 
         // Build a notification indicating ongoing location tracking
         val notification = NotificationCompat.Builder(this, LOCATION_CHANNEL_ID)
-            .setContentTitle("Tracking location...")
-            .setContentText("Location: null")
+            .setContentTitle("Tracking is activated")
+        //.setContentText("Location: null")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Start receiving location updates
         locationClient
@@ -94,12 +92,6 @@ class LocationService : Service() {
                         false
                     )
                 )
-                val lat = location.latitude.toString()
-                val long = location.longitude.toString()
-                val updatedNotification = notification.setContentText(
-                    "Location: ($lat, $long)"
-                )
-                notificationManager.notify(1, updatedNotification.build())
             }
             .launchIn(serviceScope)
 
