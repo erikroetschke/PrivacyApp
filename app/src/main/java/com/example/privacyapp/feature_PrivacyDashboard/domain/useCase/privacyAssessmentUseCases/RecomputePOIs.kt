@@ -3,6 +3,7 @@ package com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.privacyAs
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.Location
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.LocationRepository
 import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.POIRepository
+import com.example.privacyapp.feature_PrivacyDashboard.domain.repository.PrivacyAssessmentRepository
 import kotlinx.coroutines.delay
 
 /**
@@ -13,12 +14,13 @@ import kotlinx.coroutines.delay
  */
 class RecomputePOIs(
     private val poiRepository: POIRepository,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val privacyAssessmentRepository: PrivacyAssessmentRepository
 ) {
 
     /**
      * Recomputes Points of Interest (POIs) based on location data.
-     * This operation involves deleting existing POIs, resetting processed flags on location data,
+     * This operation involves deleting existing POIs and privacyAssessments, resetting processed flags on location data,
      * and computing new POIs using the [UpdatePOIs] operation.
      *
      */
@@ -30,6 +32,8 @@ class RecomputePOIs(
         for (location in locations) {
             locationRepository.insertLocation(location.copy(processed = false))
         }
+        //delete privacyAssesmt Data
+        privacyAssessmentRepository.deleteAssessment1dOlderThanTimestamp(System.currentTimeMillis())
         //compute pois
         UpdatePOIs(poiRepository, locationRepository).invoke()
     }

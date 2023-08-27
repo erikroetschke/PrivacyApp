@@ -35,6 +35,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.co
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.LocationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.NotificationPermissionTextProvider
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.dashboard.components.PermissionDialog
+import com.example.privacyapp.ui.theme.PrivacyAppTheme
 
 /**
  * Welcome screen activity that guides users through permissions setup.
@@ -45,155 +46,163 @@ class WelcomeScreenActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val viewModel = hiltViewModel<WelcomeScreenViewModel>()
+            PrivacyAppTheme {
+                val viewModel = hiltViewModel<WelcomeScreenViewModel>()
 
-            val dialogQueue = viewModel.visiblePermissionDialogQueue
+                val dialogQueue = viewModel.visiblePermissionDialogQueue
 
-            /**
-             * The list of permissions to request from the user.
-             */
-            val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
-                arrayOf(
-                    //Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-            }else if (Build.VERSION.SDK_INT >= 29){
-                arrayOf(
-                    //Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
+                /**
+                 * The list of permissions to request from the user.
+                 */
+                /**
+                 * The list of permissions to request from the user.
+                 */
+                val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
+                    arrayOf(
+                        //Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                } else if (Build.VERSION.SDK_INT >= 29) {
+                    arrayOf(
+                        //Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
 
-                )
-            } else {
-                arrayOf(
-                    //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            }
-
-            /**
-             * A launcher for requesting multiple permissions.
-             */
-            val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions(),
-                onResult = { _ ->
-                    permissionsToRequest.forEach { permission ->
-                        viewModel.onPermissionResult(
-                            permission = permission,
-                            welcomeActivity = this@WelcomeScreenActivity
-                        )
-                    }
-                }
-            )
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Display headline
-                Text(
-                    text = viewModel.headline.value,
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                )
-                // Display main text
-                Text(
-                    text = viewModel.text.value,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .padding(25.dp, 0.dp)
-                )
-                // Action buttons
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(
-                        onClick = {
-                            if (viewModel.onFirstPage.value) {
-                                this@WelcomeScreenActivity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-                            } else {
-                                multiplePermissionResultLauncher.launch(permissionsToRequest)
-                            }
-                        },
-                    ) {
-                        Text(text = viewModel.actionButton.value)
-                    }
-                    Spacer(modifier = Modifier.width(30.dp))
-                    Button(
-                        onClick = {
-                            if (viewModel.onFirstPage.value) {
-                                if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
-                                    Toast.makeText(
-                                        ApplicationProvider.application,
-                                        "Please grant the said permission before moving on.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }else {
-                                if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
-                                    Toast.makeText(
-                                        ApplicationProvider.application,
-                                        "Please grant the said permissions before moving on.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    finish()
-                                }
-                            }
-                        },
-                    ) {
-                        Text(text = viewModel.nextButton.value)
-                    }
-                }
-            }
-
-            dialogQueue
-                .reversed()
-                .forEach { permission ->
-
-                    PermissionDialog(
-                        permissionTextProvider = when (permission) {
-
-                            Manifest.permission.ACCESS_FINE_LOCATION -> {
-                                LocationPermissionTextProvider()
-                            }
-
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
-                                BackgroundLocationPermissionTextProvider()
-                            }
-
-                            Manifest.permission.POST_NOTIFICATIONS -> {
-                                NotificationPermissionTextProvider()
-                            }
-
-                            else -> return@forEach
-                        },
-                        isPermanentlyDeclined = ActivityCompat.shouldShowRequestPermissionRationale(
-                            this@WelcomeScreenActivity,
-                            permission
-                        ),
-                        onDismiss = viewModel::dismissDialog,
-                        onOkClick = {
-                            multiplePermissionResultLauncher.launch(
-                                arrayOf(permission)
-                            )
-                            viewModel.dismissDialog()
-                        },
-                        onGoToAppSettingsClick = {
-                            openAppSettings()
-                            viewModel.dismissDialog()
-                        }
+                    )
+                } else {
+                    arrayOf(
+                        //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
                     )
                 }
+
+                /**
+                 * A launcher for requesting multiple permissions.
+                 */
+                /**
+                 * A launcher for requesting multiple permissions.
+                 */
+                val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestMultiplePermissions(),
+                    onResult = { _ ->
+                        permissionsToRequest.forEach { permission ->
+                            viewModel.onPermissionResult(
+                                permission = permission,
+                                welcomeActivity = this@WelcomeScreenActivity
+                            )
+                        }
+                    }
+                )
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Display headline
+                    Text(
+                        text = viewModel.headline.value,
+                        style = MaterialTheme.typography.headlineLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    )
+                    // Display main text
+                    Text(
+                        text = viewModel.text.value,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .padding(25.dp, 0.dp)
+                    )
+                    // Action buttons
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                if (viewModel.onFirstPage.value) {
+                                    this@WelcomeScreenActivity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                                } else {
+                                    multiplePermissionResultLauncher.launch(permissionsToRequest)
+                                }
+                            },
+                        ) {
+                            Text(text = viewModel.actionButton.value)
+                        }
+                        Spacer(modifier = Modifier.width(30.dp))
+                        Button(
+                            onClick = {
+                                if (viewModel.onFirstPage.value) {
+                                    if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
+                                        Toast.makeText(
+                                            ApplicationProvider.application,
+                                            "Please grant the said permission before moving on.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
+                                        Toast.makeText(
+                                            ApplicationProvider.application,
+                                            "Please grant the said permissions before moving on.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        finish()
+                                    }
+                                }
+                            },
+                        ) {
+                            Text(text = viewModel.nextButton.value)
+                        }
+                    }
+                }
+
+                dialogQueue
+                    .reversed()
+                    .forEach { permission ->
+
+                        PermissionDialog(
+                            permissionTextProvider = when (permission) {
+
+                                Manifest.permission.ACCESS_FINE_LOCATION -> {
+                                    LocationPermissionTextProvider()
+                                }
+
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                                    BackgroundLocationPermissionTextProvider()
+                                }
+
+                                Manifest.permission.POST_NOTIFICATIONS -> {
+                                    NotificationPermissionTextProvider()
+                                }
+
+                                else -> return@forEach
+                            },
+                            isPermanentlyDeclined = ActivityCompat.shouldShowRequestPermissionRationale(
+                                this@WelcomeScreenActivity,
+                                permission
+                            ),
+                            onDismiss = viewModel::dismissDialog,
+                            onOkClick = {
+                                multiplePermissionResultLauncher.launch(
+                                    arrayOf(permission)
+                                )
+                                viewModel.dismissDialog()
+                            },
+                            onGoToAppSettingsClick = {
+                                openAppSettings()
+                                viewModel.dismissDialog()
+                            }
+                        )
+                    }
+            }
         }
     }
 

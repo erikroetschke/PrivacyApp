@@ -1,5 +1,7 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -82,21 +84,23 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
         val firstRun = sharedPreferences.getBoolean("FIRST_RUN", true)
         val grantedUsagePermission = sharedPreferences.getBoolean("USAGE_PERMISSION_GRANTED", false)
         if (firstRun) {
-            isLoading.value = false
             val intent = Intent(this, WelcomeScreenActivity::class.java)
             startActivity(intent)
             sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+            runBlocking {  isLoading.value = false }
         } else {
             initData()
             cleanDb()
         }
 
 
-        installSplashScreen().apply {
-            setKeepOnScreenCondition {
-                isLoading.value
+            installSplashScreen().apply {
+                setKeepOnScreenCondition {
+                    isLoading.value
+                }
             }
-        }
+
+
         //actual content/ui
         setContent {
             PrivacyAppTheme {
@@ -126,11 +130,6 @@ class MainActivity() : ComponentActivity(), SharedPreferences.OnSharedPreference
         )
 
         lifecycleScope.launch {
-           /*val locations = locationUseCases.getUsedLocationsLastSinceTimestamp(1692704700000)
-            for (location in locations) {
-                locationUseCases.addLocation(Location(location.longitude, location.latitude, location.timestamp, null, location.processed))
-            }
-            val usages = appUsageUseCases.deleteAppUsageOlderThanTimestamp(System.currentTimeMillis())*/
             privacyAssessmentUseCases.deletePrivacyAssessment(timestamp)
             locationUseCases.deleteLocationsOlderThanTimestamp(timestamp)
             appUsageUseCases.deleteAppUsageOlderThanTimestamp(timestamp)
