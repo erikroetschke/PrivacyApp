@@ -55,7 +55,11 @@ class AppDetailsViewModel @Inject constructor(
                 false,
                 0,
                 false,
-                true
+                true,
+                false,
+                false,
+                false,
+                false
             )
         )
     val stateApp: MutableState<App> = _stateApp
@@ -143,7 +147,11 @@ class AppDetailsViewModel @Inject constructor(
                             ACCESS_BACKGROUND_LOCATION = _stateApp.value.ACCESS_BACKGROUND_LOCATION,
                             numberOfEstimatedRequests = _stateApp.value.numberOfEstimatedRequests,
                             favorite = !_stateApp.value.favorite,
-                            active = _stateApp.value.active
+                            active = _stateApp.value.active,
+                            requestedACCESS_COARSE_LOCATION = _stateApp.value.requestedACCESS_COARSE_LOCATION,
+                            requestedACCESS_FINE_LOCATION = _stateApp.value.requestedACCESS_FINE_LOCATION,
+                            requestedACCESS_BACKGROUND_LOCATION = _stateApp.value.requestedACCESS_BACKGROUND_LOCATION,
+                            preinstalled = _stateApp.value.preinstalled
                         )
                         appUseCases.addApp(
                             currentAppCopy
@@ -169,7 +177,11 @@ class AppDetailsViewModel @Inject constructor(
                             ACCESS_BACKGROUND_LOCATION = _stateApp.value.ACCESS_BACKGROUND_LOCATION,
                             numberOfEstimatedRequests = _stateApp.value.numberOfEstimatedRequests,
                             favorite = _stateApp.value.favorite,
-                            active = !_stateApp.value.active
+                            active = !_stateApp.value.active,
+                            requestedACCESS_COARSE_LOCATION = _stateApp.value.requestedACCESS_COARSE_LOCATION,
+                            requestedACCESS_FINE_LOCATION = _stateApp.value.requestedACCESS_FINE_LOCATION,
+                            requestedACCESS_BACKGROUND_LOCATION = _stateApp.value.requestedACCESS_BACKGROUND_LOCATION,
+                            preinstalled = _stateApp.value.preinstalled
                         )
                         appUseCases.addApp(
                             currentAppCopy

@@ -1,10 +1,12 @@
 package com.example.privacyapp.feature_PrivacyDashboard.presentation.allApps.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppPermissionFilter
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponents.DefaultRadioButton
 
@@ -20,7 +22,9 @@ import com.example.privacyapp.feature_PrivacyDashboard.presentation.coreComponen
 fun OrderSection(
     modifier: Modifier = Modifier,
     appOrder: AppOrder = AppOrder.Title(OrderType.Ascending),
-    onOrderChange: (AppOrder) -> Unit
+    appFilter: AppPermissionFilter = AppPermissionFilter(false, false, false, false),
+    onOrderChange: (AppOrder) -> Unit,
+    onFilterChange: (AppPermissionFilter) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -41,7 +45,6 @@ fun OrderSection(
             )
 
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -58,6 +61,56 @@ fun OrderSection(
                 selected = appOrder.orderType is OrderType.Descending,
                 onSelect = {
                     onOrderChange(appOrder.copy(OrderType.Descending))
+                }
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Divider(Modifier.fillMaxWidth())
+        Row(Modifier.fillMaxWidth()) {
+            DefaultRadioButton(
+                text = "No Location",
+                selected = appFilter.none,
+                onSelect = {
+                    if(appFilter.none){
+                        onFilterChange(appFilter.copy(none = false))
+                    }else {
+                        onFilterChange(appFilter.copy(none = true, coarseLocation = false, fineLocation = false, backgroundLocation = false))
+                    }
+                }
+            )
+            DefaultRadioButton(
+                text = "Coarse Location",
+                selected = appFilter.coarseLocation,
+                onSelect = {
+                    if(appFilter.coarseLocation){
+                        onFilterChange(appFilter.copy(coarseLocation = false, fineLocation = false, backgroundLocation = false))
+                    }else {
+                        onFilterChange(appFilter.copy(none = false, coarseLocation = true, fineLocation = false, backgroundLocation = false))
+                    }
+                }
+            )
+        }
+        Row(Modifier.fillMaxWidth()) {
+            DefaultRadioButton(
+                text = "Fine location",
+                selected = appFilter.fineLocation,
+                onSelect = {
+                    if(appFilter.fineLocation){
+                        onFilterChange(appFilter.copy(fineLocation = false, backgroundLocation = false))
+                    }else {
+                        onFilterChange(appFilter.copy(none = false, coarseLocation = true, fineLocation = true, backgroundLocation = false))
+                    }
+                }
+            )
+            DefaultRadioButton(
+                text = "Background Location",
+                selected = appFilter.backgroundLocation,
+                onSelect = {
+                    if(appFilter.backgroundLocation){
+                        onFilterChange(appFilter.copy(backgroundLocation = false))
+                    }else {
+                        onFilterChange(appFilter.copy(none = false, coarseLocation = true, fineLocation = true, backgroundLocation = true))
+                    }
                 }
             )
         }

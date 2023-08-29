@@ -111,14 +111,15 @@ class DashboardViewModel @Inject constructor(
         getTop5AppsJob =
             appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).onEach { apps ->
                 _top5Apps.clear()
-                val appTop5 = apps.take(5)
-                    .filter { it.numberOfEstimatedRequests > 0 }
-                _top5Apps.addAll(appTop5)
-                cumulativeUsage = if (_top5Apps.isNotEmpty()) {
-                    _top5Apps.sumOf { it.numberOfEstimatedRequests }
+                cumulativeUsage = if (apps.isNotEmpty()) {
+                    apps.sumOf { it.numberOfEstimatedRequests }
                 } else {
                     0
                 }
+                val appTop5 = apps.take(5)
+                    .filter { it.numberOfEstimatedRequests > 0 }
+                _top5Apps.addAll(appTop5)
+
             }.launchIn(viewModelScope)
     }
 

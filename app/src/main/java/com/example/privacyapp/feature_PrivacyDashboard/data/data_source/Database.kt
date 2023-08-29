@@ -20,7 +20,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.PrivacyAsses
  */
 @Database(
     entities = [Location::class, App::class, AppUsage::class, PrivacyAssessment1d::class, POI::class],
-    version = 14,
+    version = 15,
     autoMigrations = [
         AutoMigration (
             from = 13,

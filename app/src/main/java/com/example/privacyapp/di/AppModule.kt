@@ -245,7 +245,7 @@ object AppModule {
             extractPOIsLast24h = ExtractPOIsLast24h(locationRepository, poiRepository),
             getPOISinceTimestampAsFlow = GetPOISinceTimestampAsFlow(poiRepository),
             updatePOIs = UpdatePOIs(poiRepository, locationRepository),
-            recomputePOIs = RecomputePOIs(poiRepository, locationRepository)
+            recomputePOIs = RecomputePOIs(poiRepository, locationRepository, repository)
         )
     }
 }

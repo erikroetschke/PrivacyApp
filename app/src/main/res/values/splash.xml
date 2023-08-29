@@ -4,7 +4,7 @@
         <item name="windowSplashScreenBackground">#6E6E6E</item>
 
         <item name="windowSplashScreenAnimatedIcon">
-            @drawable/app_logo
+            @drawable/logo
         </item>
         <item name="postSplashScreenTheme">@style/Theme.PrivacyApp</item>
     </style>

@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +13,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
@@ -72,7 +78,33 @@ fun AppItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = app.appName, style = MaterialTheme.typography.bodyLarge)
-                    Text(text = String.format("%.2f", locationUsedBoxWidthInPercentage) + "%", style = MaterialTheme.typography.bodyLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if(app.ACCESS_BACKGROUND_LOCATION){
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = "Warning",
+                                tint = Color.Yellow, // Set the desired color
+                                modifier = Modifier.size(24.dp) // Adjust size as needed
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                        if(app.preinstalled){
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .border(1.dp, Color.Yellow, shape = RoundedCornerShape(4.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "S",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.Yellow
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                        Text(text = String.format("%.2f", locationUsedBoxWidthInPercentage) + "%", style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 // Display the usage visualization bar

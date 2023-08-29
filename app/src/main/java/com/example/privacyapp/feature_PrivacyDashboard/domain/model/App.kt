@@ -1,5 +1,6 @@
 package com.example.privacyapp.feature_PrivacyDashboard.domain.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -25,7 +26,12 @@ data class App(
     val ACCESS_BACKGROUND_LOCATION: Boolean,
     val numberOfEstimatedRequests: Int,
     val favorite: Boolean,
-    val active: Boolean
+    val active: Boolean,
+    @ColumnInfo(name = "requestedACCESS_COARSE_LOCATION", defaultValue = "0") val requestedACCESS_COARSE_LOCATION: Boolean,
+    @ColumnInfo(name = "requestedACCESS_FINE_LOCATION", defaultValue = "0") val requestedACCESS_FINE_LOCATION: Boolean,
+    @ColumnInfo(name = "requestedACCESS_BACKGROUND_LOCATION", defaultValue = "0") val requestedACCESS_BACKGROUND_LOCATION: Boolean,
+    @ColumnInfo(name = "preinstalled", defaultValue = "0") val preinstalled: Boolean
+
 )
 
 

@@ -38,7 +38,11 @@ class UpdateAppUsageLast24Hours(
                     app.ACCESS_BACKGROUND_LOCATION,
                     numberOfEstimatedRequests,
                     app.favorite,
-                    app.active
+                    app.active,
+                    app.requestedACCESS_COARSE_LOCATION,
+                    app.requestedACCESS_FINE_LOCATION,
+                    app.requestedACCESS_BACKGROUND_LOCATION,
+                    app.preinstalled
                 )
             )
 

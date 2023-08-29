@@ -46,18 +46,16 @@ class FavoritesViewModel @Inject constructor(
      */
     private fun getAppsFromDB() {
         getAppsJob?.cancel()
-        getAppsJob = appUseCases.getFavoriteApps().onEach { apps ->
-            _state.value = state.value.copy(
-                apps = apps
-            )
-            if (apps.isEmpty()){
-                cumulativeUsage = 0
+        getAppsJob = appUseCases.getApps(AppOrder.LocationUsage(OrderType.Descending)).onEach { apps ->
+            cumulativeUsage = if (apps.isEmpty()){
+                0
             }else {
-                cumulativeUsage = apps.sumOf { it.numberOfEstimatedRequests }
+                apps.sumOf { it.numberOfEstimatedRequests }
             }
-
+            _state.value = state.value.copy(
+                apps = apps.filter { it.favorite }
+            )
         }
             .launchIn(viewModelScope)
     }
-
 }

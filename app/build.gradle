@@ -33,7 +33,7 @@ android {
         }
         python {
             pip{
-                install "git+https://github.com/erikroetschke/geoDetection.git"
+                install "git+https://git.informatik.uni-leipzig.de/scads/de4l/privacy/PrivacyScoreAppMetrics.git"
                 install "numpy"
                 install "haversine"
                 install "pandas"

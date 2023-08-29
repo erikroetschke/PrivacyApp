@@ -18,6 +18,9 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppStatus
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppStatusTracker
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.ApplicationProvider
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.UsageEvent
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * The `ComputeUsage` class encapsulates the use case of processing user location data along with associated usage events
@@ -35,7 +38,7 @@ class ComputeUsage(
     private val usageEventProvider: UsageEventProvider
 ) {
 
-    val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
+    private val sharedPrefs = PreferencesManagerImpl(ApplicationProvider.application)
 
     /**
      * Processes a list of [Location] objects along with associated usage events to update app status and usage information.
@@ -54,29 +57,6 @@ class ComputeUsage(
      * @see UsageStatsManager
      */
     suspend operator fun invoke(locations: List<Location>) {
-
-        /*val eventListDebug = usageEventProvider.getUsageEventsByInterval(System.currentTimeMillis()- 1000*60*60*24*3, System.currentTimeMillis())
-        for (item in eventListDebug){
-            if(item.packageName.contains("com.ezviz") *//*&& (item.eventType == 19 || item.eventType == 20|| item.eventType == 23|| item.eventType == 1|| item.eventType == 2)*//*) {
-                val calendar = Calendar.getInstance()
-                calendar.timeInMillis = item.timeStamp
-
-                val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).format(calendar.time)
-                if(item.eventType == 19){
-                    Log.v("hello", "Start_Service: $dateFormat")
-                }else if (item.eventType == 20) {
-                    Log.v("hello", "Stop_Service: $dateFormat")
-                }else if (item.eventType == 1) {
-                    Log.v("hello", "Start: $dateFormat")
-                }else if (item.eventType == 2) {
-                    Log.v("hello", "background: $dateFormat")
-                }else if (item.eventType == 23) {
-                    Log.v("hello", "Stop: $dateFormat")
-                }else {
-                    Log.v("hello", "${item.eventType}: $dateFormat")
-                }
-            }
-        }*/
 
         //init
         var skip = false
@@ -263,7 +243,7 @@ class ComputeUsage(
      * Updates the provided app status map based on usage events within the specified time range.
      * The map is updated with app status changes corresponding to the usage events.
      *
-     * @param appStatusMap The HashMap containing app statuses to be updated.
+     * @param appStatusTracker The Tracker class containing app statuses to be updated.
      * @param startTimestamp The start timestamp of the time range for querying usage events.
      * @param endTimestamp The end timestamp of the time range for querying usage events.
      * @return The updated HashMap of app statuses after processing the usage events.

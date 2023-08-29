@@ -82,6 +82,10 @@ fun AllAppsScreen(
                 appOrder = state.appOrder,
                 onOrderChange = {
                     viewModel.onEvent(AppsEvent.Order(it))
+                },
+                appFilter = state.appFilter,
+                onFilterChange = {
+                    viewModel.onEvent(AppsEvent.Filter(it))
                 }
             )
         }

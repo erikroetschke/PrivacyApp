@@ -15,10 +15,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -106,60 +108,64 @@ class WelcomeScreenActivity : ComponentActivity() {
                             .fillMaxWidth()
                             .padding(10.dp)
                     )
-                    // Display main text
-                    Text(
-                        text = viewModel.text.value,
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.Center)
-                            .padding(25.dp, 0.dp)
-                    )
-                    // Action buttons
-                    Row(
+                    Column(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Button(
-                            onClick = {
-                                if (viewModel.onFirstPage.value) {
-                                    this@WelcomeScreenActivity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-                                } else {
-                                    multiplePermissionResultLauncher.launch(permissionsToRequest)
-                                }
-                            },
+                        // Display main text
+                        Text(
+                            text = viewModel.text.value,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(25.dp, 0.dp)
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        // Action buttons
+                        Row(
+                            modifier = Modifier
+                                .padding(20.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = viewModel.actionButton.value)
-                        }
-                        Spacer(modifier = Modifier.width(30.dp))
-                        Button(
-                            onClick = {
-                                if (viewModel.onFirstPage.value) {
-                                    if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
-                                        Toast.makeText(
-                                            ApplicationProvider.application,
-                                            "Please grant the said permission before moving on.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                } else {
-                                    if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
-                                        Toast.makeText(
-                                            ApplicationProvider.application,
-                                            "Please grant the said permissions before moving on.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                            Button(
+                                onClick = {
+                                    if (viewModel.onFirstPage.value) {
+                                        this@WelcomeScreenActivity.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
                                     } else {
-                                        finish()
+                                        multiplePermissionResultLauncher.launch(permissionsToRequest)
                                     }
-                                }
-                            },
-                        ) {
-                            Text(text = viewModel.nextButton.value)
+                                },
+                            ) {
+                                Text(text = viewModel.actionButton.value)
+                            }
+                            Spacer(modifier = Modifier.width(30.dp))
+                            Button(
+                                onClick = {
+                                    if (viewModel.onFirstPage.value) {
+                                        if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
+                                            Toast.makeText(
+                                                ApplicationProvider.application,
+                                                "Please grant the said permission before moving on.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } else {
+                                        if (!viewModel.onNextButtonClick(this@WelcomeScreenActivity)) {
+                                            Toast.makeText(
+                                                ApplicationProvider.application,
+                                                "Please grant the said permissions before moving on.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            finish()
+                                        }
+                                    }
+                                },
+                            ) {
+                                Text(text = viewModel.nextButton.value)
+                            }
                         }
                     }
                 }

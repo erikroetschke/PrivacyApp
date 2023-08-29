@@ -240,11 +240,6 @@ class DoAssessment(
     ): List<Pair<Int, Double>> {
 
         val pOIs = pOIs.toMutableList()
-        /*var string = ""
-        for (poi in pOIs) {
-            string += poi.latitude.toString() + "," + poi.longitude.toString() + "\n"
-        }
-        println(string)*/
         val result = createEmptyResultList(metricInterval)
 
         val distanceThreshold =

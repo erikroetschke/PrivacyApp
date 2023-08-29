@@ -8,6 +8,7 @@ import com.example.privacyapp.feature_PrivacyDashboard.domain.model.App
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUsageUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.useCase.AppUseCases
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppOrder
+import com.example.privacyapp.feature_PrivacyDashboard.domain.util.AppPermissionFilter
 import com.example.privacyapp.feature_PrivacyDashboard.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -45,7 +46,14 @@ class AppsViewModel @Inject constructor(
      */
     init {
         //get apps
-        getAppsFromDB(AppOrder.LocationUsage(OrderType.Descending))
+        getAppsFromDB(
+            AppOrder.LocationUsage(OrderType.Descending), AppPermissionFilter(
+                none = false,
+                coarseLocation = false,
+                fineLocation = false,
+                backgroundLocation = false
+            )
+        )
     }
 
     /**
@@ -67,7 +75,7 @@ class AppsViewModel @Inject constructor(
                     _state.value = state.value.copy(
                         appOrder = event.appOrder
                     )
-                    getAppsFromDB(event.appOrder)
+                    getAppsFromDB(event.appOrder, _state.value.appFilter)
                 }
             }
 
@@ -75,6 +83,13 @@ class AppsViewModel @Inject constructor(
                 _state.value = state.value.copy(
                     isOrderSectionVisible = !state.value.isOrderSectionVisible
                 )
+            }
+
+            is AppsEvent.Filter -> {
+                _state.value = _state.value.copy(
+                    appFilter = event.filter
+                )
+                getAppsFromDB(_state.value.appOrder, event.filter)
             }
         }
     }
@@ -88,9 +103,9 @@ class AppsViewModel @Inject constructor(
      *
      * @param appOrder The criteria for ordering the list of apps.
      */
-    private fun getAppsFromDB(appOrder: AppOrder) {
+    private fun getAppsFromDB(appOrder: AppOrder, appFilter: AppPermissionFilter) {
         getAppsJob?.cancel()
-        getAppsJob = appUseCases.getApps(appOrder).onEach { apps ->
+        getAppsJob = appUseCases.getApps(appOrder, appFilter).onEach { apps ->
             _state.value = state.value.copy(apps = apps)
             cumulativeUsage = _state.value.apps.sumOf { it.numberOfEstimatedRequests }
         }.launchIn(viewModelScope)

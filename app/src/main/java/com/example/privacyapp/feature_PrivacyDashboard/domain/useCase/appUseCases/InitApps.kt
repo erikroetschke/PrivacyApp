@@ -65,6 +65,10 @@ class InitApps(
             var ACCESS_COARSE_LOCATION = false
             var ACCESS_FINE_LOCATION = false
             var ACCESS_BACKGROUND_LOCATION = false
+            var requestedACCESS_COARSE_LOCATION = false
+            var requestedACCESS_FINE_LOCATION = false
+            var requestedACCESS_BACKGROUND_LOCATION = false
+            var preinstalled = false
             var visible = false
 
             // Get detailed package information
@@ -108,12 +112,23 @@ class InitApps(
                     if (per == "android.permission.ACCESS_COARSE_LOCATION") {
                         visible = true
                     }
+
+                    //set requested permissions
+                    if (requestedPermissions[index].contains("android.permission.ACCESS_COARSE_LOCATION")) {
+                        requestedACCESS_COARSE_LOCATION = true
+                    } else if (requestedPermissions[index].contains("android.permission.ACCESS_FINE_LOCATION")) {
+                        requestedACCESS_FINE_LOCATION = true
+                    } else if (requestedPermissions[index].contains("android.permission.ACCESS_BACKGROUND_LOCATION")) {
+                        requestedACCESS_BACKGROUND_LOCATION = true
+                    }
+
                 }
             }
 
             // Determine app visibility based on system status or user installation
             if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1) {
                 // Preinstalled app
+                preinstalled = true
                 // Only visible when app requested location, but not necessarily granted
             } else {
                 // Installed by user
@@ -124,14 +139,18 @@ class InitApps(
             // Create an App object with extracted details and add it to the list
             if (visible) {
                 val app = App(
-                    packageName,
-                    appName,
-                    ACCESS_COARSE_LOCATION,
-                    ACCESS_FINE_LOCATION,
-                    ACCESS_BACKGROUND_LOCATION,
-                    0,
-                    false,
-                    true
+                    packageName = packageName,
+                    appName = appName,
+                    ACCESS_COARSE_LOCATION = ACCESS_COARSE_LOCATION,
+                    ACCESS_FINE_LOCATION = ACCESS_FINE_LOCATION,
+                    ACCESS_BACKGROUND_LOCATION = ACCESS_BACKGROUND_LOCATION,
+                    numberOfEstimatedRequests = 0,
+                    favorite = false,
+                    active = true,
+                    requestedACCESS_COARSE_LOCATION = requestedACCESS_COARSE_LOCATION,
+                    requestedACCESS_FINE_LOCATION = requestedACCESS_FINE_LOCATION,
+                    requestedACCESS_BACKGROUND_LOCATION = requestedACCESS_BACKGROUND_LOCATION,
+                    preinstalled = preinstalled
                 )
                 if (app.packageName != "") {
                     appsList.add(app)
